@@ -20,8 +20,9 @@
 
             <TextView
                 android:id="@+id/adapter_proxy_item_name"
+                android:ellipsize="marquee"
                 android:textColor="@android:color/black"
-                android:maxLines="1"
+                android:singleLine="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/adapter_proxy_item_delay"
