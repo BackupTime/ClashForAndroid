@@ -21,4 +21,7 @@ interface ClashProfileDao {
 
     @Query("DELETE FROM profiles WHERE id = :id")
     fun removeProfile(id: Int)
+
+    @Query("UPDATE profiles SET last_update = :lastUpdate WHERE id = :id")
+    fun touchProfile(id: Int, lastUpdate: Long = System.currentTimeMillis())
 }

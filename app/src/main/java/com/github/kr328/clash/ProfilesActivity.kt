@@ -180,8 +180,7 @@ class ProfilesActivity : BaseActivity() {
                     }
 
                     runClash { clash ->
-                        clash.profileService.addProfile(profile
-                            .copy(lastUpdate = System.currentTimeMillis()))
+                        clash.profileService.touchProfile(profile.id)
                     }
                 }
                 catch (e: Exception) {

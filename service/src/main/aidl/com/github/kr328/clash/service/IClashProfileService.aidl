@@ -7,5 +7,6 @@ interface IClashProfileService {
     void setActiveProfile(int id);
     void addProfile(in ClashProfileEntity profile);
     void removeProfile(int id);
+    void touchProfile(int id);
     ClashProfileEntity queryActiveProfile();
 }
