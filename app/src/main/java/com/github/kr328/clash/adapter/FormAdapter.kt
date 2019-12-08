@@ -79,6 +79,7 @@ class FormAdapter(
                 castedHolder.clickable.setOnClickListener {
                     showTextEditDialog(
                         castedHolder.text.text.toString(),
+                        castedHolder.title.text.toString(),
                         castedHolder.text.hint.toString()
                     ) {
                         current.content = it
@@ -126,9 +127,9 @@ class FormAdapter(
         return elements[position].javaClass.hashCode()
     }
 
-    private fun showTextEditDialog(initial: String, hint: String, callback: (String) -> Unit) {
+    private fun showTextEditDialog(initial: String, title: String, hint: String, callback: (String) -> Unit) {
         MaterialAlertDialogBuilder(activity)
-            .setTitle(R.string.clash_profile_name)
+            .setTitle(title)
             .setView(R.layout.dialog_text_edit)
             .setPositiveButton(R.string.ok) { _, _ -> }
             .setNegativeButton(R.string.cancel) { _, _ -> }
