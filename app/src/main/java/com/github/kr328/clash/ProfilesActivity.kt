@@ -33,10 +33,7 @@ class ProfilesActivity : BaseActivity() {
 
         setSupportActionBar(activity_profiles_toolbar)
 
-        activity_profiles_main_list.layoutManager = object : LinearLayoutManager(this) {
-            override fun canScrollHorizontally(): Boolean = false
-            override fun canScrollVertically(): Boolean = false
-        }
+        activity_profiles_main_list.layoutManager = LinearLayoutManager(this)
         activity_profiles_main_list.adapter = ProfileAdapter(this,
             this::onProfileClick,
             this::onOperateClick,

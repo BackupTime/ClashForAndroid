@@ -102,6 +102,7 @@ class SettingAccessActivity : BaseActivity() {
             }
 
             val exclude = resources.getStringArray(R.array.default_disallow_application).toSet()
+            val selected = settings.accessControlApps.toMutableSet()
 
             val applications = packageManager.getInstalledApplications(0)
                 .filterNot {
@@ -114,10 +115,11 @@ class SettingAccessActivity : BaseActivity() {
                         app.loadIcon(packageManager)
                     )
                 }
-                .sortedBy { app ->
-                    app.name
-                }
-            val selected = settings.accessControlApps.toMutableSet()
+                .sortedWith(
+                    compareBy(
+                        { app -> selected.contains(app.packageName) },
+                        { app -> app.name })
+                )
 
             runOnUiThread {
                 activity_setting_access_app_list.apply {
@@ -230,7 +232,7 @@ class SettingAccessActivity : BaseActivity() {
     }
 
     private fun updateSelectedMode(mode: Int) {
-        when ( mode ) {
+        when (mode) {
             0 -> {
                 activity_setting_access_allow_all.isChecked = true
                 activity_setting_access_allow.isChecked = false
