@@ -20,7 +20,7 @@
 
             <TextView
                 android:id="@+id/adapter_proxy_item_name"
-                android:ellipsize="marquee"
+                android:ellipsize="middle"
                 android:textColor="@android:color/black"
                 android:singleLine="true"
                 android:layout_width="wrap_content"

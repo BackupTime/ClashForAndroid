@@ -17,26 +17,8 @@
             android:layout_height="60dp" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/activity_profiles_main_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/activity_profiles_main_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <com.github.kr328.clash.view.FatItem
-                android:id="@+id/activity_profiles_new_profile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_new_profile"
-                app:title="@string/clash_new_profile" />
-        </LinearLayout>
-    </ScrollView>
+        android:layout_height="match_parent" />
 </LinearLayout>
