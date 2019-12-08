@@ -134,8 +134,13 @@ func handlePullLogEvent(client *net.UnixConn) {
 	for {
 		select {
 		case elm := <-subseribe:
-			buf.Reset()
 			msg := elm.(*log.Event)
+
+			if msg.LogLevel < log.Level() {
+				break
+			}
+
+			buf.Reset()
 
 			var payload struct {
 				Level   int    `json:"level"`
