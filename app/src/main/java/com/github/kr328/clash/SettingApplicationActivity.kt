@@ -19,8 +19,15 @@ class SettingApplicationActivity : BaseActivity() {
 
     @Keep
     class Fragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
+        private var startOnBootStatus = false
+
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.setting_application, rootKey)
+
+            findPreference<CheckBoxPreference>(KEY_START_ON_BOOT)?.also {
+                it.isChecked = startOnBootStatus
+                it.onPreferenceChangeListener = this
+            }
         }
 
         override fun onAttach(context: Context) {
@@ -34,11 +41,12 @@ class SettingApplicationActivity : BaseActivity() {
                     )
                 )
 
+            startOnBootStatus = status == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+
             findPreference<CheckBoxPreference>(KEY_START_ON_BOOT)?.also {
-                it.isChecked = status == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                it.isChecked = startOnBootStatus
                 it.onPreferenceChangeListener = this
             }
-
         }
 
         override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
@@ -94,6 +102,4 @@ class SettingApplicationActivity : BaseActivity() {
 
         setSupportActionBar(activity_setting_application_toolbar)
     }
-
-
 }
