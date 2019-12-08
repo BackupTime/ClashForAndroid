@@ -29,12 +29,14 @@ class ClashNotification(private val context: Service) {
         .setContentIntent(
             PendingIntent.getActivity(
                 context,
-                CLASH_STATUS_NOTIFICATION_ID,
+                (Math.random() * 100).toInt(),
                 Intent().setComponent(
                     ComponentName.createRelative(
                         context,
                         MAIN_ACTIVITY_NAME
                     )
+                ).setFlags(
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 ),
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
