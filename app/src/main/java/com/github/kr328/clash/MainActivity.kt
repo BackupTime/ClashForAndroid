@@ -77,6 +77,10 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun shouldDisplayHomeAsUpEnabled(): Boolean {
+        return false
+    }
+
     override fun onProcessEvent(event: ProcessEvent?) {
         runOnUiThread {
             if (event == lastEvent)

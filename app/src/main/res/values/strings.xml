@@ -69,6 +69,8 @@
     <string name="proxy_setting_vpn_setting_bypass_private_network_summary">Bypass private network subnet</string>
     <string name="proxy_setting_vpn_setting_ipv6">IPv6 Support</string>
     <string name="proxy_setting_vpn_setting_ipv6_summary">Routing IPv6 traffic</string>
+    <string name="proxy_setting_vpn_setting_dns_hijacking">DNS Hijacking</string>
+    <string name="proxy_setting_vpn_setting_dns_hijacking_summary">Redirect ALL dns traffic to clash</string>
 
     <string name="access_setting_allow_all">Global</string>
     <string name="access_setting_allow_all_summary">Allow all apps access vpn</string>

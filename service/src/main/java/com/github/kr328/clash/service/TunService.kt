@@ -112,7 +112,7 @@ class TunService : VpnService(), IClashEventObserver {
             }
             ProcessEvent.STARTED -> {
                 start = false
-                clash.startTunDevice(fileDescriptor, VPN_MTU)
+                clash.startTunDevice(fileDescriptor, VPN_MTU, settings.isDnsHijackingEnabled)
 
                 Log.i("STARTED")
             }

@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.github.kr328.clash.core.event.*
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.ClashService
@@ -97,6 +98,22 @@ abstract class BaseActivity : AppCompatActivity(), IClashEventObserver {
         }
 
         super.onDestroy()
+    }
+
+    override fun setSupportActionBar(toolbar: Toolbar?) {
+        super.setSupportActionBar(toolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(shouldDisplayHomeAsUpEnabled())
+    }
+
+    open fun shouldDisplayHomeAsUpEnabled(): Boolean {
+        return true
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        this.onBackPressed()
+
+        return true
     }
 
     private val observerBinder = object : IClashEventObserver.Stub() {

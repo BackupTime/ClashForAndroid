@@ -9,6 +9,10 @@
             android:key="key_vpn_setting_ipv6_support"
             android:title="@string/proxy_setting_vpn_setting_ipv6"
             android:summary="@string/proxy_setting_vpn_setting_ipv6_summary" />
+        <CheckBoxPreference
+            android:key="key_dns_hijacking"
+            android:title="@string/proxy_setting_vpn_setting_dns_hijacking"
+            android:summary="@string/proxy_setting_vpn_setting_dns_hijacking_summary" />
         <Preference
             android:layout="@layout/preference_proxy_item"
             android:title="@string/proxy_setting_vpn_setting_access_control"

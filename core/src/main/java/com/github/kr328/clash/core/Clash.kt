@@ -177,12 +177,13 @@ class Clash(
         Log.i("Url test exited")
     }
 
-    fun startTunDevice(fd: FileDescriptor, mtu: Int) {
+    fun startTunDevice(fd: FileDescriptor, mtu: Int, dnsHijacking: Boolean) {
         runControl(COMMAND_TUN_START) { socket, _, output ->
             socket.setFileDescriptorsForSend(arrayOf(fd))
             socket.outputStream.write(0)
             socket.outputStream.flush()
             output.writeInt(mtu)
+            output.writeInt(if ( dnsHijacking ) 1 else 0)
             output.writeInt(0x243)
         }
     }

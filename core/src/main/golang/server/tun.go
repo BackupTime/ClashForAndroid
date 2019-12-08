@@ -35,14 +35,22 @@ func handleTunStart(client *net.UnixConn) {
 	}
 
 	var mtu uint32
+	var dns uint32
 	var end uint32
 
 	binary.Read(client, binary.BigEndian, &mtu)
+	binary.Read(client, binary.BigEndian, &dns)
 	binary.Read(client, binary.BigEndian, &end)
 
 	if end != tunCommandEnd {
 		log.Errorln("Invalid tun command end")
 		return
+	}
+
+	if dns != 0 {
+		tun.SetDnsHijacking(true)
+	} else {
+		tun.SetDnsHijacking(false)
 	}
 
 	if err := tun.StartTunProxy(fds[0], int(mtu)); err != nil {

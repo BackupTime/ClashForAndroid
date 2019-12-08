@@ -19,7 +19,7 @@ interface IClashService {
 
     // Control
     void setSelectProxy(String proxy, String selected);
-    void startTunDevice(in ParcelFileDescriptor fd, int mtu);
+    void startTunDevice(in ParcelFileDescriptor fd, int mtu, boolean dnsHijacking);
     void stopTunDevice();
     void start();
     void stop();

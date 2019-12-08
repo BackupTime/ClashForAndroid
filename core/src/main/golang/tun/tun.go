@@ -15,7 +15,8 @@ type handler struct {
 const dnsServerAddress = "172.19.0.2:53"
 
 var (
-	instance *handler
+	dnsHijacking bool = false
+	instance     *handler
 )
 
 // StartTunProxy - start
@@ -51,5 +52,14 @@ func ResetDnsRedirect() {
 		return
 	}
 
-	(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, dnsServerAddress)
+	if dnsHijacking {
+		(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, "0.0.0.0:53")
+	} else {
+		(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, dnsServerAddress)
+	}
+
+}
+
+func SetDnsHijacking(enabled bool) {
+	dnsHijacking = false
 }

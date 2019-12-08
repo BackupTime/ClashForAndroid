@@ -101,11 +101,11 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
             clash.process.stop()
         }
 
-        override fun startTunDevice(fd: ParcelFileDescriptor, mtu: Int) {
+        override fun startTunDevice(fd: ParcelFileDescriptor, mtu: Int, dnsHijacking: Boolean) {
             try {
                 notification.setVpn(true)
 
-                clash.startTunDevice(fd.fileDescriptor, mtu)
+                clash.startTunDevice(fd.fileDescriptor, mtu, dnsHijacking)
             } catch (e: Exception) {
                 Log.e("Start tun failure", e)
 

@@ -8,6 +8,7 @@ class ClashSettingService(context: Context): IClashSettingService.Stub() {
         const val KEY_ACCESS_CONTROL_MODE = "key_access_control_mode"
         const val KEY_ACCESS_CONTROL_APPS = "ley_access_control_apps"
         const val KEY_IPV6_ENABLED = "key_ipv6_enabled"
+        const val KEY_DNS_HIJACKING_ENABLED = "key_dns_hijacking_enabled"
         const val KEY_BYPASS_PRIVATE_NETWORK = "key_bypass_private_network"
 
         const val ACCESS_CONTROL_MODE_ALLOW_ALL = 0
@@ -34,6 +35,12 @@ class ClashSettingService(context: Context): IClashSettingService.Stub() {
         }
     }
 
+    override fun setDnsHijackingEnabled(enabled: Boolean) {
+        preference.edit {
+            putBoolean(KEY_DNS_HIJACKING_ENABLED, enabled)
+        }
+    }
+
     override fun setBypassPrivateNetwork(enabled: Boolean) {
         preference.edit {
             putBoolean(KEY_BYPASS_PRIVATE_NETWORK, enabled)
@@ -46,6 +53,10 @@ class ClashSettingService(context: Context): IClashSettingService.Stub() {
 
     override fun isIPv6Enabled(): Boolean {
         return preference.getBoolean(KEY_IPV6_ENABLED, true)
+    }
+
+    override fun isDnsHijackingEnabled(): Boolean {
+        return preference.getBoolean(KEY_DNS_HIJACKING_ENABLED, true)
     }
 
     override fun getAccessControlApps(): Array<String> {

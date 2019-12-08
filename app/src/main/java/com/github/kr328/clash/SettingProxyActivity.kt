@@ -13,6 +13,7 @@ class SettingProxyActivity : BaseActivity() {
     companion object {
         private const val KEY_BYPASS_PRIVATE_NETWORK = "key_vpn_setting_bypass_private_network"
         private const val KEY_IPV6_SUPPORT = "key_vpn_setting_ipv6_support"
+        private const val KEY_DNS_HIJACKING = "key_dns_hijacking"
     }
 
     @Keep
@@ -29,11 +30,13 @@ class SettingProxyActivity : BaseActivity() {
 
                 val ipv6 = settings.isIPv6Enabled
                 val privateNetwork = settings.isBypassPrivateNetwork
+                val dnsHijacking = settings.isDnsHijackingEnabled
 
                 requireActivity().runOnUiThread {
                     findPreference<CheckBoxPreference>(KEY_IPV6_SUPPORT)?.isChecked = ipv6
                     findPreference<CheckBoxPreference>(KEY_BYPASS_PRIVATE_NETWORK)?.isChecked =
                         privateNetwork
+                    findPreference<CheckBoxPreference>(KEY_DNS_HIJACKING)?.isChecked = dnsHijacking
                 }
             }
         }
@@ -49,6 +52,8 @@ class SettingProxyActivity : BaseActivity() {
                 settings.isBypassPrivateNetwork =
                     findPreference<CheckBoxPreference>(KEY_BYPASS_PRIVATE_NETWORK)?.isChecked
                         ?: true
+                settings.isDnsHijackingEnabled =
+                    findPreference<CheckBoxPreference>(KEY_DNS_HIJACKING)?.isChecked ?: true
             }
         }
     }
