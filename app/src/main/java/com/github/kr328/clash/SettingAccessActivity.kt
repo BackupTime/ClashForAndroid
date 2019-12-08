@@ -117,7 +117,7 @@ class SettingAccessActivity : BaseActivity() {
                 }
                 .sortedWith(
                     compareBy(
-                        { app -> selected.contains(app.packageName) },
+                        { app -> !selected.contains(app.packageName) },
                         { app -> app.name })
                 )
 
