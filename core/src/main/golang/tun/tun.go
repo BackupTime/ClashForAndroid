@@ -61,5 +61,5 @@ func ResetDnsRedirect() {
 }
 
 func SetDnsHijacking(enabled bool) {
-	dnsHijacking = false
+	dnsHijacking = enabled
 }

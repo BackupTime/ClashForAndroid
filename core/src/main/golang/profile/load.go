@@ -6,6 +6,7 @@ import (
 	adapters "github.com/Dreamacro/clash/adapters/outbound"
 	"github.com/Dreamacro/clash/component/auth"
 	trie "github.com/Dreamacro/clash/component/domain-trie"
+	"github.com/Dreamacro/clash/component/fakeip"
 	"github.com/Dreamacro/clash/config"
 	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/dns"
@@ -15,25 +16,6 @@ import (
 
 	"github.com/kr328/cfa/tun"
 )
-
-var defaultDNSResolver = dns.New(dns.Config{
-	Main: []dns.NameServer{
-		dns.NameServer{Net: "tcp", Addr: "1.1.1.1:53"},
-		dns.NameServer{Net: "tcp", Addr: "8.8.8.8:53"},
-		dns.NameServer{Net: "tcp", Addr: "208.67.222.222:53"},
-		dns.NameServer{Net: "", Addr: "119.29.29.29:53"},
-		dns.NameServer{Net: "", Addr: "223.5.5.5:53"},
-		dns.NameServer{Net: "", Addr: "114.114.114.114:53"},
-	},
-	Fallback:     make([]dns.NameServer, 0),
-	IPv6:         true,
-	EnhancedMode: dns.MAPPING,
-	Pool:         nil,
-	FallbackFilter: dns.FallbackFilter{
-		GeoIP:  false,
-		IPCIDR: make([]*net.IPNet, 0),
-	},
-})
 
 // LoadDefault - load default configure
 func LoadDefault() {
@@ -114,6 +96,26 @@ func LoadFromFile(path string) error {
 	}
 
 	if dns.DefaultResolver == nil {
+		_, ipnet, _ := net.ParseCIDR("198.18.0.1/16")
+		pool, _ := fakeip.New(ipnet, 1000)
+
+		var defaultDNSResolver = dns.New(dns.Config{
+			Main: []dns.NameServer{
+				dns.NameServer{Net: "tcp", Addr: "1.1.1.1:53"},
+				dns.NameServer{Net: "tcp", Addr: "208.67.222.222:53"},
+				dns.NameServer{Net: "", Addr: "119.29.29.29:53"},
+				dns.NameServer{Net: "", Addr: "223.5.5.5:53"},
+			},
+			Fallback:     make([]dns.NameServer, 0),
+			IPv6:         true,
+			EnhancedMode: dns.FAKEIP,
+			Pool:         pool,
+			FallbackFilter: dns.FallbackFilter{
+				GeoIP:  false,
+				IPCIDR: make([]*net.IPNet, 0),
+			},
+		})
+
 		dns.DefaultResolver = defaultDNSResolver
 	}
 
