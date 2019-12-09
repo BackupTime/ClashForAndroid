@@ -46,6 +46,9 @@ data class ClashRule(val matcher: Matcher, val pattern: String, val target: Stri
                     "DST-PORT" -> DST_PORT
                     "SRC-PORT" -> SRC_PORT
                     "MATCH" -> MATCH
+                    // Deprecated
+                    "SOURCE-IP-CIDR" -> SRC_IP_CIDR
+                    "FINAL" -> MATCH
                     else -> throw YamlException("Invalid matcher $s", 0, 0)
                 }
             }
