@@ -24,7 +24,7 @@ class ClashNotification(private val context: Service) {
         .setSmallIcon(R.drawable.ic_notification_icon)
         .setOngoing(true)
         .setColor(context.getColor(R.color.colorAccentService))
-        .setColorized(true)
+        //.setColorized(true)
         .setShowWhen(false)
         .setContentIntent(
             PendingIntent.getActivity(
