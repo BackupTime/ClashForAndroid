@@ -3,7 +3,7 @@
     <string name="application_name">Clash for Android</string>
 
     <string name="clash_status_stopped">Stopped</string>
-    <string name="clash_status_click_to_start">Click here to start</string>
+    <string name="clash_status_tap_to_start">Tap to start</string>
     <string name="clash_status_started">Running</string>
     <string name="clash_status_forwarded_traffic">%s Forwarded</string>
 
@@ -14,7 +14,7 @@
 
     <string name="clash_profiles">Profiles</string>
     <string name="clash_profiles_summary_selected">%s Activated</string>
-    <string name="clash_profiles_summary_unselected">Unselected</string>
+    <string name="clash_profiles_summary_unselected">Not selected</string>
 
     <string name="clash_logs">Logs</string>
     <string name="clash_settings">Settings</string>
@@ -73,11 +73,11 @@
     <string name="proxy_setting_vpn_setting_dns_hijacking_summary">Redirect ALL dns traffic to clash</string>
 
     <string name="access_setting_allow_all">Global</string>
-    <string name="access_setting_allow_all_summary">Allow all apps access vpn</string>
+    <string name="access_setting_allow_all_summary">Allow all apps</string>
     <string name="access_setting_allow">Whitelist</string>
-    <string name="access_setting_allow_summary">Allow follow apps access vpn</string>
+    <string name="access_setting_allow_summary">Only allowing selected apps</string>
     <string name="access_setting_disallow">Blacklist</string>
-    <string name="access_setting_disallow_summary">Disallow follow apps access vpn</string>
+    <string name="access_setting_disallow_summary">Disallow selected apps</string>
     <string name="access_setting_loading">Loading</string>
     <string name="access_setting_show_header">Show Mode</string>
     <string name="access_setting_hide_header">Hide Mode</string>

@@ -53,7 +53,7 @@ class MainActivity : BaseActivity() {
 
         activity_main_clash_status_icon.setImageResource(R.drawable.ic_clash_stopped)
         activity_main_clash_status_title.text = getString(R.string.clash_status_stopped)
-        activity_main_clash_status_summary.text = getString(R.string.clash_status_click_to_start)
+        activity_main_clash_status_summary.text = getString(R.string.clash_status_tap_to_start)
         activity_main_clash_proxies.visibility = View.GONE
         activity_main_clash_logs.visibility = View.GONE
 
@@ -99,7 +99,7 @@ class MainActivity : BaseActivity() {
                     activity_main_clash_status_icon.setImageResource(R.drawable.ic_clash_stopped)
                     activity_main_clash_status_title.text = getString(R.string.clash_status_stopped)
                     activity_main_clash_status_summary.text =
-                        getString(R.string.clash_status_click_to_start)
+                        getString(R.string.clash_status_tap_to_start)
                     activity_main_clash_proxies.visibility = View.GONE
                     activity_main_clash_logs.visibility = View.GONE
                 }
