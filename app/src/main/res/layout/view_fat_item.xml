@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/view_fat_item_icon"
         android:layout_toStartOf="@id/view_fat_item_operation_clickable"
-        android:layout_marginStart="22.5dp"
+        android:layout_marginStart="24.5dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
         android:orientation="vertical">

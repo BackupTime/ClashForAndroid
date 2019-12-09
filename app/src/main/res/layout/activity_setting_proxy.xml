@@ -14,7 +14,7 @@
             android:id="@+id/activity_setting_proxy_toolbar"
             android:elevation="4dp"
             android:layout_width="match_parent"
-            android:layout_height="60dp" />
+            android:layout_height="wrap_content" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <com.github.kr328.clash.view.RadioFatItem

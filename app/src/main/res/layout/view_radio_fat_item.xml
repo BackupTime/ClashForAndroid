@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@id/view_radio_fat_item_operation_clickable"
-        android:layout_marginStart="70dp"
+        android:layout_marginStart="72dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
         android:orientation="vertical">

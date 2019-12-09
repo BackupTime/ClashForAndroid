@@ -10,7 +10,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/activity_logs_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="wrap_content">
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 

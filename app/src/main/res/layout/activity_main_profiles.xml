@@ -34,7 +34,7 @@
             android:layout_toEndOf="@id/activity_main_profiles_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="25dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:text="@string/clash_profiles" />
 

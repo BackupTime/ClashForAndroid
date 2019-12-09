@@ -27,10 +27,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setSupportActionBar(activity_main_toolbar.apply {
-            setLogo(R.mipmap.ic_launcher_foreground)
-        })
-
         activity_main_clash_proxies.setOnClickListener {
             startActivity(Intent(this, ProxyActivity::class.java))
         }

@@ -9,12 +9,28 @@
     android:animateLayoutChanges="true"
     tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/activity_main_toolbar"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        app:contentInsetStartWithNavigation="0dp"
-        app:contentInsetStart="0dp" />
+        android:gravity="center_vertical">
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="36dp"
+            android:contentDescription="@string/application_name"
+            android:src="@drawable/ic_logo" />
+        <TextView
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="@string/launch_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"/>
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
     <include layout="@layout/activity_main_clash_status" />
 
@@ -44,7 +60,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="25dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:text="@string/clash_logs" />
     </LinearLayout>
@@ -71,7 +87,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="25dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:text="@string/clash_settings" />
     </LinearLayout>
@@ -98,7 +114,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="25dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:text="@string/clash_feedback" />
     </LinearLayout>
@@ -125,7 +141,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="25dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:text="@string/clash_about" />
     </LinearLayout>
