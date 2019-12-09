@@ -23,8 +23,9 @@
 
         <ImageView
             android:id="@+id/activity_main_clash_status_icon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_centerVertical="true"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:contentDescription="@string/clash_status_stopped"
             android:src="@drawable/ic_clash_stopped" />
 
