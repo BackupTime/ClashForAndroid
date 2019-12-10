@@ -50,7 +50,7 @@ class TileService : TileService() {
             }
         }
 
-        qsTile.label = current.second?.name
+        qsTile.label = current.second?.name ?: getString(R.string.launch_name)
 
         qsTile.updateTile()
     }
