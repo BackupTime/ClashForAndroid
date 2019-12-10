@@ -25,6 +25,12 @@ See also [LICENSE](./LICENSE) and [NOTICE](./NOTICE)
 
 
 
+###  Privacy Policy
+
+See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
+
+
+
 ### Build
 
 1. Update submodules
