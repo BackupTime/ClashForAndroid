@@ -6,6 +6,7 @@ import com.crashlytics.android.Crashlytics
 import com.github.kr328.clash.core.Constants
 import com.github.kr328.clash.core.utils.Log
 import com.google.firebase.FirebaseApp
+import io.fabric.sdk.android.Fabric
 
 class MainApplication : Application() {
     companion object {
@@ -27,6 +28,7 @@ class MainApplication : Application() {
 
         try {
             FirebaseApp.initializeApp(this)
+            Fabric.with(this)
             Log.i("Registered")
         } catch (e: IllegalStateException) {
             Log.i("Already registered")
