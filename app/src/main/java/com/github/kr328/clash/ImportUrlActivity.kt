@@ -1,5 +1,6 @@
 package com.github.kr328.clash
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -58,6 +59,8 @@ class ImportUrlActivity : BaseActivity() {
             (elements[1] as FormAdapter.TextType).content =
                 intent.data?.getQueryParameter("url") ?: ""
         }
+
+        setResult(Activity.RESULT_CANCELED)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -123,6 +126,8 @@ class ImportUrlActivity : BaseActivity() {
                         }
 
                         runOnUiThread {
+                            setResult(Activity.RESULT_OK)
+
                             finish()
                         }
                     }

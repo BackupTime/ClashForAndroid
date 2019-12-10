@@ -1,5 +1,6 @@
 package com.github.kr328.clash
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -50,6 +51,8 @@ class ImportFileActivity : BaseActivity() {
                 checkAndInsert()
             }
         }
+
+        setResult(Activity.RESULT_CANCELED)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -122,6 +125,8 @@ class ImportFileActivity : BaseActivity() {
                     )
                 )
             }
+
+            setResult(Activity.RESULT_OK)
 
             finish()
         } catch (e: Exception) {

@@ -1,5 +1,6 @@
 package com.github.kr328.clash
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -23,6 +24,7 @@ class CreateProfileActivity : BaseActivity() {
                 R.string.clash_new_profile_url_summary
             )
         )
+        private const val IMPORT_REQUEST_CODE = 1024
     }
 
     class Adapter(private val context: Context) : BaseAdapter() {
@@ -51,6 +53,15 @@ class CreateProfileActivity : BaseActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if ( requestCode == IMPORT_REQUEST_CODE && resultCode == Activity.RESULT_OK ) {
+            finish()
+            return
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     data class AdapterData(val icon: Int, val title: Int, val summary: Int)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,19 +75,19 @@ class CreateProfileActivity : BaseActivity() {
             setOnItemClickListener { _, _, index, _ ->
                 when (index) {
                     0 -> {
-                        startActivity(
+                        startActivityForResult(
                             Intent(
                                 this@CreateProfileActivity,
                                 ImportFileActivity::class.java
-                            )
+                            ), IMPORT_REQUEST_CODE
                         )
                     }
                     1 -> {
-                        startActivity(
+                        startActivityForResult(
                             Intent(
                                 this@CreateProfileActivity,
                                 ImportUrlActivity::class.java
-                            )
+                            ), IMPORT_REQUEST_CODE
                         )
                     }
                 }
