@@ -18,9 +18,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <TextView
+            <com.github.kr328.clash.view.MarqueeTextView
                 android:id="@+id/adapter_proxy_item_name"
-                android:ellipsize="middle"
                 android:textColor="@android:color/black"
                 android:singleLine="true"
                 android:layout_width="wrap_content"
