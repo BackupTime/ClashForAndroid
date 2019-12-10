@@ -3,6 +3,8 @@ apply plugin: 'kotlinx-serialization'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 29
@@ -50,6 +52,5 @@ dependencies {
     implementation "com.charleskorn.kaml:kaml:0.14.0"
     implementation "com.google.android.material:material:1.2.0-alpha02"
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 }
-
-apply plugin: 'com.google.gms.google-services'
