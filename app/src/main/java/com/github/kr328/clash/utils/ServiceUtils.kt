@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
+import com.github.kr328.clash.ClashStartService
 import com.github.kr328.clash.MainApplication
 import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.TunService
@@ -34,5 +35,12 @@ object ServiceUtils {
 
             return null
         }
+    }
+
+    fun startStarterService(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            context.startForegroundService(Intent(context, ClashStartService::class.java))
+        else
+            context.startService(Intent(context, ClashStartService::class.java))
     }
 }

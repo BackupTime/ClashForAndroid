@@ -19,7 +19,7 @@ class TileService : TileService() {
 
         when (tile.state) {
             Tile.STATE_INACTIVE -> {
-                ServiceUtils.startProxyService(this)
+                ServiceUtils.startStarterService(this)
             }
             Tile.STATE_ACTIVE -> {
                 val binder =
