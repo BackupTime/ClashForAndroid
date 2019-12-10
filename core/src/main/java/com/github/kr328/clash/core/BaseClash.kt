@@ -46,18 +46,13 @@ abstract class BaseClash(private val controllerPath: File) {
     ): R? {
         return try {
             runControl(command, block)
-        } catch (e: Exception) {
-            Log.w("Run command $command failure", e)
-            null
-        }
+        } catch (ignored: Exception) { null }
     }
 
     protected fun runControlNoException(command: Int) {
         try {
             runControl(command)
-        } catch (e: Exception) {
-            Log.w("Run command $command failure", e)
-        }
+        } catch (ignored: Exception) {}
     }
 
     protected fun DataOutputStream.writeString(string: String) {
