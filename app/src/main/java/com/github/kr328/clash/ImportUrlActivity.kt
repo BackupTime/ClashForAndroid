@@ -51,6 +51,13 @@ class ImportUrlActivity : BaseActivity() {
         activity_import_url_save.setOnClickListener {
             checkAndInsert()
         }
+
+        if ( intent.action == Intent.ACTION_VIEW
+            && intent.data?.scheme == "clash"
+            && intent.data?.host == "install-config") {
+            (elements[1] as FormAdapter.TextType).content =
+                intent.data?.getQueryParameter("url") ?: ""
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

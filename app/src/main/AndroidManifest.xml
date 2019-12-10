@@ -18,81 +18,89 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/launch_name"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ImportUrlActivity"
+            android:label="@string/clash_import_from_url"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="clash" android:host="install-config"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".ProfilesActivity"
-            android:label="@string/clash_profiles"
             android:exported="false"
+            android:label="@string/clash_profiles"
             android:screenOrientation="portrait" />
         <activity
             android:name=".CreateProfileActivity"
-            android:label="@string/clash_new_profile"
             android:exported="false"
+            android:label="@string/clash_new_profile"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ImportFileActivity"
-            android:label="@string/clash_import_from_file"
             android:exported="false"
+            android:label="@string/clash_import_from_file"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".ImportUrlActivity"
-            android:label="@string/clash_import_from_url"
-            android:screenOrientation="portrait"
-            android:exported="false" />
         <activity
             android:name=".ClashStatusActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ProxyActivity"
-            android:label="@string/clash_proxy_manage"
             android:exported="false"
+            android:label="@string/clash_proxy_manage"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SettingMainActivity"
-            android:label="@string/application_setting_title"
             android:exported="false"
+            android:label="@string/application_setting_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SettingProxyActivity"
-            android:label="@string/application_setting_proxy"
             android:exported="false"
+            android:label="@string/application_setting_proxy"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SettingAccessActivity"
-            android:label="@string/proxy_setting_vpn_setting_access_control"
             android:exported="false"
+            android:label="@string/proxy_setting_vpn_setting_access_control"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SettingApplicationActivity"
-            android:label="@string/application_setting_application"
             android:exported="false"
+            android:label="@string/application_setting_application"
             android:screenOrientation="portrait" />
         <activity
             android:name=".LogActivity"
+            android:exported="false"
             android:label="@string/clash_logs"
-            android:exported="false"
             android:screenOrientation="portrait" />
-        <activity android:name=".FeedbackActivity"
+        <activity
+            android:name=".FeedbackActivity"
+            android:exported="false"
             android:label="@string/clash_feedback"
-            android:exported="false"
             android:screenOrientation="portrait" />
+
         <service
             android:name=".ClashStartService"
             android:exported="false" />
         <service
             android:name=".TileService"
-            android:label="@string/launch_name"
             android:icon="@drawable/ic_logo"
+            android:label="@string/launch_name"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
@@ -101,8 +109,8 @@
 
         <receiver
             android:name=".BootCompleteReceiver"
-            android:exported="true"
-            android:enabled="false">
+            android:enabled="false"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
