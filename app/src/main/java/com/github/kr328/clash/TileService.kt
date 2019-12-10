@@ -7,8 +7,10 @@ import android.content.IntentFilter
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.github.kr328.clash.core.event.ProcessEvent
+import com.github.kr328.clash.core.event.ProfileReloadEvent
 import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.Constants
+import com.github.kr328.clash.service.IClashEventObserver
 import com.github.kr328.clash.service.IClashService
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.utils.ServiceUtils
@@ -35,29 +37,29 @@ class TileService : TileService() {
     }
 
     override fun onStartListening() {
-        refreshTileStatus()
+        refreshStatus()
     }
 
-    private fun refreshTileStatus() {
+    private fun refreshStatus() {
         val current = getCurrentStatus()
 
         when (current.first) {
             ProcessEvent.STARTED -> {
                 qsTile.state = Tile.STATE_ACTIVE
+                qsTile.label = current.second?.name ?: getString(R.string.launch_name)
             }
             ProcessEvent.STOPPED -> {
                 qsTile.state = Tile.STATE_INACTIVE
+                qsTile.label = getString(R.string.launch_name)
             }
         }
-
-        qsTile.label = current.second?.name ?: getString(R.string.launch_name)
 
         qsTile.updateTile()
     }
 
     private val clashStatusReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            refreshTileStatus()
+            refreshStatus()
         }
     }
 
@@ -66,7 +68,10 @@ class TileService : TileService() {
 
         registerReceiver(
             clashStatusReceiver,
-            IntentFilter(Constants.CLASH_PROCESS_BROADCAST_ACTION)
+            IntentFilter().apply {
+                addAction(Constants.CLASH_PROCESS_BROADCAST_ACTION)
+                addAction(Constants.CLASH_RELOAD_BROADCAST_ACTION)
+            }
         )
     }
 
