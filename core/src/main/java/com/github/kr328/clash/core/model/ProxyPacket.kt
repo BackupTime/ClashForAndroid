@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProxyPacket(val mode: String, val proxies: Map<Int, Proxy>): Parcelable {
     @Serializable
-    data class Proxy(val name: String, val type: Type, val now: Int, val all: Set<Int>, val delay: Long)
+    data class Proxy(val name: String, val type: Type, val now: Int, val all: List<Int>, val delay: Long)
 
     enum class Type {
         SELECT,
@@ -78,7 +78,7 @@ data class ProxyPacket(val mode: String, val proxies: Map<Int, Proxy>): Parcelab
                 }
 
                 val now = hashed[entry.value.second.now]?.first ?: 0
-                val all = entry.value.second.all.mapNotNull { hashed[it]?.first }.toSet()
+                val all = entry.value.second.all.mapNotNull { hashed[it]?.first }
                 val delay = entry.value.second.history.firstOrNull()?.delay ?: 0
 
                 entry.value.first to Proxy(entry.key, type, now, all, delay)

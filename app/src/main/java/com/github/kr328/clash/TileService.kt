@@ -41,6 +41,9 @@ class TileService : TileService() {
     }
 
     private fun refreshStatus() {
+        if ( qsTile == null )
+            return
+
         val current = getCurrentStatus()
 
         when (current.first) {

@@ -26,12 +26,11 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        try {
+        runCatching {
             FirebaseApp.initializeApp(this)
+        }
+        runCatching {
             Fabric.with(this)
-            Log.i("Registered")
-        } catch (e: IllegalStateException) {
-            Log.i("Already registered")
         }
 
         Log.handler = object: Log.LogHandler {

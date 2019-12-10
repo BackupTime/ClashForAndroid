@@ -189,7 +189,8 @@ class ProfilesActivity : BaseActivity() {
                 }
 
                 runOnUiThread {
-                    dialog?.dismiss()
+                    if ( dialog?.isShowing == true )
+                        dialog?.dismiss()
                 }
             }
         }
