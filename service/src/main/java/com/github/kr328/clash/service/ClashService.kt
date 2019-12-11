@@ -15,6 +15,7 @@ import com.github.kr328.clash.core.utils.Log
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.Executors
+import javax.xml.transform.SourceLocator
 import kotlin.concurrent.thread
 
 class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
@@ -183,6 +184,8 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
 
     override fun onCreate() {
         super.onCreate()
+
+        StubSoLoader.loadSo()
 
         clash = Clash(
             this,
