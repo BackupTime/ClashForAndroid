@@ -185,8 +185,6 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
     override fun onCreate() {
         super.onCreate()
 
-        StubSoLoader.loadSo()
-
         clash = Clash(
             this,
             filesDir.resolve("clash"),
