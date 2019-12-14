@@ -2,9 +2,9 @@ package tun
 
 import (
 	"fmt"
+	"net"
 	"strconv"
 
-	"github.com/Dreamacro/clash/dns"
 	T "github.com/Dreamacro/clash/proxy/tun"
 )
 
@@ -13,6 +13,8 @@ type handler struct {
 }
 
 const dnsServerAddress = "172.19.0.2:53"
+const gatewayAddress = "172.19.0.1/30"
+const fakeInterface = "172.19.0.2"
 
 var (
 	dnsHijacking bool = false
@@ -23,13 +25,19 @@ var (
 func StartTunProxy(fd, mtu int) error {
 	StopTunProxy()
 
-	adapter, err := T.NewTunProxy("fd://" + strconv.Itoa(fd) + "?mtu=" + strconv.Itoa(mtu))
+	ip, network, _ := net.ParseCIDR(gatewayAddress)
+
+	network.IP = ip.To4()
+
+	fakeInterface := net.ParseIP(fakeInterface).To4()
+
+	adapter, err := T.NewTunProxy("fd://"+strconv.Itoa(fd)+"?mtu="+strconv.Itoa(mtu), *network, fakeInterface)
 	if err != nil {
 		return err
 	}
 
 	instance = &handler{
-		tunAdapter: &adapter,
+		tunAdapter: adapter,
 	}
 
 	ResetDnsRedirect()
@@ -52,12 +60,11 @@ func ResetDnsRedirect() {
 		return
 	}
 
-	if dnsHijacking {
-		(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, "0.0.0.0:53")
-	} else {
-		(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, dnsServerAddress)
-	}
-
+	// if dnsHijacking {
+	// 	(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, "0.0.0.0:53")
+	// } else {
+	// 	(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, dnsServerAddress)
+	// }
 }
 
 func SetDnsHijacking(enabled bool) {
