@@ -26,7 +26,8 @@ android {
     sourceSets {
         main {
             assets.srcDirs += ["$buildDir/intermediates/dynamic_assets"]
-            jniLibs.srcDirs += ["$buildDir/intermediates/native_output"]
+            jniLibs.srcDirs += ["$buildDir/intermediates/go_output/native_library"]
+            java.srcDirs += ["$buildDir/intermediates/go_output/generate_java"]
         }
     }
     compileOptions {
@@ -76,7 +77,12 @@ afterEvaluate {
             task.dependsOn(es)
     }
 
-    tasks.register("golangBind", GolangBindTask.class)
+    def gs = tasks.register("golangBind", GolangBindTask.class)
+
+    for ( task in tasks ) {
+        if ( task.name.contains("compile") && task.name.contains("Sources") )
+            task.dependsOn(gs)
+    }
 }
 
 repositories {

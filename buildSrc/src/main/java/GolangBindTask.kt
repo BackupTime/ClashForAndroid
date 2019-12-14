@@ -3,10 +3,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
-import kotlin.concurrent.thread
+import java.util.zip.ZipFile
 
 open class GolangBindTask : DefaultTask() {
     companion object {
@@ -30,14 +31,14 @@ open class GolangBindTask : DefaultTask() {
         """.trimIndent()
     }
 
-    val javaOutput: File
-            get() {
-                return project.buildDir.resolve("intermediates/go_output/generate_java")
-            }
-    val nativeOutput: File
-            get() {
-                return project.buildDir.resolve("intermediates/go_output/native_library")
-            }
+    private val javaOutput: File
+        get() {
+            return project.buildDir.resolve("intermediates/go_output/generate_java")
+        }
+    private val nativeOutput: File
+        get() {
+            return project.buildDir.resolve("intermediates/go_output/native_library")
+        }
     private val goBuildPath: File
         get() {
             return project.buildDir.resolve("intermediates/go_build")
@@ -62,7 +63,14 @@ open class GolangBindTask : DefaultTask() {
     private val environment = mutableMapOf<String, String>()
 
     init {
-        
+        onlyIf {
+            val lastModify = sourcePath.walk()
+                .filter { it.extension == "go" || it.extension == "mod" }
+                .map { it.lastModified() }
+                .max() ?: 0L
+
+            return@onlyIf goBuildPath.resolve("bridge.aar").lastModified() < lastModify
+        }
     }
 
     @TaskAction
@@ -71,7 +79,7 @@ open class GolangBindTask : DefaultTask() {
         environment.put("ANDROID_HOME", findAndroidSdkPath().absolutePath)
         environment.put("ANDROID_NDK_HOME", findAndroidNdkPath().absolutePath)
 
-        if ( Os.isFamily(Os.FAMILY_WINDOWS) )
+        if (Os.isFamily(Os.FAMILY_WINDOWS))
             environment.put("Path", System.getenv("Path") + ";" + goPath.resolve("bin"))
         else
             environment.put("PATH", System.getenv("PATH") + ":" + goPath.resolve("bin"))
@@ -95,6 +103,40 @@ open class GolangBindTask : DefaultTask() {
 
         "gomobile init".exec(goBuildPath)
         "gomobile bind -target=android github.com/kr328/cfa/bridge".exec(goBuildPath)
+
+        with(ZipFile(goBuildPath.resolve("bridge.aar"))) {
+            stream()
+                .filter { !it.isDirectory }
+                .filter { it.name.startsWith("jni") }
+                .forEach {
+                    val target = nativeOutput.resolve(it.name.removePrefix("jni/"))
+
+                    target.parentFile.mkdirs()
+
+                    FileOutputStream(target).use { output ->
+                        getInputStream(it).use { input ->
+                            input.copyTo(output)
+                        }
+                    }
+                }
+        }
+
+        with(ZipFile(goBuildPath.resolve("bridge-sources.jar"))) {
+            stream()
+                .filter { !it.isDirectory }
+                .filter { it.name.endsWith(".java") }
+                .forEach {
+                    val target = javaOutput.resolve(it.name)
+
+                    target.parentFile.mkdirs()
+
+                    FileOutputStream(target).use { output ->
+                        getInputStream(it).use { input ->
+                            input.copyTo(output)
+                        }
+                    }
+                }
+        }
     }
 
     private fun findAndroidNdkPath(): File {
@@ -108,8 +150,8 @@ open class GolangBindTask : DefaultTask() {
     }
 
     private fun String.exec(pwd: File = File(".")) {
-        val process = with (ProcessBuilder()) {
-            if ( Os.isFamily(Os.FAMILY_WINDOWS) )
+        val process = with(ProcessBuilder()) {
+            if (Os.isFamily(Os.FAMILY_WINDOWS))
                 command("cmd.exe", "/c", this@exec)
             else
                 command("bash", "-c", this@exec)
@@ -125,12 +167,12 @@ open class GolangBindTask : DefaultTask() {
         process.inputStream.copyTo(System.out)
         println()
 
-        if ( process.waitFor() != 0 )
+        if (process.waitFor() != 0)
             throw GradleException("Run command $this failure")
     }
 
     private fun String.exe(): String {
-        return if ( Os.isFamily(Os.FAMILY_WINDOWS) )
+        return if (Os.isFamily(Os.FAMILY_WINDOWS))
             "$this.exe"
         else
             this
