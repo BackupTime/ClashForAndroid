@@ -19,8 +19,6 @@ interface IClashService {
 
     // Control
     void setSelectProxy(String proxy, String selected);
-    void startTunDevice(in ParcelFileDescriptor fd, int mtu, boolean dnsHijacking);
-    void stopTunDevice();
     void start();
     void stop();
 

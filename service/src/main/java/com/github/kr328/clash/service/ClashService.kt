@@ -33,10 +33,6 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
     private lateinit var notification: ClashNotification
 
     private val clashService = object : IClashService.Stub() {
-        override fun stopTunDevice() {
-            notification.setVpn(false)
-        }
-
         override fun setSelectProxy(proxy: String?, selected: String?) {
             require(proxy != null && selected != null)
 
@@ -73,23 +69,12 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
         }
 
         override fun stop() {
+            if ( processStatus == ProcessEvent.STOPPED )
+                return
+
             processStatus = ProcessEvent.STOPPED
 
             this@ClashService.eventService.performProcessEvent(processStatus)
-        }
-
-        override fun startTunDevice(fd: ParcelFileDescriptor, mtu: Int, dnsHijacking: Boolean) {
-            try {
-                notification.setVpn(true)
-            } catch (e: Exception) {
-                Log.e("Start tun failure", e)
-
-                this@ClashService.eventService.performErrorEvent(
-                    ErrorEvent(ErrorEvent.Type.START_FAILURE, e.toString())
-                )
-            } finally {
-                fd.close()
-            }
         }
 
         override fun getEventService(): IClashEventService {

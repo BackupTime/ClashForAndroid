@@ -8,7 +8,6 @@ import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.*
 import bridge.Bridge
-import bridge.TunCallback
 import com.github.kr328.clash.core.event.*
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkObserver
@@ -19,7 +18,6 @@ class TunService : VpnService(), IClashEventObserver {
         private const val VPN_MTU = 1500
         private const val PRIVATE_VLAN_DNS = "172.19.0.2" // sync with tun/tun.go/dnsServerAddress
         private const val PRIVATE_VLAN4_CLIENT = "172.19.0.1"
-        private const val PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1"
     }
 
     private var start = true
@@ -87,9 +85,6 @@ class TunService : VpnService(), IClashEventObserver {
     override fun onDestroy() {
         super.onDestroy()
 
-        fileDescriptor.close()
-
-        clash.stopTunDevice()
         clash.stop()
 
         clash.eventService.unregisterEventObserver(TunService::class.java.simpleName)
@@ -117,11 +112,22 @@ class TunService : VpnService(), IClashEventObserver {
             ProcessEvent.STARTED -> {
                 start = false
 
-                Bridge.startTunDevice(fileDescriptor.fd.toLong(), VPN_MTU.toLong(),
-                    "$PRIVATE_VLAN4_CLIENT/30", PRIVATE_VLAN_DNS
-                ) {
-                    protect(it.toInt())
+                if ( settings.isDnsHijackingEnabled ) {
+                    Bridge.startTunDevice(fileDescriptor.fd.toLong(), VPN_MTU.toLong(),
+                        "$PRIVATE_VLAN4_CLIENT/30", "0.0.0.0"
+                    ) {
+                        protect(it.toInt())
+                    }
                 }
+                else {
+                    Bridge.startTunDevice(fileDescriptor.fd.toLong(), VPN_MTU.toLong(),
+                        "$PRIVATE_VLAN4_CLIENT/30", PRIVATE_VLAN_DNS
+                    ) {
+                        protect(it.toInt())
+                    }
+                }
+
+                fileDescriptor.close()
 
                 Log.i("STARTED")
             }
@@ -144,12 +150,6 @@ class TunService : VpnService(), IClashEventObserver {
         }
         else {
             addRoute("0.0.0.0", 0)
-        }
-
-        // IPv6
-        if ( settings.isIPv6Enabled ) {
-
-            addRoute("::", 0)
         }
 
         return this
@@ -193,9 +193,6 @@ class TunService : VpnService(), IClashEventObserver {
 
     private fun Builder.addAddress(): Builder {
         addAddress(PRIVATE_VLAN4_CLIENT, 30)
-
-        if ( settings.isIPv6Enabled )
-            addAddress(PRIVATE_VLAN6_CLIENT, 126)
 
         return this
     }
