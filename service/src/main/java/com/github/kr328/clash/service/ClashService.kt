@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
+import bridge.Bridge
 import com.github.kr328.clash.callback.IUrlTestCallback
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.event.*
@@ -26,23 +27,20 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
     private val profileService = ClashProfileService(this, this)
     private val settingService = ClashSettingService(this)
 
-    private lateinit var clash: Clash
-    private lateinit var puller: ClashEventPuller
+    private var processStatus = ProcessEvent.STOPPED
+
+    //private lateinit var puller: ClashEventPuller
     private lateinit var notification: ClashNotification
 
     private val clashService = object : IClashService.Stub() {
         override fun stopTunDevice() {
             notification.setVpn(false)
-
-            clash.stopTunDevice()
         }
 
         override fun setSelectProxy(proxy: String?, selected: String?) {
             require(proxy != null && selected != null)
 
             try {
-                clash.setSelectProxy(proxy, selected)
-
                 this@ClashService.profileService.setCurrentProfileProxy(proxy, selected)
             } catch (e: IOException) {
                 Log.w("Set proxy failure", e)
@@ -54,59 +52,35 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
         }
 
         override fun queryGeneral(): GeneralPacket {
-            return clash.queryGeneral()
+            return GeneralPacket(GeneralPacket.Ports(0, 0, 0, 0), GeneralPacket.Mode.DIRECT)
         }
 
         override fun queryAllProxies(): ProxyPacket {
-            return try {
-                ProxyPacket.fromRawProxy(clash.queryProxies())
-            } catch (e: Exception) {
-                this@ClashService.eventService.performErrorEvent(
-                    ErrorEvent(ErrorEvent.Type.QUERY_PROXY_FAILURE, e.toString())
-                )
-                ProxyPacket("Unknown", emptyMap())
-            }
+            return ProxyPacket("Direct", emptyMap())
         }
 
         override fun startUrlTest(proxies: Array<out String>?, callback: IUrlTestCallback?) {
             require(proxies != null && callback != null)
-
-            thread {
-                try {
-                    clash.startUrlTest(proxies.toList()) { name, delay ->
-                        callback.onResult(name, delay)
-                    }
-                }
-                catch (e: Exception) {
-                    Log.w("Url test failure", e)
-                }
-
-                callback.onResult(null, -1)
-                // Ignore exceptions
-            }
         }
 
         override fun start() {
-            try {
-                clash.process.start()
-            } catch (e: Exception) {
-                Log.e("Start failure", e)
+            if ( processStatus == ProcessEvent.STARTED )
+                return
 
-                this@ClashService.eventService.performErrorEvent(
-                    ErrorEvent(ErrorEvent.Type.START_FAILURE, e.toString())
-                )
-            }
+            processStatus = ProcessEvent.STARTED
+
+            this@ClashService.eventService.performProcessEvent(processStatus)
         }
 
         override fun stop() {
-            clash.process.stop()
+            processStatus = ProcessEvent.STOPPED
+
+            this@ClashService.eventService.performProcessEvent(processStatus)
         }
 
         override fun startTunDevice(fd: ParcelFileDescriptor, mtu: Int, dnsHijacking: Boolean) {
             try {
                 notification.setVpn(true)
-
-                clash.startTunDevice(fd.fileDescriptor, mtu, dnsHijacking)
             } catch (e: Exception) {
                 Log.e("Start tun failure", e)
 
@@ -131,7 +105,7 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
         }
 
         override fun getCurrentProcessStatus(): ProcessEvent {
-            return clash.process.getProcessStatus()
+            return processStatus
         }
     }
 
@@ -155,44 +129,22 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
     }
 
     override fun acquireEvent(event: Int) {
-        if (clash.process.getProcessStatus() == ProcessEvent.STOPPED)
+        if (processStatus == ProcessEvent.STOPPED)
             return
 
-        when (event) {
-            Event.EVENT_SPEED ->
-                puller.startSpeedPull()
-            Event.EVENT_LOG ->
-                puller.startLogPuller()
-            Event.EVENT_BANDWIDTH ->
-                puller.startBandwidthPull()
-        }
     }
 
     override fun releaseEvent(event: Int) {
-        if (clash.process.getProcessStatus() == ProcessEvent.STOPPED)
+        if (processStatus == ProcessEvent.STOPPED)
             return
-
-        when (event) {
-            Event.EVENT_SPEED ->
-                puller.stopSpeedPull()
-            Event.EVENT_LOG ->
-                puller.stopLogPull()
-            Event.EVENT_BANDWIDTH ->
-                puller.stopBandwidthPull()
-        }
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        clash = Clash(
-            this,
-            filesDir.resolve("clash"),
-            cacheDir.resolve("clash_controller"),
-            eventService::performProcessEvent
-        )
+        Bridge.init(filesDir.resolve("clash").absolutePath)
 
-        puller = ClashEventPuller(clash, this)
+        //puller = ClashEventPuller(clash, this)
 
         notification = ClashNotification(this)
 
@@ -211,7 +163,7 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        clash.process.start()
+        clashService.start()
 
         return START_NOT_STICKY
     }
@@ -221,7 +173,7 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
     }
 
     override fun onDestroy() {
-        clash.process.stop()
+        clashService.stop()
 
         executor.shutdown()
         eventService.shutdown()
@@ -251,6 +203,8 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
                 notification.cancel()
 
                 stopSelf()
+
+                Bridge.loadProfileDefault()
             }
         }
 
@@ -259,32 +213,27 @@ class ClashService : Service(), IClashEventObserver, ClashEventService.Master,
 
     private fun reloadProfile() {
         executor.submit {
-            if ( clash.process.getProcessStatus() != ProcessEvent.STARTED)
+            if ( processStatus != ProcessEvent.STARTED)
                 return@submit
 
             val active = profileService.queryActiveProfile()
 
             if (active == null) {
                 eventService.performErrorEvent(ErrorEvent(ErrorEvent.Type.PROFILE_LOAD, "No profile activated"))
-                clash.process.stop()
+                clashService.stop()
                 return@submit
             }
 
             Log.i("Loading profile ${active.file}")
 
             try {
-                val remove = clash.loadProfile(
-                    File(active.file),
-                    profileService.queryProfileSelected(active.id)
-                )
-
-                profileService.removeCurrentProfileProxy(remove)
+                Bridge.loadProfileFile(active.file)
 
                 notification.setProfile(active.name)
 
                 eventService.performProfileReloadEvent(ProfileReloadEvent())
             } catch (e: Exception) {
-                clash.process.stop()
+                clashService.stop()
                 eventService.performErrorEvent(ErrorEvent(ErrorEvent.Type.PROFILE_LOAD, e.message ?: "Unknown"))
                 Log.w("Load profile failure", e)
             }

@@ -79,10 +79,7 @@ afterEvaluate {
 
     def gs = tasks.register("golangBind", GolangBindTask.class)
 
-    for ( task in tasks ) {
-        if ( task.name.contains("compile") && task.name.contains("Sources") )
-            task.dependsOn(gs)
-    }
+    preBuild.dependsOn(gs)
 }
 
 repositories {

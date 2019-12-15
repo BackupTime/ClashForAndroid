@@ -1,72 +1,83 @@
 package tun
 
 import (
-	"fmt"
 	"net"
 	"strconv"
+	"syscall"
 
-	T "github.com/Dreamacro/clash/proxy/tun"
+	"github.com/Dreamacro/clash/dns"
+	"github.com/Dreamacro/clash/global"
+	"github.com/Dreamacro/clash/log"
+	"github.com/Dreamacro/clash/proxy/tun"
 )
 
-type handler struct {
-	tunAdapter *T.TunAdapter
+type Callback interface {
+	OnNewSocket(fd int)
 }
 
-const dnsServerAddress = "172.19.0.2:53"
-const gatewayAddress = "172.19.0.1/30"
-const fakeInterface = "172.19.0.2"
+var tunInstance *tun.TUN
+var dnsGateway net.IP
 
-var (
-	dnsHijacking bool = false
-	instance     *handler
-)
+func StartTunDevice(fd, mtu int, gateway string, dns string, callback Callback) error {
+	if tunInstance != nil {
+		return nil
+	}
 
-// StartTunProxy - start
-func StartTunProxy(fd, mtu int) error {
-	StopTunProxy()
-
-	ip, network, _ := net.ParseCIDR(gatewayAddress)
-
-	network.IP = ip.To4()
-
-	fakeInterface := net.ParseIP(fakeInterface).To4()
-
-	adapter, err := T.NewTunProxy("fd://"+strconv.Itoa(fd)+"?mtu="+strconv.Itoa(mtu), *network, fakeInterface)
+	ip, n, err := net.ParseCIDR(gateway)
 	if err != nil {
 		return err
 	}
 
-	instance = &handler{
-		tunAdapter: adapter,
+	n.IP = ip.To4()
+
+	global.DefaultDialer.Control = func(network, address string, c syscall.RawConn) error {
+		return c.Control(func(fd uintptr) {
+			callback.OnNewSocket(int(fd))
+		})
 	}
+	global.DefaultListenConfig.Control = func(network, address string, c syscall.RawConn) error {
+		return c.Control(func(fd uintptr) {
+			callback.OnNewSocket(int(fd))
+		})
+	}
+
+	t, err := tun.NewTunProxy("fd://"+strconv.Itoa(fd)+"?mtu="+strconv.Itoa(mtu), *n)
+
+	if err != nil {
+		global.DefaultDialer.Control = nil
+		global.DefaultListenConfig.Control = nil
+
+		return err
+	}
+	tunInstance = t
+
+	dnsGateway = net.ParseIP(dns)
 
 	ResetDnsRedirect()
 
-	fmt.Println("Android tun started")
+	log.Infoln("Android tun started")
 
 	return nil
 }
 
-// StopTunProxy - stop
-func StopTunProxy() {
-	if instance != nil {
-		(*instance.tunAdapter).Close()
-		instance = nil
-	}
-}
-
-func ResetDnsRedirect() {
-	if instance == nil {
+func StopTunDevice() {
+	t := tunInstance
+	if t == nil {
 		return
 	}
 
-	// if dnsHijacking {
-	// 	(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, "0.0.0.0:53")
-	// } else {
-	// 	(*instance.tunAdapter).ReCreateDNSServer(dns.DefaultResolver, dnsServerAddress)
-	// }
+	t.Close()
+
+	global.DefaultDialer.Control = nil
+	global.DefaultListenConfig.Control = nil
+
+	tunInstance = nil
 }
 
-func SetDnsHijacking(enabled bool) {
-	dnsHijacking = enabled
+func ResetDnsRedirect() {
+	if tunInstance == nil {
+		return
+	}
+
+	tunInstance.ReCreateDNSServer(dns.DefaultResolver, dnsGateway)
 }

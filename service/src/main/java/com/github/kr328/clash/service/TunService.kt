@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.*
+import bridge.Bridge
+import bridge.TunCallback
 import com.github.kr328.clash.core.event.*
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkObserver
@@ -15,7 +17,7 @@ class TunService : VpnService(), IClashEventObserver {
     companion object {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
         private const val VPN_MTU = 1500
-        private const val PRIVATE_VLAN_DNS = "114.114.114.114" // sync with tun/tun.go/dnsServerAddress
+        private const val PRIVATE_VLAN_DNS = "172.19.0.2" // sync with tun/tun.go/dnsServerAddress
         private const val PRIVATE_VLAN4_CLIENT = "172.19.0.1"
         private const val PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1"
     }
@@ -108,11 +110,18 @@ class TunService : VpnService(), IClashEventObserver {
                 else
                     stopSelf()
 
+                Bridge.stopTunDevice()
+
                 Log.i("STOPPED")
             }
             ProcessEvent.STARTED -> {
                 start = false
-                clash.startTunDevice(fileDescriptor, VPN_MTU, settings.isDnsHijackingEnabled)
+
+                Bridge.startTunDevice(fileDescriptor.fd.toLong(), VPN_MTU.toLong(),
+                    "$PRIVATE_VLAN4_CLIENT/30", PRIVATE_VLAN_DNS
+                ) {
+                    protect(it.toInt())
+                }
 
                 Log.i("STARTED")
             }
@@ -156,6 +165,7 @@ class TunService : VpnService(), IClashEventObserver {
                 }
             }
             ClashSettingService.ACCESS_CONTROL_MODE_ALLOW -> {
+                addAllowedApplication(packageName)
                 for ( app in (settings.accessControlApps.toSet() -
                         resources.getStringArray(R.array.default_disallow_application)) ) {
                     runCatching {
@@ -167,7 +177,8 @@ class TunService : VpnService(), IClashEventObserver {
             }
             ClashSettingService.ACCESS_CONTROL_MODE_DISALLOW -> {
                 for ( app in (settings.accessControlApps.toSet() +
-                        resources.getStringArray(R.array.default_disallow_application)) ) {
+                        resources.getStringArray(R.array.default_disallow_application) -
+                        listOf(packageName)) ) {
                     runCatching {
                         addDisallowedApplication(app)
                     }.onFailure {

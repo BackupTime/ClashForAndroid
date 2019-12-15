@@ -104,6 +104,9 @@ open class GolangBindTask : DefaultTask() {
         "gomobile init".exec(goBuildPath)
         "gomobile bind -target=android github.com/kr328/cfa/bridge".exec(goBuildPath)
 
+        nativeOutput.deleteRecursively()
+        javaOutput.deleteRecursively()
+
         with(ZipFile(goBuildPath.resolve("bridge.aar"))) {
             stream()
                 .filter { !it.isDirectory }
@@ -165,7 +168,7 @@ open class GolangBindTask : DefaultTask() {
         }
 
         process.inputStream.copyTo(System.out)
-        println()
+        System.out.flush()
 
         if (process.waitFor() != 0)
             throw GradleException("Run command $this failure")
