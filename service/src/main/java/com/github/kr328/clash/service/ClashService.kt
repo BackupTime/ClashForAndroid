@@ -20,9 +20,9 @@ class ClashService : Service(), IClashEventObserver {
         ClashServiceImpl(this)
     }
 
-    val events: ClashEventService
+    private val events: ClashEventService
         get() = instance.eventService
-    val clash: Clash
+    private val clash: Clash
         get() = instance.clash
 
     //private lateinit var puller: ClashEventPuller
@@ -35,7 +35,7 @@ class ClashService : Service(), IClashEventObserver {
                     instance.eventService.registerEventObserver(
                         ClashService::class.java.name,
                         this@ClashService,
-                        intArrayOf(Event.EVENT_SPEED)
+                        intArrayOf(Event.EVENT_TRAFFIC)
                     )
                 Intent.ACTION_SCREEN_OFF ->
                     instance.eventService.registerEventObserver(
@@ -55,27 +55,42 @@ class ClashService : Service(), IClashEventObserver {
         if ( instance.clash.getCurrentProcessStatus() == ProcessEvent.STOPPED )
             return
 
-
+        when ( event ) {
+            Event.EVENT_BANDWIDTH ->
+                instance.eventPoll.startBandwidthPoll()
+            Event.EVENT_TRAFFIC ->
+                instance.eventPoll.startTrafficPoll()
+            Event.EVENT_LOG ->
+                instance.eventPoll.startLogsPoll()
+        }
     }
 
     fun releaseEvent(event: Int) {
         if ( instance.clash.getCurrentProcessStatus() == ProcessEvent.STOPPED )
             return
 
-
+        when ( event ) {
+            Event.EVENT_BANDWIDTH ->
+                instance.eventPoll.stopBandwidthPoll()
+            Event.EVENT_TRAFFIC ->
+                instance.eventPoll.stopTrafficPoll()
+            Event.EVENT_LOG ->
+                instance.eventPoll.stopLogPoll()
+        }
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        //puller = ClashEventPuller(clash, this)
+        // Init instance
+        instance
 
         notification = ClashNotification(this)
 
         instance.eventService.registerEventObserver(
             ClashService::class.java.name,
             this@ClashService,
-            intArrayOf(Event.EVENT_SPEED)
+            intArrayOf(Event.EVENT_TRAFFIC)
         )
 
         registerReceiver(screenReceiver, IntentFilter().apply {
@@ -99,6 +114,8 @@ class ClashService : Service(), IClashEventObserver {
     override fun onDestroy() {
         instance.clash.stop()
 
+        instance.shutdown()
+
         executor.shutdown()
 
         unregisterReceiver(screenReceiver)
@@ -120,7 +137,7 @@ class ClashService : Service(), IClashEventObserver {
                 instance.eventService.recastEventRequirement()
             }
             ProcessEvent.STOPPED -> {
-                instance.eventService.performSpeedEvent(SpeedEvent(0, 0))
+                instance.eventService.performSpeedEvent(TrafficEvent(0, 0))
                 instance.eventService.performBandwidthEvent(BandwidthEvent(0))
 
                 notification.cancel()
@@ -140,7 +157,7 @@ class ClashService : Service(), IClashEventObserver {
             val active = instance.profileService.queryActiveProfile()
 
             if (active == null) {
-                sendError(ErrorEvent.Type.PROFILE_LOAD, "No profile activated")
+                events.performErrorEvent(ErrorEvent(ErrorEvent.Type.PROFILE_LOAD, "No active profile"))
                 clash.stop()
                 return@submit
             }
@@ -150,12 +167,21 @@ class ClashService : Service(), IClashEventObserver {
             try {
                 clash.loadProfile(active.file)
 
+                instance.profileService.queryProfileSelected(active.id).mapNotNull {
+                    if ( clash.setSelectedProxy(it.key, it.value) )
+                        null
+                    else
+                        it.key
+                }.toList().apply {
+                    instance.profileService.removeCurrentProfileProxy(this)
+                }
+
                 notification.setProfile(active.name)
 
                 events.performProfileReloadEvent(ProfileReloadEvent())
             } catch (e: Exception) {
                 clash.stop()
-                sendError(ErrorEvent.Type.PROFILE_LOAD, e.message)
+                events.performErrorEvent(ErrorEvent(ErrorEvent.Type.PROFILE_LOAD, e.message ?: e.toString()))
                 Log.w("Load profile failure", e)
             }
         }
@@ -165,7 +191,7 @@ class ClashService : Service(), IClashEventObserver {
         sendBroadcast(Intent(Constants.CLASH_RELOAD_BROADCAST_ACTION).setPackage(packageName))
     }
 
-    override fun onSpeedEvent(event: SpeedEvent?) {
+    override fun onTrafficEvent(event: TrafficEvent?) {
         notification.setSpeed(event?.up ?: 0, event?.down ?: 0)
     }
 
@@ -176,9 +202,5 @@ class ClashService : Service(), IClashEventObserver {
         override fun queryLocalInterface(descriptor: String): IInterface? {
             return this@ClashService
         }
-    }
-
-    private fun sendError(type: ErrorEvent.Type, message: String?) {
-        events.performErrorEvent(ErrorEvent(type, message ?: "Unknown"))
     }
 }

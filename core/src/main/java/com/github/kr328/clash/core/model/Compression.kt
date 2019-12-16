@@ -3,6 +3,7 @@ package com.github.kr328.clash.core.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.github.kr328.clash.core.serialization.Parcels
+import com.github.kr328.clash.core.utils.Log
 import kotlinx.serialization.Serializable
 import java.lang.IllegalStateException
 
@@ -13,9 +14,9 @@ fun List<Proxy>.compress(): CompressedProxyList {
 
     val elements = this.map {
         CompressedProxyList.Element(
-            name = nameMap[it.name] ?: throw IllegalStateException("Unknown proxy $it"),
+            name = nameMap[it.name] ?: throw IllegalStateException("Unknown proxy ${it.name}"),
             type = it.type,
-            now = nameMap[it.now] ?: throw IllegalStateException("Unknown proxy $it"),
+            now = nameMap[it.now] ?: -1,
             all = it.all.mapNotNull { name -> nameMap[name] },
             delay = it.delay
         )
@@ -38,7 +39,7 @@ data class CompressedProxyList(val proxyName: Map<Int, String>, val elements: Li
             Proxy(
                 name = proxyName[it.name] ?: throw IllegalStateException("Unknown proxy $it"),
                 type = it.type,
-                now = proxyName[it.now] ?: throw IllegalStateException("Unknown proxy $it"),
+                now = proxyName[it.now] ?: "",
                 all = it.all.mapNotNull { index -> proxyName[index] },
                 delay = it.delay
             )

@@ -3,6 +3,7 @@ package com.github.kr328.clash
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.charleskorn.kaml.Yaml
@@ -89,15 +90,9 @@ class ImportUrlActivity : BaseActivity() {
             activity_import_url_saving.visibility = View.VISIBLE
 
             runClash {
-                val httpPort = it.queryGeneral().ports.randomHttp
-
                 thread {
                     try {
-                        val connection = if ( httpPort > 0 )
-                            URL(url.content).openConnection(Proxy(Proxy.Type.HTTP,
-                                InetSocketAddress.createUnresolved("127.0.0.1", httpPort)))
-                        else
-                            URL(url.content).openConnection()
+                        val connection = URL(url.content).openConnection()
 
                         val data = with (connection) {
                             connectTimeout = DEFAULT_TIMEOUT
@@ -108,7 +103,21 @@ class ImportUrlActivity : BaseActivity() {
                             }
                         }
 
-                        Yaml(configuration = YamlConfiguration(strictMode = false)).parse(ClashProfile.serializer(), data)
+                        val pipe = ParcelFileDescriptor.createPipe()
+
+                        thread {
+                            FileOutputStream(pipe[1].fileDescriptor).use {
+                                it.write(data.toByteArray())
+                            }
+
+                            pipe[0].close()
+                            pipe[1].close()
+                        }
+
+                        val error = it.checkProfileValid(pipe[0])
+
+                        if ( error != null )
+                            throw Exception(error)
 
                         val cache =
                             FileUtils.generateRandomFile(filesDir.resolve(Constants.PROFILES_DIR), ".yaml")

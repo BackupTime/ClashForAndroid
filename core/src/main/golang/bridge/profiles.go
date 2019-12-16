@@ -9,3 +9,7 @@ func LoadProfileFile(path string) error {
 func LoadProfileDefault() {
 	profile.LoadDefault()
 }
+
+func CheckProfileValid(profileData string) error {
+	return profile.CheckValid(profileData)
+}

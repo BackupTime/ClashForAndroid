@@ -6,7 +6,7 @@ interface IClashEventObserver {
     void onProcessEvent(in ProcessEvent event);
     void onLogEvent(in LogEvent event);
     void onErrorEvent(in ErrorEvent event);
-    void onSpeedEvent(in SpeedEvent event);
+    void onTrafficEvent(in TrafficEvent event);
     void onBandwidthEvent(in BandwidthEvent event);
     void onProfileChanged(in ProfileChangedEvent event);
     void onProfileReloaded(in ProfileReloadEvent event);

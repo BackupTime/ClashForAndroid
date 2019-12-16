@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.*
-import bridge.Bridge
 import com.github.kr328.clash.core.event.*
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkObserver
@@ -22,7 +21,7 @@ class TunService : VpnService(), IClashEventObserver {
 
     private var start = true
     private lateinit var fileDescriptor: ParcelFileDescriptor
-    private lateinit var clash: IClashService
+    private lateinit var clash: ClashServiceImpl
     private lateinit var defaultNetworkObserver: DefaultNetworkObserver
     private lateinit var settings: ClashSettingService
     private val connection = object : ServiceConnection {
@@ -35,7 +34,7 @@ class TunService : VpnService(), IClashEventObserver {
                 service
             ) ?: throw NullPointerException()
 
-            this@TunService.clash = clash
+            this@TunService.clash = (clash as ClashServiceImpl)
 
             start = true
 
@@ -105,7 +104,7 @@ class TunService : VpnService(), IClashEventObserver {
                 else
                     stopSelf()
 
-                Bridge.stopTunDevice()
+                clash.clash.stopTunDevice()
 
                 Log.i("STOPPED")
             }
@@ -113,14 +112,14 @@ class TunService : VpnService(), IClashEventObserver {
                 start = false
 
                 if ( settings.isDnsHijackingEnabled ) {
-                    Bridge.startTunDevice(fileDescriptor.fd.toLong(), VPN_MTU.toLong(),
+                    clash.clash.startTunDevice(fileDescriptor.fd, VPN_MTU,
                         "$PRIVATE_VLAN4_CLIENT/30", "0.0.0.0"
                     ) {
                         protect(it.toInt())
                     }
                 }
                 else {
-                    Bridge.startTunDevice(fileDescriptor.fd.toLong(), VPN_MTU.toLong(),
+                    clash.clash.startTunDevice(fileDescriptor.fd, VPN_MTU,
                         "$PRIVATE_VLAN4_CLIENT/30", PRIVATE_VLAN_DNS
                     ) {
                         protect(it.toInt())
@@ -199,7 +198,7 @@ class TunService : VpnService(), IClashEventObserver {
         return this
     }
 
-    override fun onSpeedEvent(event: SpeedEvent?) {}
+    override fun onTrafficEvent(event: TrafficEvent?) {}
     override fun onBandwidthEvent(event: BandwidthEvent?) {}
     override fun onLogEvent(event: LogEvent?) {}
     override fun onErrorEvent(event: ErrorEvent?) {}

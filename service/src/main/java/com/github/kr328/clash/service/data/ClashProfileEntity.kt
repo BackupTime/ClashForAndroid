@@ -1,9 +1,10 @@
 package com.github.kr328.clash.service.data
 
-import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.github.kr328.clash.core.serialization.Parcels
 import kotlinx.serialization.Serializable
 

@@ -4,7 +4,8 @@ import android.os.Bundle
 import com.github.kr328.clash.adapter.ProxyAdapter
 import com.github.kr328.clash.callback.IUrlTestCallback
 import com.github.kr328.clash.core.event.ErrorEvent
-import com.github.kr328.clash.core.model.ProxyPacket
+import com.github.kr328.clash.core.model.General
+import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.model.ListProxy
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_proxies.*
@@ -76,58 +77,62 @@ class ProxyActivity : BaseActivity() {
             activity_proxies_swipe.isRefreshing = true
 
         runClash { clash ->
-            val packet = clash.queryAllProxies()
-            val proxies = packet.proxies
-            val order = (proxies["GLOBAL".hashCode()]?.all ?: emptyList())
-                .mapIndexed { index, i -> i to index }.toMap()
+            val proxies = clash.queryAllProxies().uncompress().map {
+                it.name to it
+            }.toMap()
+            val general = clash.queryGeneral()
+            val order = (proxies["GLOBAL"]?.all ?: emptyList())
+                .mapIndexed { index, name ->
+                    name to index
+                }.toMap()
 
             val listData = proxies
+                .map { it.value }
                 .asSequence()
                 .filter {
-                    when (it.value.type) {
-                        ProxyPacket.Type.URL_TEST -> true
-                        ProxyPacket.Type.FALLBACK -> true
-                        ProxyPacket.Type.LOAD_BALANCE -> true
-                        ProxyPacket.Type.SELECT -> true
+                    when (it.type) {
+                        Proxy.Type.URL_TEST -> true
+                        Proxy.Type.FALLBACK -> true
+                        Proxy.Type.LOAD_BALANCE -> true
+                        Proxy.Type.SELECT -> true
                         else -> false
                     }
                 }
                 .filter {
-                    when (packet.mode) {
-                        "Global" -> it.value.name == "GLOBAL"
-                        "Rule" -> it.value.name != "GLOBAL"
-                        else -> false
+                    when (general.mode) {
+                        General.Mode.GLOBAL -> it.name == "GLOBAL"
+                        General.Mode.RULE -> it.name != "GLOBAL"
+                        else -> true
                     }
                 }
                 .sortedWith(compareBy(
                     {
-                        it.value.type != ProxyPacket.Type.SELECT
+                        it.type != Proxy.Type.SELECT
                     }, {
-                        order[it.key] ?: 0
+                        order[it.name] ?: Int.MAX_VALUE
                     })
                 )
                 .flatMap {
                     val header =
-                        ListProxy.ListProxyHeader(it.value.name, it.value.type, it.value.now)
+                        ListProxy.ListProxyHeader(it.name, it.type, it.now, 0)
 
                     sequenceOf(header) +
-                            it.value.all
-                                .mapNotNull {
-                                    proxies[it]
-                                }
+                            it.all
+                                .mapNotNull { name -> proxies[name] }
                                 .map { item ->
                                     ListProxy.ListProxyItem(
                                         item.name,
                                         item.type.toString(),
-                                        item.delay, header
+                                        item.delay,
+                                        header
                                     )
                                 }
                                 .asSequence()
                 }
                 .mapIndexed { index, listProxy ->
                     if (listProxy is ListProxy.ListProxyItem) {
-                        if (listProxy.name.hashCode() == listProxy.header.now)
-                            listProxy.header.now = index
+                        if (listProxy.name == listProxy.header.now)
+                            listProxy.header.nowIndex = index
                     }
                     listProxy
                 }
@@ -136,11 +141,11 @@ class ProxyActivity : BaseActivity() {
             val listDataOldChanged = (activity_proxies_list.adapter!! as ProxyAdapter)
                 .elements
                 .filterIsInstance(ListProxy.ListProxyHeader::class.java)
-                .map { it.now }
+                .map { it.nowIndex }
 
             val listDataChanged = listData
                 .filterIsInstance<ListProxy.ListProxyHeader>()
-                .map { it.now }
+                .map { it.nowIndex }
 
             val changed = (if (listDataOldChanged.size != listDataChanged.size)
                 (0..listData.size).toList()

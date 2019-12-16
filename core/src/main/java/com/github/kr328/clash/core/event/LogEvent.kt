@@ -10,10 +10,11 @@ import kotlinx.serialization.internal.StringDescriptor
 data class LogEvent(val level: Level, val message: String, val time: Long = System.currentTimeMillis()) :
     Event, Parcelable {
     companion object {
-        const val DEBUG_VALUE = 1
-        const val INFO_VALUE = 2
-        const val WARN_VALUE = 3
-        const val ERROR_VALUE = 4
+        const val DEBUG_VALUE = "debug"
+        const val INFO_VALUE = "info"
+        const val WARN_VALUE = "warning"
+        const val ERROR_VALUE = "error"
+        const val UNKNOWN_VALUE = "unknown"
 
         @JvmField
         val CREATOR = object : Parcelable.Creator<LogEvent> {
@@ -27,32 +28,23 @@ data class LogEvent(val level: Level, val message: String, val time: Long = Syst
         }
     }
 
-    @Serializable(LevelSerializer::class)
-    enum class Level(val value: Int) {
-        DEBUG(DEBUG_VALUE), INFO(
-            INFO_VALUE
-        ),
-        WARN(WARN_VALUE), ERROR(
-            ERROR_VALUE
-        )
-    }
+    enum class Level {
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR,
+        UNKNOWN;
 
-    class LevelSerializer : KSerializer<Level> {
-        override val descriptor: SerialDescriptor
-            get() = StringDescriptor
-
-        override fun deserialize(decoder: Decoder): Level {
-            return when (val value = decoder.decodeInt()) {
-                DEBUG_VALUE -> Level.DEBUG
-                INFO_VALUE -> Level.INFO
-                WARN_VALUE -> Level.WARN
-                ERROR_VALUE -> Level.ERROR
-                else -> throw IllegalArgumentException("Invalid level type $value")
+        companion object {
+            fun fromString(type: String): Level {
+                return when ( type ) {
+                    DEBUG_VALUE -> DEBUG
+                    INFO_VALUE -> INFO
+                    WARN_VALUE -> WARN
+                    ERROR_VALUE -> ERROR
+                    else -> UNKNOWN
+                }
             }
-        }
-
-        override fun serialize(encoder: Encoder, obj: Level) {
-            encoder.encodeInt(obj.value)
         }
     }
 

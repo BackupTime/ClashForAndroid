@@ -94,3 +94,8 @@ func LoadFromFile(path string) error {
 
 	return nil
 }
+
+func CheckValid(data string) error {
+	_, err := config.Parse([]byte(data))
+	return err
+}

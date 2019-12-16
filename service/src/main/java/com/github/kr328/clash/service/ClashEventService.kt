@@ -11,7 +11,7 @@ class ClashEventService(private val master: Master) : IClashEventService.Stub() 
 
     companion object {
         private val EVENT_SET =
-            setOf(Event.EVENT_LOG, Event.EVENT_SPEED, Event.EVENT_BANDWIDTH)
+            setOf(Event.EVENT_LOG, Event.EVENT_TRAFFIC, Event.EVENT_BANDWIDTH)
     }
 
     private data class EventObserverRecord(
@@ -43,11 +43,11 @@ class ClashEventService(private val master: Master) : IClashEventService.Stub() 
         }
     }
 
-    fun performSpeedEvent(event: SpeedEvent) {
+    fun performSpeedEvent(event: TrafficEvent) {
         handler.submit {
             observers.values.forEach {
-                if (it.acquiredEvent.contains(Event.EVENT_SPEED))
-                    it.observer.onSpeedEvent(event)
+                if (it.acquiredEvent.contains(Event.EVENT_TRAFFIC))
+                    it.observer.onTrafficEvent(event)
             }
         }
     }

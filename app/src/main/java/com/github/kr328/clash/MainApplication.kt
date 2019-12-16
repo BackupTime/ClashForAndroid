@@ -30,7 +30,7 @@ class MainApplication : Application() {
             FirebaseApp.initializeApp(this)
         }
         runCatching {
-            Fabric.with(this)
+            Fabric.with(this, Crashlytics())
         }
 
         Log.handler = object: Log.LogHandler {

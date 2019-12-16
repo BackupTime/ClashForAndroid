@@ -26,4 +26,7 @@ interface IClashService {
     CompressedProxyList queryAllProxies();
     General queryGeneral();
     void startUrlTest(in String[] proxies, IUrlTestCallback callback);
+
+    // Utils
+    String checkProfileValid(in ParcelFileDescriptor pipe);
 }

@@ -1,10 +1,9 @@
 package com.github.kr328.clash.service
 
-import android.content.Context
 import com.github.kr328.clash.core.event.*
 
 class ClashEventBridge(val service: ClashService): ClashProfileService.Master,
-    ClashEventService.Master, ClashEventPuller.Master {
+    ClashEventService.Master, ClashEventPoll.Master {
     val eventService: ClashEventService = ClashEventService(this)
 
     override fun preformProfileChanged() {
@@ -23,15 +22,15 @@ class ClashEventBridge(val service: ClashService): ClashProfileService.Master,
         eventService.performProcessEvent(event)
     }
 
-    override fun onLogPulled(event: LogEvent) {
+    override fun onLogEvent(event: LogEvent) {
         eventService.performLogEvent(event)
     }
 
-    override fun onSpeedPulled(event: SpeedEvent) {
+    override fun onTrafficEvent(event: TrafficEvent) {
         eventService.performSpeedEvent(event)
     }
 
-    override fun onBandwidthPulled(event: BandwidthEvent) {
+    override fun onBandwidthEvent(event: BandwidthEvent) {
         eventService.performBandwidthEvent(event)
     }
 }

@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
-import com.github.kr328.clash.core.model.ProxyPacket
+import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.model.ListProxy
 import com.google.android.material.card.MaterialCardView
 
@@ -86,7 +86,7 @@ class ProxyAdapter(private val context: Context,
     }
 
     private fun bindItemView(holder: ItemHolder, current: ListProxy.ListProxyItem, position: Int) {
-        if (position == current.header.now) {
+        if (position == current.header.nowIndex) {
             holder.card.setCardBackgroundColor(context.getColor(R.color.colorAccent))
             holder.name.setTextColor(Color.WHITE)
             holder.type.setTextColor(Color.WHITE - 0x22222222)
@@ -98,14 +98,14 @@ class ProxyAdapter(private val context: Context,
             holder.delay.setTextColor(Color.DKGRAY)
         }
 
-        if (current.header.type == ProxyPacket.Type.SELECT) {
+        if (current.header.type == Proxy.Type.SELECT) {
             holder.card.isFocusable = true
             holder.card.isClickable = true
             holder.card.setOnClickListener {
                 val element = (elements[position] as ListProxy.ListProxyItem)
 
-                val old = element.header.now
-                element.header.now = position
+                val old = element.header.nowIndex
+                element.header.nowIndex = position
 
                 notifyItemChanged(old)
                 notifyItemChanged(position)
@@ -128,7 +128,7 @@ class ProxyAdapter(private val context: Context,
                     current.delay.toString()
                 }
                 else -> {
-                    if (current.header.type != ProxyPacket.Type.SELECT)
+                    if (current.header.type != Proxy.Type.SELECT)
                         "N/A"
                     else
                         ""
@@ -139,7 +139,7 @@ class ProxyAdapter(private val context: Context,
     private fun bindHeaderView(holder: HeaderHolder, current: ListProxy.ListProxyHeader) {
         holder.name.text = current.name
         holder.test.visibility =
-            if (current.type == ProxyPacket.Type.SELECT) View.VISIBLE else View.GONE
+            if (current.type == Proxy.Type.SELECT) View.VISIBLE else View.GONE
         holder.test.setOnClickListener {
             if ( current.urlTest )
                 return@setOnClickListener

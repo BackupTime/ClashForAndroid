@@ -126,8 +126,8 @@ abstract class BaseActivity : AppCompatActivity(), IClashEventObserver {
         override fun onErrorEvent(event: ErrorEvent?) =
             this@BaseActivity.onErrorEvent(event)
 
-        override fun onSpeedEvent(event: SpeedEvent?) =
-            this@BaseActivity.onSpeedEvent(event)
+        override fun onTrafficEvent(event: TrafficEvent?) =
+            this@BaseActivity.onTrafficEvent(event)
 
         override fun onBandwidthEvent(event: BandwidthEvent?) {
             this@BaseActivity.onBandwidthEvent(event)
@@ -145,7 +145,7 @@ abstract class BaseActivity : AppCompatActivity(), IClashEventObserver {
     override fun onErrorEvent(event: ErrorEvent?) {}
     override fun onProfileChanged(event: ProfileChangedEvent?) {}
     override fun onProcessEvent(event: ProcessEvent?) {}
-    override fun onSpeedEvent(event: SpeedEvent?) {}
+    override fun onTrafficEvent(event: TrafficEvent?) {}
     override fun onBandwidthEvent(event: BandwidthEvent?) {}
     override fun onProfileReloaded(event: ProfileReloadEvent?) {}
     override fun asBinder(): IBinder {

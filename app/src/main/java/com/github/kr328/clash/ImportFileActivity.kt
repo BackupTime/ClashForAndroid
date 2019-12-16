@@ -4,13 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.YamlException
 import com.github.kr328.clash.adapter.FormAdapter
-import com.github.kr328.clash.model.ClashProfile
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.utils.FileUtils
 import com.google.android.material.snackbar.Snackbar
@@ -47,9 +45,7 @@ class ImportFileActivity : BaseActivity() {
             activity_import_file_save.visibility = View.GONE
             activity_import_file_saving.visibility = View.VISIBLE
 
-            thread {
-                checkAndInsert()
-            }
+            checkAndInsert()
         }
 
         setResult(Activity.RESULT_CANCELED)
@@ -68,53 +64,63 @@ class ImportFileActivity : BaseActivity() {
     }
 
     private fun checkAndInsert() {
-        try {
-            val name = elements[0] as FormAdapter.TextType
-            val file = elements[1] as FormAdapter.FilePickerType
 
-            if (name.content.isEmpty()) {
-                runOnUiThread {
-                    activity_import_file_save.visibility = View.VISIBLE
-                    activity_import_file_saving.visibility = View.GONE
-                    Snackbar.make(
-                        activity_import_file_root,
-                        R.string.clash_import_file_empty_name,
-                        Snackbar.LENGTH_LONG
-                    ).show()
+        val name = elements[0] as FormAdapter.TextType
+        val file = elements[1] as FormAdapter.FilePickerType
+
+        if (name.content.isEmpty()) {
+            activity_import_file_save.visibility = View.VISIBLE
+            activity_import_file_saving.visibility = View.GONE
+            Snackbar.make(
+                activity_import_file_root,
+                R.string.clash_import_file_empty_name,
+                Snackbar.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        if (file.content == null || file.content == Uri.EMPTY) {
+            activity_import_file_save.visibility = View.VISIBLE
+            activity_import_file_saving.visibility = View.GONE
+            Snackbar.make(
+                activity_import_file_root,
+                R.string.clash_import_file_empty_path,
+                Snackbar.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        val data =
+            contentResolver.openInputStream(file.content!!)?.use {
+                it.readBytes().toString(Charsets.UTF_8)
+            } ?: throw NullPointerException("Unable to open config file")
+
+
+        runClash {
+            try {
+                val pipe = ParcelFileDescriptor.createPipe()
+
+                thread {
+                    FileOutputStream(pipe[1].fileDescriptor).use {
+                        it.write(data.toByteArray())
+                    }
+
+                    pipe[0].close()
+                    pipe[1].close()
                 }
-                return
-            }
 
-            if (file.content == null || file.content == Uri.EMPTY) {
-                runOnUiThread {
-                    activity_import_file_save.visibility = View.VISIBLE
-                    activity_import_file_saving.visibility = View.GONE
-                    Snackbar.make(
-                        activity_import_file_root,
-                        R.string.clash_import_file_empty_path,
-                        Snackbar.LENGTH_LONG
-                    ).show()
+                val error = it.checkProfileValid(pipe[0])
+
+                if (error != null)
+                    throw Exception(error)
+
+                val cache =
+                    FileUtils.generateRandomFile(filesDir.resolve(Constants.PROFILES_DIR), ".yaml")
+
+                FileOutputStream(cache).use {
+                    it.write(data.toByteArray())
                 }
-                return
-            }
 
-            val data =
-                contentResolver.openInputStream(file.content!!)?.use {
-                    it.readBytes().toString(Charsets.UTF_8)
-                } ?: throw NullPointerException("Unable to open config file")
-
-            Yaml(configuration = YamlConfiguration(strictMode = false)).parse(
-                ClashProfile.serializer(),
-                data
-            )
-            val cache =
-                FileUtils.generateRandomFile(filesDir.resolve(Constants.PROFILES_DIR), ".yaml")
-
-            FileOutputStream(cache).use {
-                it.write(data.toByteArray())
-            }
-
-            runClash {
                 it.profileService.addProfile(
                     ClashProfileEntity(
                         name = name.content,
@@ -124,17 +130,25 @@ class ImportFileActivity : BaseActivity() {
                         lastUpdate = System.currentTimeMillis()
                     )
                 )
+
+                runOnUiThread {
+                    setResult(Activity.RESULT_OK)
+
+                    finish()
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Snackbar.make(
+                        activity_import_file_root,
+                        getString(
+                            R.string.clash_profile_invalid,
+                            e.message?.replace(YamlException::class.java.name + ":", "")
+                                ?: "Unknown"
+                        ),
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
             }
-
-            setResult(Activity.RESULT_OK)
-
-            finish()
-        } catch (e: Exception) {
-            Snackbar.make(
-                activity_import_file_root,
-                getString(R.string.clash_profile_invalid, e.message?.replace(YamlException::class.java.name + ":", "") ?: "Unknown"),
-                Snackbar.LENGTH_LONG
-            ).show()
         }
     }
 }
