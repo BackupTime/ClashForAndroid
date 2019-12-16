@@ -143,6 +143,8 @@ class TunService : VpnService(), IClashEventObserver {
     private fun Builder.addBypassPrivateRoute(): Builder {
         // IPv4
         if ( settings.isBypassPrivateNetwork ) {
+            Log.i("Bypass Private Network")
+
             resources.getStringArray(R.array.bypass_private_route).forEach {
                 val address = it.split("/")
                 addRoute(address[0], address[1].toInt())

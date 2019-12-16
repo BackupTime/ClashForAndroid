@@ -1,194 +1,118 @@
 package com.github.kr328.clash.core
 
 import android.content.Context
-import android.net.LocalSocket
-import com.github.kr328.clash.core.event.BandwidthEvent
-import com.github.kr328.clash.core.event.LogEvent
+import bridge.Bridge
 import com.github.kr328.clash.core.event.ProcessEvent
-import com.github.kr328.clash.core.event.SpeedEvent
-import com.github.kr328.clash.core.model.*
-import com.github.kr328.clash.core.utils.Log
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.stringify
-import java.io.File
-import java.io.FileDescriptor
-import java.io.IOException
+import com.github.kr328.clash.core.model.General
+import com.github.kr328.clash.core.model.Proxy
+import java.lang.IllegalStateException
 
 class Clash(
     context: Context,
-    clashDir: File,
-    controllerPath: File,
-    listener: (ProcessEvent) -> Unit
-) : BaseClash(controllerPath) {
+    private val listener: (ProcessEvent) -> Unit
+) {
     companion object {
-        const val COMMAND_PING = 0
-        const val COMMAND_TUN_START = 1
-        const val COMMAND_TUN_STOP = 2
-        const val COMMAND_PROFILE_RELOAD = 4
-        const val COMMAND_QUERY_PROXIES = 5
-        const val COMMAND_PULL_SPEED = 6
-        const val COMMAND_PULL_LOG = 7
-        const val COMMAND_PULL_BANDWIDTH = 8
-        const val COMMAND_SET_PROXY = 9
-        const val COMMAND_QUERY_GENERAL = 10
-        const val COMMAND_URL_TEST = 11
-
-        const val PING_REPLY = 233
+        const val CLASH_DIR = "clash"
 
         const val DEFAULT_URL_TEST_TIMEOUT = 5000
         const val DEFAULT_URL_TEST_URL = "https://www.gstatic.com/generate_204"
     }
 
-    val process = ClashProcess(context, clashDir, controllerPath, listener)
+    private var currentProcess = ProcessEvent.STOPPED
 
-    fun ping(): Boolean {
-        return runControlNoException(COMMAND_PING) { _, input, _ ->
-            input.readInt() == PING_REPLY
-        } ?: false
+    init {
+        val home = context.filesDir.resolve(CLASH_DIR)
+
+        home.mkdirs()
+
+        Bridge.init(home.absolutePath)
     }
 
-    fun loadProfile(file: File, selected: Map<String, String>): List<String> {
-        return runControl(COMMAND_PROFILE_RELOAD) { _, input, output ->
-            output.writeString(
-                Json(JsonConfiguration.Stable)
-                    .stringify(
-                        LoadProfilePacket.Request.serializer(),
-                        LoadProfilePacket.Request(file.absolutePath, selected)
-                    )
-            )
-
-            val result = Json(JsonConfiguration.Stable)
-                .parse(LoadProfilePacket.Response.serializer(), input.readString())
-
-            if (result.error.isNotEmpty()) {
-                throw IOException(result.error)
-            }
-
-            return@runControl result.invalidSelected
-        }
+    fun getCurrentProcessStatus(): ProcessEvent {
+        return currentProcess
     }
 
-    fun queryGeneral(): GeneralPacket {
-        return runCatching {
-            runControl(COMMAND_QUERY_GENERAL) { _, input, _ ->
-                Json(JsonConfiguration.Stable).parse(GeneralPacket.serializer(), input.readString())
-            }
-        }.getOrDefault(
-            GeneralPacket(
-                GeneralPacket.Ports(0, 0, 0, 0),
-                GeneralPacket.Mode.DIRECT
-            )
-        )
+    fun start() {
+        if ( currentProcess == ProcessEvent.STARTED )
+            return
+
+        currentProcess = ProcessEvent.STARTED
+
+        listener(currentProcess)
+
+        loadDefault()
     }
 
-    fun queryProxies(): RawProxyPacket {
-        return runControl(COMMAND_QUERY_PROXIES) { _, input, _ ->
-            val data = input.readString()
+    fun stop() {
+        if ( currentProcess == ProcessEvent.STOPPED )
+            return
 
-            Json(JsonConfiguration.Stable.copy(strictMode = false))
-                .parse(RawProxyPacket.serializer(), data)
-        }
+        currentProcess = ProcessEvent.STOPPED
+
+        listener(currentProcess)
+
+        loadDefault()
     }
 
-    fun setSelectProxy(key: String, value: String) {
-        runControl(COMMAND_SET_PROXY) { _, input, output ->
-            output.writeString(
-                Json(JsonConfiguration.Stable)
-                    .stringify(
-                        SetProxyPacket.Request.serializer(),
-                        SetProxyPacket.Request(key, value)
-                    )
-            )
+    fun startTunDevice(fd: Int, mtu: Int, gateway: String, dns: String, onSocket: (Int) -> Unit) {
+        enforceStarted()
 
-            val response = Json(JsonConfiguration.Stable).parse(
-                SetProxyPacket.Response.serializer(),
-                input.readString()
-            )
-
-            if (response.error.isNotEmpty())
-                throw IOException(response.error)
-        }
-    }
-
-    fun pullSpeedEvent(initial: (LocalSocket) -> Unit, callback: (SpeedEvent) -> Unit) {
-        runControlNoException(COMMAND_PULL_SPEED) { socket, input, _ ->
-            initial(socket)
-
-            while (!Thread.currentThread().isInterrupted) {
-                callback(
-                    Json(JsonConfiguration.Stable).parse(
-                        SpeedEvent.serializer(),
-                        input.readString()
-                    )
-                )
-            }
-        }
-    }
-
-    fun pullLogsEvent(initial: (LocalSocket) -> Unit, callback: (LogEvent) -> Unit) {
-        runControlNoException(COMMAND_PULL_LOG) { socket, input, _ ->
-            initial(socket)
-
-            while (!Thread.currentThread().isInterrupted) {
-                callback(
-                    Json(JsonConfiguration.Stable).parse(
-                        LogEvent.serializer(),
-                        input.readString()
-                    )
-                )
-            }
-        }
-    }
-
-    fun pullBandwidthEvent(initial: (LocalSocket) -> Unit, callback: (BandwidthEvent) -> Unit) {
-        runControlNoException(COMMAND_PULL_BANDWIDTH) { socket, input, _ ->
-            initial(socket)
-
-            while (!Thread.currentThread().isInterrupted) {
-                callback(
-                    Json(JsonConfiguration.Stable).parse(
-                        BandwidthEvent.serializer(),
-                        input.readString()
-                    )
-                )
-            }
-        }
-    }
-
-    fun startUrlTest(proxies: List<String>, callback: (String, Long) -> Unit) {
-        runControl(COMMAND_URL_TEST) { _, input, output ->
-            output.writeString(Json(JsonConfiguration.Stable)
-                .stringify(UrlTestPacket.Request.serializer(),
-                    UrlTestPacket.Request(proxies, DEFAULT_URL_TEST_TIMEOUT, DEFAULT_URL_TEST_URL)))
-
-            while ( true ) {
-                val data = input.readString()
-                if ( data.isEmpty() )
-                    return@runControl
-
-                val response = Json(JsonConfiguration.Stable)
-                    .parse(UrlTestPacket.Response.serializer(), data)
-
-                callback(response.name, response.delay)
-            }
-        }
-
-        Log.i("Url test exited")
-    }
-
-    fun startTunDevice(fd: FileDescriptor, mtu: Int, dnsHijacking: Boolean) {
-        runControl(COMMAND_TUN_START) { socket, _, output ->
-            socket.setFileDescriptorsForSend(arrayOf(fd))
-            socket.outputStream.write(0)
-            socket.outputStream.flush()
-            output.writeInt(mtu)
-            output.writeInt(if ( dnsHijacking ) 1 else 0)
-            output.writeInt(0x243)
+        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), gateway, dns) {
+            onSocket(it.toInt())
         }
     }
 
     fun stopTunDevice() {
-        runControlNoException(COMMAND_TUN_STOP)
+        Bridge.stopTunDevice()
+    }
+
+    fun loadProfile(path: String) {
+        enforceStarted()
+
+        Bridge.loadProfileFile(path)
+    }
+
+    fun queryProxies(): List<Proxy> {
+        enforceStarted()
+
+        val list = Bridge.queryAllProxies()
+        val result = mutableListOf<Proxy>()
+
+        for (i in 0..list.proxiesLength) {
+            val p = list.getProxiesElement(i)
+            val all = mutableListOf<String>()
+
+            for (index in 0..p.allLength) {
+                all.add(p.getAllElement(index))
+            }
+
+            result.add(
+                Proxy(
+                    p.name,
+                    Proxy.Type.fromString(p.type),
+                    p.now,
+                    all,
+                    p.delay
+                )
+            )
+        }
+
+        return result
+    }
+
+    fun queryGeneral(): General {
+        val t = Bridge.queryGeneral()
+
+        return General(General.Mode.fromString(t.mode),
+            t.httpPort.toInt(), t.socksPort.toInt(), t.redirectPort.toInt())
+    }
+
+    private fun loadDefault() {
+        Bridge.loadProfileDefault()
+    }
+
+    private fun enforceStarted() {
+        if ( currentProcess == ProcessEvent.STOPPED )
+            throw IllegalStateException("Clash Stopped")
     }
 }

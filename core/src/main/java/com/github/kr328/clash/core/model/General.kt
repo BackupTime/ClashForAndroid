@@ -5,25 +5,35 @@ import android.os.Parcelable
 import com.github.kr328.clash.core.serialization.Parcels
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.StringDescriptor
-import java.lang.IllegalArgumentException
+import kotlin.IllegalArgumentException
 
 @Serializable
-data class GeneralPacket(val ports: Ports, val mode: Mode) : Parcelable {
+data class General(val mode: Mode, val http: Int, val socks: Int, val redirect: Int) : Parcelable {
     @Serializable(with = ModeSerializer::class)
     enum class Mode {
-        DIRECT, GLOBAL, RULE
-    }
+        DIRECT, GLOBAL, RULE;
 
-    @Serializable
-    data class Ports(val http: Int, val socks: Int, val redirect: Int, val randomHttp: Int)
-
-    class ModeSerializer : KSerializer<Mode> {
-        companion object {
-            const val MODE_DIRECT = 1
-            const val MODE_GLOBAL = 2
-            const val MODE_RULE = 3
+        override fun toString(): String {
+            return when ( this ) {
+                DIRECT -> "Direct"
+                GLOBAL -> "Global"
+                RULE -> "Rule"
+            }
         }
 
+        companion object {
+            fun fromString(mode: String): Mode {
+                return when ( mode ) {
+                    "Direct" -> DIRECT
+                    "Global" -> GLOBAL
+                    "Rule" -> RULE
+                    else -> throw IllegalArgumentException("Invalid mode $mode")
+                }
+            }
+        }
+    }
+
+    class ModeSerializer : KSerializer<Mode> {
         override val descriptor: SerialDescriptor
             get() = StringDescriptor
 
@@ -53,13 +63,20 @@ data class GeneralPacket(val ports: Ports, val mode: Mode) : Parcelable {
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<GeneralPacket> {
-        override fun createFromParcel(parcel: Parcel): GeneralPacket {
-            return Parcels.load(serializer(), parcel)
-        }
+    companion object {
+        const val MODE_DIRECT = 1
+        const val MODE_GLOBAL = 2
+        const val MODE_RULE = 3
 
-        override fun newArray(size: Int): Array<GeneralPacket?> {
-            return arrayOfNulls(size)
+        @JvmField
+        val CREATOR = object: Parcelable.Creator<General> {
+            override fun createFromParcel(parcel: Parcel): General {
+                return Parcels.load(serializer(), parcel)
+            }
+
+            override fun newArray(size: Int): Array<General?> {
+                return arrayOfNulls(size)
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.github.kr328.clash.core.event.*
-import com.github.kr328.clash.core.model.GeneralPacket
+import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.utils.ByteFormatter
 import com.github.kr328.clash.service.TunService
 import com.github.kr328.clash.utils.ServiceUtils
@@ -113,13 +113,13 @@ class MainActivity : BaseActivity() {
 
             runOnUiThread {
                 when ( general.mode ) {
-                    GeneralPacket.Mode.DIRECT ->
+                    General.Mode.DIRECT ->
                         activity_main_clash_proxies_summary.text =
                             getText(R.string.clash_proxy_manage_summary_direct)
-                    GeneralPacket.Mode.GLOBAL ->
+                    General.Mode.GLOBAL ->
                         activity_main_clash_proxies_summary.text =
                             getText(R.string.clash_proxy_manage_summary_global)
-                    GeneralPacket.Mode.RULE ->
+                    General.Mode.RULE ->
                         activity_main_clash_proxies_summary.text =
                             getText(R.string.clash_proxy_manage_summary_rule)
                 }

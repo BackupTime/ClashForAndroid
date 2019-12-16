@@ -173,11 +173,4 @@ open class GolangBindTask : DefaultTask() {
         if (process.waitFor() != 0)
             throw GradleException("Run command $this failure")
     }
-
-    private fun String.exe(): String {
-        return if (Os.isFamily(Os.FAMILY_WINDOWS))
-            "$this.exe"
-        else
-            this
-    }
 }

@@ -23,7 +23,7 @@ interface IClashService {
     void stop();
 
     // Query
-    ProxyPacket queryAllProxies();
-    GeneralPacket queryGeneral();
+    CompressedProxyList queryAllProxies();
+    General queryGeneral();
     void startUrlTest(in String[] proxies, IUrlTestCallback callback);
 }
