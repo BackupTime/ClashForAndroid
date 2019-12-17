@@ -104,12 +104,13 @@ class ImportFileActivity : BaseActivity() {
                     FileOutputStream(pipe[1].fileDescriptor).use {
                         it.write(data.toByteArray())
                     }
+
+                    pipe[1].close()
                 }
 
                 val error = it.checkProfileValid(pipe[0])
 
                 pipe[0].close()
-                pipe[1].close()
 
                 if (error != null)
                     throw Exception(error)
