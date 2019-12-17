@@ -25,6 +25,7 @@ class ClashNotification(private val context: Service) {
         .setOngoing(true)
         .setColor(context.getColor(R.color.colorAccentService))
         //.setColorized(true)
+        .setOnlyAlertOnce(true)
         .setShowWhen(false)
         .setContentIntent(
             PendingIntent.getActivity(

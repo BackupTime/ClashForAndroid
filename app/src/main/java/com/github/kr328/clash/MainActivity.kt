@@ -90,7 +90,7 @@ class MainActivity : BaseActivity() {
                     activity_main_clash_status_icon.setImageResource(R.drawable.ic_clash_started)
                     activity_main_clash_status_title.text = getString(R.string.clash_status_started)
                     activity_main_clash_status_summary.text =
-                        getString(R.string.clash_status_forwarded_traffic, "0 Bytes")
+                        getString(R.string.clash_status_forwarded_traffic, ByteFormatter.byteToString(0))
                     activity_main_clash_proxies.visibility = View.VISIBLE
                     activity_main_clash_logs.visibility = View.VISIBLE
                 }

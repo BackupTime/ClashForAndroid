@@ -31,6 +31,13 @@ func PollTraffic(traffic Traffic) *EventPoll {
 	stopChannel := make(chan int, 1)
 	ticker := time.NewTicker(time.Second)
 
+	tick := func() {
+		up, down := tunnel.DefaultManager.Now()
+		traffic.OnEvent(down, up)
+	}
+
+	tick()
+
 	go func() {
 		defer close(stopChannel)
 		defer log.Infoln("Traffic Poll Stopped")
@@ -40,8 +47,7 @@ func PollTraffic(traffic Traffic) *EventPoll {
 			case <-stopChannel:
 				return
 			case <-ticker.C:
-				up, down := tunnel.DefaultManager.Now()
-				traffic.OnEvent(down, up)
+				tick()
 			}
 		}
 	}()
@@ -57,6 +63,13 @@ func PollBandwidth(bandwidth Bandwidth) *EventPoll {
 	stopChannel := make(chan int, 1)
 	ticker := time.NewTicker(time.Second)
 
+	tick := func() {
+		s := tunnel.DefaultManager.Snapshot()
+		bandwidth.OnEvent(s.DownloadTotal + s.UploadTotal)
+	}
+
+	tick()
+
 	go func() {
 		defer close(stopChannel)
 		defer log.Infoln("Bandwidth Poll Stopped")
@@ -66,8 +79,7 @@ func PollBandwidth(bandwidth Bandwidth) *EventPoll {
 			case <-stopChannel:
 				return
 			case <-ticker.C:
-				s := tunnel.DefaultManager.Snapshot()
-				bandwidth.OnEvent(s.DownloadTotal + s.UploadTotal)
+				tick()
 			}
 		}
 	}()
