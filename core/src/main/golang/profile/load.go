@@ -78,7 +78,7 @@ func LoadFromFile(path string) error {
 				dns.NameServer{Net: "", Addr: "223.5.5.5:53"},
 			},
 			Fallback:     make([]dns.NameServer, 0),
-			IPv6:         true,
+			IPv6:         false,
 			EnhancedMode: dns.FAKEIP,
 			Pool:         pool,
 			FallbackFilter: dns.FallbackFilter{

@@ -104,12 +104,12 @@ class ImportFileActivity : BaseActivity() {
                     FileOutputStream(pipe[1].fileDescriptor).use {
                         it.write(data.toByteArray())
                     }
-
-                    pipe[0].close()
-                    pipe[1].close()
                 }
 
                 val error = it.checkProfileValid(pipe[0])
+
+                pipe[0].close()
+                pipe[1].close()
 
                 if (error != null)
                     throw Exception(error)
@@ -148,6 +148,11 @@ class ImportFileActivity : BaseActivity() {
                         Snackbar.LENGTH_LONG
                     ).show()
                 }
+            }
+
+            runOnUiThread {
+                activity_import_file_save.visibility = View.VISIBLE
+                activity_import_file_saving.visibility = View.GONE
             }
         }
     }

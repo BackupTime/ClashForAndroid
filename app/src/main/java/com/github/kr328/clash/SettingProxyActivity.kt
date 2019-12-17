@@ -28,7 +28,7 @@ class SettingProxyActivity : BaseActivity() {
             (requireActivity() as SettingProxyActivity).runClash {
                 val settings = it.settingService
 
-                val ipv6 = settings.isIPv6Enabled
+                val ipv6 = false
                 val privateNetwork = settings.isBypassPrivateNetwork
                 val dnsHijacking = settings.isDnsHijackingEnabled
 
@@ -48,7 +48,7 @@ class SettingProxyActivity : BaseActivity() {
                 val settings = it.settingService
 
                 settings.isIPv6Enabled =
-                    findPreference<CheckBoxPreference>(KEY_IPV6_SUPPORT)?.isChecked ?: true
+                    findPreference<CheckBoxPreference>(KEY_IPV6_SUPPORT)?.isChecked ?: false
                 settings.isBypassPrivateNetwork =
                     findPreference<CheckBoxPreference>(KEY_BYPASS_PRIVATE_NETWORK)?.isChecked
                         ?: true
