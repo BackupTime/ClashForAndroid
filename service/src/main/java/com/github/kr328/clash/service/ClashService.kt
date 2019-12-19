@@ -12,6 +12,7 @@ import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.event.*
 import com.github.kr328.clash.core.utils.Log
 import java.util.concurrent.Executors
+import kotlin.concurrent.thread
 
 class ClashService : Service(), IClashEventObserver {
     private val executor = Executors.newSingleThreadExecutor()
@@ -101,6 +102,9 @@ class ClashService : Service(), IClashEventObserver {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+
+        notification.setVpn(false)
+        notification.show()
 
         instance.clash.start()
 
