@@ -15,7 +15,7 @@ class TunService : VpnService(), IClashEventObserver {
     companion object {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
         private const val VPN_MTU = 1500
-        private const val PRIVATE_VLAN_DNS = "172.19.0.2" // sync with tun/tun.go/dnsServerAddress
+        private const val PRIVATE_VLAN_DNS = "172.19.0.2"
         private const val PRIVATE_VLAN4_CLIENT = "172.19.0.1"
     }
 
@@ -112,14 +112,16 @@ class TunService : VpnService(), IClashEventObserver {
                 start = false
 
                 if ( settings.isDnsHijackingEnabled ) {
-                    clash.clash.startTunDevice(fileDescriptor.fd, VPN_MTU,
+                    clash.clash.startTunDevice(
+                        fileDescriptor.fd, VPN_MTU,
                         "$PRIVATE_VLAN4_CLIENT/30", "0.0.0.0"
                     ) {
                         protect(it.toInt())
                     }
                 }
                 else {
-                    clash.clash.startTunDevice(fileDescriptor.fd, VPN_MTU,
+                    clash.clash.startTunDevice(
+                        fileDescriptor.fd, VPN_MTU,
                         "$PRIVATE_VLAN4_CLIENT/30", PRIVATE_VLAN_DNS
                     ) {
                         protect(it.toInt())

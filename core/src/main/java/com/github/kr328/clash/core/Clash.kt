@@ -3,7 +3,6 @@ package com.github.kr328.clash.core
 import android.content.Context
 import bridge.Bridge
 import bridge.EventPoll
-import bridge.Logs
 import com.github.kr328.clash.core.event.BandwidthEvent
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.event.ProcessEvent
@@ -77,7 +76,13 @@ class Clash(
         loadDefault()
     }
 
-    fun startTunDevice(fd: Int, mtu: Int, gateway: String, dns: String, onSocket: (Int) -> Unit) {
+    fun startTunDevice(
+        fd: Int,
+        mtu: Int,
+        gateway: String,
+        dns: String,
+        onSocket: (Int) -> Unit
+    ) {
         enforceStarted()
 
         Bridge.startTunDevice(fd.toLong(), mtu.toLong(), gateway, dns) {
