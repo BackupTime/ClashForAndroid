@@ -13,8 +13,8 @@ android {
         applicationId "com.github.kr328.clash"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 10025
-        versionName "1.0.25-alpha"
+        versionCode 10026
+        versionName "1.0.26-alpha"
     }
     buildTypes {
         release {

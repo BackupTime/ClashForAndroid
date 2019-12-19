@@ -40,7 +40,7 @@ class ClashStartService : Service() {
         startForeground(NOTIFICATION_ID, notification)
 
         thread {
-            Thread.sleep(5000)
+            Thread.sleep(1000)
 
             ServiceUtils.startProxyService(this)
 
