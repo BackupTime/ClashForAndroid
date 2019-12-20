@@ -113,6 +113,7 @@ class ClashServiceImpl(clashService: ClashService) : IClashService.Stub() {
     }
 
     fun shutdown() {
+        eventPoll.shutdown()
         eventService.shutdown()
     }
 }

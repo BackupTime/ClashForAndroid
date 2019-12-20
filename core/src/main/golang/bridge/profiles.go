@@ -6,10 +6,6 @@ func LoadProfileFile(path string) error {
 	return profile.LoadFromFile(path)
 }
 
-func LoadProfileDefault() {
-	profile.LoadDefault()
-}
-
 func CheckProfileValid(profileData string) error {
 	return profile.CheckValid(profileData)
 }

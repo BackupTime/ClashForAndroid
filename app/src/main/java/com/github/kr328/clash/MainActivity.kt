@@ -3,8 +3,12 @@ package com.github.kr328.clash
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import com.github.kr328.clash.core.event.*
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.utils.ByteFormatter
@@ -194,7 +198,11 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showAboutDialog() {
-        AlertDialog.Builder(this).setView(R.layout.dialog_about).show()
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_about, window.decorView as ViewGroup?, false)
+
+        view.findViewById<TextView>(android.R.id.summary).text = packageManager.getPackageInfo(packageName, 0).let(PackageInfo::versionName)
+
+        AlertDialog.Builder(this).setView(view).show()
     }
 
     override fun onErrorEvent(event: ErrorEvent?) {

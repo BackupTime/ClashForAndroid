@@ -20,79 +20,87 @@ class ClashEventService(private val master: Master) : IClashEventService.Stub() 
     )
 
     private val observers = mutableMapOf<String, EventObserverRecord>()
-    private val handler = Executors.newSingleThreadExecutor()
+    private val executor = Executors.newSingleThreadExecutor()
 
     private var currentProcessEvent = ProcessEvent.STOPPED
 
     fun performProcessEvent(event: ProcessEvent) {
-        handler.submit {
-            currentProcessEvent = event
+        if (!executor.isShutdown)
+            executor.submit {
+                currentProcessEvent = event
 
-            observers.values.forEach {
-                it.observer.onProcessEvent(event)
+                observers.values.forEach {
+                    it.observer.onProcessEvent(event)
+                }
             }
-        }
     }
 
     fun performLogEvent(event: LogEvent) {
-        handler.submit {
-            observers.values.forEach {
-                if (it.acquiredEvent.contains(Event.EVENT_LOG))
-                    it.observer.onLogEvent(event)
+        if (!executor.isShutdown)
+            executor.submit {
+                observers.values.forEach {
+                    if (it.acquiredEvent.contains(Event.EVENT_LOG))
+                        it.observer.onLogEvent(event)
+                }
             }
-        }
     }
 
     fun performSpeedEvent(event: TrafficEvent) {
-        handler.submit {
-            observers.values.forEach {
-                if (it.acquiredEvent.contains(Event.EVENT_TRAFFIC))
-                    it.observer.onTrafficEvent(event)
+        if (!executor.isShutdown)
+            executor.submit {
+                observers.values.forEach {
+                    if (it.acquiredEvent.contains(Event.EVENT_TRAFFIC))
+                        it.observer.onTrafficEvent(event)
+                }
             }
-        }
     }
 
     fun performBandwidthEvent(event: BandwidthEvent) {
-        handler.submit {
-            observers.values.forEach {
-                if ( it.acquiredEvent.contains(Event.EVENT_BANDWIDTH) )
-                    it.observer.onBandwidthEvent(event)
+        if (!executor.isShutdown)
+            executor.submit {
+                observers.values.forEach {
+                    if (it.acquiredEvent.contains(Event.EVENT_BANDWIDTH))
+                        it.observer.onBandwidthEvent(event)
+                }
             }
-        }
     }
 
     fun performErrorEvent(event: ErrorEvent) {
-        handler.submit {
-            observers.values.forEach {
-                it.observer.onErrorEvent(event)
+        if (!executor.isShutdown)
+            executor.submit {
+                observers.values.forEach {
+                    it.observer.onErrorEvent(event)
+                }
             }
-        }
     }
 
     fun performProfileChangedEvent(event: ProfileChangedEvent) {
-        handler.submit {
-            observers.values.forEach {
-                it.observer.onProfileChanged(event)
+        if (!executor.isShutdown)
+            executor.submit {
+                observers.values.forEach {
+                    it.observer.onProfileChanged(event)
+                }
             }
-        }
     }
 
     fun performProfileReloadEvent(event: ProfileReloadEvent) {
-        handler.submit {
-            observers.values.forEach {
-                it.observer.onProfileReloaded(event)
+        if (!executor.isShutdown)
+            executor.submit {
+                observers.values.forEach {
+                    it.observer.onProfileReloaded(event)
+                }
             }
-        }
     }
 
     override fun unregisterEventObserver(id: String?) {
-        handler.submit {
-            require(id != null)
+        if (!executor.isShutdown)
+            executor.submit {
+                require(id != null)
 
-            observers.remove(id)
+                observers.remove(id)
 
-            recastEventRequirement()
-        }
+                recastEventRequirement()
+            }
     }
 
     override fun registerEventObserver(
@@ -100,38 +108,40 @@ class ClashEventService(private val master: Master) : IClashEventService.Stub() 
         observer: IClashEventObserver?,
         events: IntArray?
     ) {
-        handler.submit {
-            require(id != null && observer != null && events != null)
+        if (!executor.isShutdown)
+            executor.submit {
+                require(id != null && observer != null && events != null)
 
-            val initial = !observers.containsKey(id)
+                val initial = !observers.containsKey(id)
 
-            observers[id] = EventObserverRecord(observer, events.toSet())
+                observers[id] = EventObserverRecord(observer, events.toSet())
 
-            observer.asBinder().linkToDeath({
-                unregisterEventObserver(id)
-            }, 0)
+                observer.asBinder().linkToDeath({
+                    unregisterEventObserver(id)
+                }, 0)
 
-            recastEventRequirement()
+                recastEventRequirement()
 
-            if (initial) {
-                observer.onProcessEvent(currentProcessEvent)
+                if (initial) {
+                    observer.onProcessEvent(currentProcessEvent)
+                }
             }
-        }
-    }
-
-    fun shutdown() {
-        handler.shutdown()
     }
 
     fun recastEventRequirement() {
-        handler.submit {
-            val req = observers.values.flatMap {
-                it.acquiredEvent
-            }.toSet()
-            val rel = EVENT_SET - req
+        if (!executor.isShutdown)
+            executor.submit {
+                val req = observers.values.flatMap {
+                    it.acquiredEvent
+                }.toSet()
+                val rel = EVENT_SET - req
 
-            req.forEach(master::acquireEvent)
-            rel.forEach(master::releaseEvent)
-        }
+                req.forEach(master::acquireEvent)
+                rel.forEach(master::releaseEvent)
+            }
+    }
+
+    fun shutdown() {
+        executor.shutdown()
     }
 }

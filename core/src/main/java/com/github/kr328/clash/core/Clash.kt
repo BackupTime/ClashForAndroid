@@ -62,7 +62,7 @@ class Clash(
 
         listener(currentProcess)
 
-        loadDefault()
+        Bridge.reset()
     }
 
     fun stop() {
@@ -73,7 +73,7 @@ class Clash(
 
         listener(currentProcess)
 
-        loadDefault()
+        Bridge.reset()
     }
 
     fun startTunDevice(
@@ -171,10 +171,6 @@ class Clash(
         return Poll(Bridge.pollLogs { level, payload ->
             onEvent(LogEvent(LogEvent.Level.fromString(level), payload))
         })
-    }
-
-    private fun loadDefault() {
-        Bridge.loadProfileDefault()
     }
 
     private fun enforceStarted() {

@@ -75,4 +75,10 @@ class ClashEventPoll(private val clash: Clash, private val master: Master) {
             logs = null
         }
     }
+
+    fun shutdown() {
+        stopTrafficPoll()
+        stopBandwidthPoll()
+        stopLogPoll()
+    }
 }

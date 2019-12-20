@@ -10,13 +10,17 @@ import android.os.*
 import com.github.kr328.clash.core.event.*
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkObserver
+import java.net.Inet4Address
+import java.net.InetAddress
 
 class TunService : VpnService(), IClashEventObserver {
     companion object {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
         private const val VPN_MTU = 1500
-        private const val PRIVATE_VLAN_DNS = "172.19.0.2"
-        private const val PRIVATE_VLAN4_CLIENT = "172.19.0.1"
+        private const val PRIVATE_VLAN4_SUBNET = 30
+        private const val PRIVATE_VLAN4_CLIENT = "172.255.255.253"
+        private const val PRIVATE_VLAN_DNS = "172.255.255.254"
+        private const val VLAN4_ANY = "0.0.0.0"
     }
 
     private var start = true
@@ -114,7 +118,7 @@ class TunService : VpnService(), IClashEventObserver {
                 if ( settings.isDnsHijackingEnabled ) {
                     clash.clash.startTunDevice(
                         fileDescriptor.fd, VPN_MTU,
-                        "$PRIVATE_VLAN4_CLIENT/30", "0.0.0.0"
+                        "$PRIVATE_VLAN4_CLIENT/$PRIVATE_VLAN4_SUBNET", VLAN4_ANY
                     ) {
                         protect(it.toInt())
                     }
@@ -122,7 +126,7 @@ class TunService : VpnService(), IClashEventObserver {
                 else {
                     clash.clash.startTunDevice(
                         fileDescriptor.fd, VPN_MTU,
-                        "$PRIVATE_VLAN4_CLIENT/30", PRIVATE_VLAN_DNS
+                        "$PRIVATE_VLAN4_CLIENT/$PRIVATE_VLAN4_SUBNET", PRIVATE_VLAN_DNS
                     ) {
                         protect(it.toInt())
                     }
@@ -195,7 +199,7 @@ class TunService : VpnService(), IClashEventObserver {
     }
 
     private fun Builder.addAddress(): Builder {
-        addAddress(PRIVATE_VLAN4_CLIENT, 30)
+        addAddress(PRIVATE_VLAN4_CLIENT, PRIVATE_VLAN4_SUBNET)
 
         return this
     }
