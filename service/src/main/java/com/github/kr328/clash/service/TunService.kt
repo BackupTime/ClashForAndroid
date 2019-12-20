@@ -18,8 +18,8 @@ class TunService : VpnService(), IClashEventObserver {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
         private const val VPN_MTU = 1500
         private const val PRIVATE_VLAN4_SUBNET = 30
-        private const val PRIVATE_VLAN4_CLIENT = "172.255.255.253"
-        private const val PRIVATE_VLAN_DNS = "172.255.255.254"
+        private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
+        private const val PRIVATE_VLAN_DNS = "172.31.255.254"
         private const val VLAN4_ANY = "0.0.0.0"
     }
 

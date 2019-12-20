@@ -18,7 +18,6 @@
         <item>160.0.0.0/5</item>
         <item>168.0.0.0/6</item>
         <item>172.0.0.0/12</item>
-        <item>172.19.0.0/30</item>
         <item>172.32.0.0/11</item>
         <item>172.64.0.0/10</item>
         <item>172.128.0.0/9</item>
@@ -67,6 +66,7 @@
         <item>255.255.255.248/30</item>
         <item>255.255.255.252/31</item>
         <item>255.255.255.254/32</item>
+        <item>172.31.255.252/30</item> <!-- tun device address -->
     </string-array>
 
     <string-array name="default_disallow_application">
