@@ -127,7 +127,12 @@ class FormAdapter(
         return elements[position].javaClass.hashCode()
     }
 
-    private fun showTextEditDialog(initial: String, title: String, hint: String, callback: (String) -> Unit) {
+    private fun showTextEditDialog(
+        initial: String,
+        title: String,
+        hint: String,
+        callback: (String) -> Unit
+    ) {
         MaterialAlertDialogBuilder(activity)
             .setTitle(title)
             .setView(R.layout.dialog_text_edit)

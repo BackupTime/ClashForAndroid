@@ -25,9 +25,14 @@ class FeedbackActivity : BaseActivity() {
                 onPreferenceClickListener = Preference.OnPreferenceClickListener { p ->
                     val data = ClipData.newPlainText("userIdentifier", summary)
 
-                    requireContext().getSystemService(ClipboardManager::class.java)?.setPrimaryClip(data)
+                    requireContext().getSystemService(ClipboardManager::class.java)
+                        ?.setPrimaryClip(data)
 
-                    Toast.makeText(requireContext(), R.string.feedback_feedback_id_copied, Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.feedback_feedback_id_copied,
+                        Toast.LENGTH_LONG
+                    ).show()
 
                     true
                 }

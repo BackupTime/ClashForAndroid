@@ -9,19 +9,14 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlConfiguration
 import com.github.kr328.clash.adapter.ProfileAdapter
 import com.github.kr328.clash.core.event.ErrorEvent
 import com.github.kr328.clash.core.event.ProfileChangedEvent
-import com.github.kr328.clash.model.ClashProfile
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_profiles.*
 import java.io.File
 import java.io.FileOutputStream
-import java.net.InetSocketAddress
-import java.net.Proxy
 import java.net.URL
 import kotlin.concurrent.thread
 
@@ -35,10 +30,12 @@ class ProfilesActivity : BaseActivity() {
         setSupportActionBar(activity_profiles_toolbar)
 
         activity_profiles_main_list.layoutManager = LinearLayoutManager(this)
-        activity_profiles_main_list.adapter = ProfileAdapter(this,
+        activity_profiles_main_list.adapter = ProfileAdapter(
+            this,
             this::onProfileClick,
             this::onOperateClick,
-            this::onProfileLongClick) {
+            this::onProfileLongClick
+        ) {
             startActivity(Intent(this, CreateProfileActivity::class.java))
         }
     }
@@ -114,7 +111,7 @@ class ProfilesActivity : BaseActivity() {
                     .setCancelable(false)
                     .show()
 
-                    updateProfile(profile)
+                updateProfile(profile)
             }
             ClashProfileEntity.isFileToken(profile.token) -> {
                 Snackbar.make(
@@ -150,7 +147,7 @@ class ProfilesActivity : BaseActivity() {
                 try {
                     val connection = URL(url).openConnection()
 
-                    val data = with (connection) {
+                    val data = with(connection) {
                         connectTimeout = ImportUrlActivity.DEFAULT_TIMEOUT
                         connect()
 
@@ -172,7 +169,7 @@ class ProfilesActivity : BaseActivity() {
 
                     pipe[0].close()
 
-                    if ( error != null )
+                    if (error != null)
                         throw Exception(error)
 
                     FileOutputStream(profile.file).use { outputStream ->
@@ -182,8 +179,7 @@ class ProfilesActivity : BaseActivity() {
                     runClash { clash ->
                         clash.profileService.touchProfile(profile.id)
                     }
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     runOnUiThread {
                         Snackbar.make(
                             activity_profiles_root,
@@ -194,7 +190,7 @@ class ProfilesActivity : BaseActivity() {
                 }
 
                 runOnUiThread {
-                    if ( dialog?.isShowing == true )
+                    if (dialog?.isShowing == true)
                         dialog?.dismiss()
                 }
             }
@@ -202,6 +198,7 @@ class ProfilesActivity : BaseActivity() {
     }
 
     override fun onErrorEvent(event: ErrorEvent?) {
-        Snackbar.make(activity_profiles_root, event?.message ?: "Unknown", Snackbar.LENGTH_LONG).show()
+        Snackbar.make(activity_profiles_root, event?.message ?: "Unknown", Snackbar.LENGTH_LONG)
+            .show()
     }
 }

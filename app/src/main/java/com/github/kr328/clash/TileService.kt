@@ -7,10 +7,8 @@ import android.content.IntentFilter
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.github.kr328.clash.core.event.ProcessEvent
-import com.github.kr328.clash.core.event.ProfileReloadEvent
 import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.Constants
-import com.github.kr328.clash.service.IClashEventObserver
 import com.github.kr328.clash.service.IClashService
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.utils.ServiceUtils
@@ -41,7 +39,7 @@ class TileService : TileService() {
     }
 
     private fun refreshStatus() {
-        if ( qsTile == null )
+        if (qsTile == null)
             return
 
         val current = getCurrentStatus()
@@ -86,11 +84,14 @@ class TileService : TileService() {
 
     private fun getCurrentStatus(): Pair<ProcessEvent, ClashProfileEntity?> {
         val service =
-            IClashService.Stub.asInterface(clashStatusReceiver
-                .peekService(this, Intent(this, ClashService::class.java)))
+            IClashService.Stub.asInterface(
+                clashStatusReceiver
+                    .peekService(this, Intent(this, ClashService::class.java))
+            )
 
         return runCatching {
-            (service?.currentProcessStatus ?: ProcessEvent.STOPPED) to service?.profileService?.queryActiveProfile()
+            (service?.currentProcessStatus
+                ?: ProcessEvent.STOPPED) to service?.profileService?.queryActiveProfile()
         }.getOrNull() ?: ProcessEvent.STOPPED to null
     }
 }

@@ -5,7 +5,12 @@ import kotlinx.serialization.*
 import kotlinx.serialization.internal.StringDescriptor
 
 @Serializable(ClashRule.Serializer::class)
-data class ClashRule(val matcher: Matcher, val pattern: String, val target: String, val extras: List<String>) {
+data class ClashRule(
+    val matcher: Matcher,
+    val pattern: String,
+    val target: String,
+    val extras: List<String>
+) {
     enum class Matcher {
         DOMAIN_SUFFIX,
         DOMAIN_KEYWORD,
@@ -76,7 +81,12 @@ data class ClashRule(val matcher: Matcher, val pattern: String, val target: Stri
                     ClashRule(Matcher.fromString(rule[0]), rule[1], rule[2], emptyList())
                 }
                 else -> {
-                    ClashRule(Matcher.fromString(rule[0]), rule[1], rule[2], rule.subList(3, rule.size))
+                    ClashRule(
+                        Matcher.fromString(rule[0]),
+                        rule[1],
+                        rule[2],
+                        rule.subList(3, rule.size)
+                    )
                 }
             }
         }
@@ -85,7 +95,11 @@ data class ClashRule(val matcher: Matcher, val pattern: String, val target: Stri
             if (obj.matcher == Matcher.MATCH) {
                 encoder.encodeString("${obj.matcher},${obj.target}")
             } else {
-                encoder.encodeString("${obj.matcher},${obj.pattern},${obj.target},${obj.extras.joinToString(",")}")
+                encoder.encodeString(
+                    "${obj.matcher},${obj.pattern},${obj.target},${obj.extras.joinToString(
+                        ","
+                    )}"
+                )
             }
         }
     }

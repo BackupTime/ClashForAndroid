@@ -11,11 +11,13 @@ import com.github.kr328.clash.view.RadioFatItem
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ProfileAdapter(private val context: Context,
-                     private val onClick: (ClashProfileEntity) -> Unit,
-                     private val onOperateClick: (ClashProfileEntity) -> Unit,
-                     private val onLongClicked: (View,ClashProfileEntity) -> Unit,
-                     private val onNewProfile: () -> Unit) :
+class ProfileAdapter(
+    private val context: Context,
+    private val onClick: (ClashProfileEntity) -> Unit,
+    private val onOperateClick: (ClashProfileEntity) -> Unit,
+    private val onLongClicked: (View, ClashProfileEntity) -> Unit,
+    private val onNewProfile: () -> Unit
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var profiles: Array<ClashProfileEntity> = emptyArray()
 
@@ -23,7 +25,7 @@ class ProfileAdapter(private val context: Context,
     class NewProfileHolder(val view: FatItem) : RecyclerView.ViewHolder(view)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if ( viewType == 0 ) {
+        if (viewType == 0) {
             return NewProfileHolder(FatItem(context).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -47,7 +49,7 @@ class ProfileAdapter(private val context: Context,
     }
 
     override fun onBindViewHolder(raw: RecyclerView.ViewHolder, position: Int) {
-        if ( position == profiles.size ) {
+        if (position == profiles.size) {
             val holder = raw as NewProfileHolder
 
             holder.view.icon = context.getDrawable(R.drawable.ic_new_profile)
@@ -80,9 +82,10 @@ class ProfileAdapter(private val context: Context,
         }
         val now = Calendar.getInstance()
 
-        val formatter = if ( profileUpdateDate.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+        val formatter = if (profileUpdateDate.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
             profileUpdateDate.get(Calendar.MONTH) == now.get(Calendar.MONTH) &&
-                profileUpdateDate.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) )
+            profileUpdateDate.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)
+        )
             SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         else
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -90,19 +93,23 @@ class ProfileAdapter(private val context: Context,
         when {
             ClashProfileEntity.isFileToken(current.token) -> {
                 holder.view.operation = context.getDrawable(R.drawable.ic_edit)
-                holder.view.summary = context.getString(R.string.clash_profile_item_summary_file,
-                    formatter.format(profileUpdateDate.time))
+                holder.view.summary = context.getString(
+                    R.string.clash_profile_item_summary_file,
+                    formatter.format(profileUpdateDate.time)
+                )
             }
             ClashProfileEntity.isUrlToken(current.token) -> {
                 holder.view.operation = context.getDrawable(R.drawable.ic_sync)
-                holder.view.summary = context.getString(R.string.clash_profile_item_summary_url,
-                    formatter.format(profileUpdateDate.time))
+                holder.view.summary = context.getString(
+                    R.string.clash_profile_item_summary_url,
+                    formatter.format(profileUpdateDate.time)
+                )
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if ( position == profiles.size )
+        return if (position == profiles.size)
             0
         else
             1

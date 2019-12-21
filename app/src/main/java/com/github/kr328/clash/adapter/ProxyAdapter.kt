@@ -13,9 +13,11 @@ import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.model.ListProxy
 import com.google.android.material.card.MaterialCardView
 
-class ProxyAdapter(private val context: Context,
-                   private val onSelect: (String, String) -> Unit,
-                   private val onUrlTest: (Int, Int) -> Unit) :
+class ProxyAdapter(
+    private val context: Context,
+    private val onSelect: (String, String) -> Unit,
+    private val onUrlTest: (Int, Int) -> Unit
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var elements: List<ListProxy> = emptyList()
     var clickable: Boolean = false
@@ -141,7 +143,7 @@ class ProxyAdapter(private val context: Context,
         holder.test.visibility =
             if (current.type == Proxy.Type.SELECT) View.VISIBLE else View.GONE
         holder.test.setOnClickListener {
-            if ( current.urlTest )
+            if (current.urlTest)
                 return@setOnClickListener
 
             val indexed = elements.withIndex()

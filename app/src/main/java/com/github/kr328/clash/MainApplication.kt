@@ -9,7 +9,6 @@ import com.github.kr328.clash.core.utils.Log
 import com.google.firebase.FirebaseApp
 import io.fabric.sdk.android.Fabric
 import java.security.MessageDigest
-import kotlin.experimental.and
 
 
 class MainApplication : Application() {
@@ -35,7 +34,7 @@ class MainApplication : Application() {
             return this.map {
                 Integer.toHexString(it.toInt() and 0xff)
             }.map {
-                if ( it.length < 2 )
+                if (it.length < 2)
                     "0$it"
                 else
                     it
@@ -63,7 +62,7 @@ class MainApplication : Application() {
         Crashlytics.setBool(CRASHLYTICS_SPLIT_APK_KEY, detectSplitArchive())
         Crashlytics.setUserIdentifier(userIdentifier)
 
-        Log.handler = object: Log.LogHandler {
+        Log.handler = object : Log.LogHandler {
             override fun info(message: String, throwable: Throwable?) {
                 android.util.Log.i(Constants.TAG, message, throwable)
             }

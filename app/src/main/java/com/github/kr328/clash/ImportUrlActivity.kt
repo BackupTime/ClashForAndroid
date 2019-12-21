@@ -6,18 +6,13 @@ import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.YamlException
 import com.github.kr328.clash.adapter.FormAdapter
-import com.github.kr328.clash.model.ClashProfile
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.utils.FileUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_import_url.*
 import java.io.FileOutputStream
-import java.net.InetSocketAddress
-import java.net.Proxy
 import java.net.URL
 import kotlin.concurrent.thread
 
@@ -54,9 +49,10 @@ class ImportUrlActivity : BaseActivity() {
             checkAndInsert()
         }
 
-        if ( intent.action == Intent.ACTION_VIEW
+        if (intent.action == Intent.ACTION_VIEW
             && intent.data?.scheme == "clash"
-            && intent.data?.host == "install-config") {
+            && intent.data?.host == "install-config"
+        ) {
             (elements[1] as FormAdapter.TextType).content =
                 intent.data?.getQueryParameter("url") ?: ""
         }
@@ -78,11 +74,11 @@ class ImportUrlActivity : BaseActivity() {
             val name = elements[0] as FormAdapter.TextType
             val url = elements[1] as FormAdapter.TextType
 
-            if ( name.content.isBlank() ) {
+            if (name.content.isBlank()) {
                 return
             }
 
-            if ( url.content.isBlank() ) {
+            if (url.content.isBlank()) {
                 return
             }
 
@@ -94,7 +90,7 @@ class ImportUrlActivity : BaseActivity() {
                     try {
                         val connection = URL(url.content).openConnection()
 
-                        val data = with (connection) {
+                        val data = with(connection) {
                             connectTimeout = DEFAULT_TIMEOUT
                             connect()
 
@@ -117,22 +113,29 @@ class ImportUrlActivity : BaseActivity() {
 
                         pipe[0].close()
 
-                        if ( error != null )
+                        if (error != null)
                             throw Exception(error)
 
                         val cache =
-                            FileUtils.generateRandomFile(filesDir.resolve(Constants.PROFILES_DIR), ".yaml")
+                            FileUtils.generateRandomFile(
+                                filesDir.resolve(Constants.PROFILES_DIR),
+                                ".yaml"
+                            )
 
                         FileOutputStream(cache).use { outputStream ->
                             outputStream.write(data.toByteArray())
                         }
 
                         runClash { clash ->
-                            clash.profileService.addProfile(ClashProfileEntity(name.content,
-                                ClashProfileEntity.urlToken(url.content),
-                                cache.absolutePath,
-                                false,
-                                System.currentTimeMillis()))
+                            clash.profileService.addProfile(
+                                ClashProfileEntity(
+                                    name.content,
+                                    ClashProfileEntity.urlToken(url.content),
+                                    cache.absolutePath,
+                                    false,
+                                    System.currentTimeMillis()
+                                )
+                            )
                         }
 
                         runOnUiThread {
@@ -140,12 +143,15 @@ class ImportUrlActivity : BaseActivity() {
 
                             finish()
                         }
-                    }
-                    catch (e: Exception) {
+                    } catch (e: Exception) {
                         runOnUiThread {
                             Snackbar.make(
                                 activity_import_url_root,
-                                getString(R.string.clash_profile_invalid, e.message?.replace(YamlException::class.java.name + ":", "") ?: "Unknown"),
+                                getString(
+                                    R.string.clash_profile_invalid,
+                                    e.message?.replace(YamlException::class.java.name + ":", "")
+                                        ?: "Unknown"
+                                ),
                                 Snackbar.LENGTH_LONG
                             ).show()
 
@@ -155,8 +161,7 @@ class ImportUrlActivity : BaseActivity() {
                     }
                 }
             }
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
 
         }
     }

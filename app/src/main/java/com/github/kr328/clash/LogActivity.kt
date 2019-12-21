@@ -46,9 +46,11 @@ class LogActivity : BaseActivity() {
         activity_logs_list.adapter?.notifyDataSetChanged()
 
         runClash {
-            it.eventService.registerEventObserver(LogActivity::class.java.name,
+            it.eventService.registerEventObserver(
+                LogActivity::class.java.name,
                 this,
-                intArrayOf(Event.EVENT_LOG))
+                intArrayOf(Event.EVENT_LOG)
+            )
         }
     }
 
@@ -70,18 +72,20 @@ class LogActivity : BaseActivity() {
         handler.post {
             buffer.addFirst(event)
 
-            if ( syncLog ) {
+            if (syncLog) {
                 activity_logs_list.adapter!!.notifyItemInserted(0)
-                if ( activity_logs_list.computeVerticalScrollOffset() < 30 )
+                if (activity_logs_list.computeVerticalScrollOffset() < 30)
                     activity_logs_list.scrollToPosition(0)
             }
 
-            if ( buffer.size() >= MAX_EVENT_COUNT ) {
+            if (buffer.size() >= MAX_EVENT_COUNT) {
                 buffer.removeFromEnd(buffer.size() - MAX_EVENT_COUNT - 1)
 
-                if ( syncLog ) {
-                    activity_logs_list.adapter?.notifyItemRangeRemoved(MAX_EVENT_COUNT - 1,
-                        buffer.size() - MAX_EVENT_COUNT - 1 )
+                if (syncLog) {
+                    activity_logs_list.adapter?.notifyItemRangeRemoved(
+                        MAX_EVENT_COUNT - 1,
+                        buffer.size() - MAX_EVENT_COUNT - 1
+                    )
                 }
             }
         }

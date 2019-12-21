@@ -39,18 +39,18 @@ class ProxyActivity : BaseActivity() {
         val adapter = (activity_proxies_list.adapter as ProxyAdapter)
 
         runClash {
-            val proxies = adapter.elements.subList(position, position+size)
+            val proxies = adapter.elements.subList(position, position + size)
                 .filterIsInstance<ListProxy.ListProxyItem>()
-                .mapIndexed { index, proxy -> proxy.name to IndexedValue(index, proxy)}
+                .mapIndexed { index, proxy -> proxy.name to IndexedValue(index, proxy) }
                 .toMap()
 
             for ((_, p) in proxies) {
                 p.value.delay = -1
             }
 
-            it.startUrlTest(proxies.keys.toTypedArray(), object: IUrlTestCallback.Stub() {
+            it.startUrlTest(proxies.keys.toTypedArray(), object : IUrlTestCallback.Stub() {
                 override fun onResult(proxy: String?, delay: Long) {
-                    if ( proxy == null ) {
+                    if (proxy == null) {
                         (adapter.elements[position] as ListProxy.ListProxyHeader).urlTest = false
 
                         runOnUiThread {
@@ -177,6 +177,7 @@ class ProxyActivity : BaseActivity() {
     }
 
     override fun onErrorEvent(event: ErrorEvent?) {
-        Snackbar.make(activity_proxies_root, event?.message ?: "Unknown", Snackbar.LENGTH_LONG).show()
+        Snackbar.make(activity_proxies_root, event?.message ?: "Unknown", Snackbar.LENGTH_LONG)
+            .show()
     }
 }

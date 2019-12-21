@@ -19,7 +19,7 @@ object ServiceUtils {
                 MainApplication.PROXY_MODE_VPN -> {
                     val prepare = VpnService.prepare(context)
 
-                    if ( prepare != null )
+                    if (prepare != null)
                         return prepare
 
                     context.startService(Intent(context, TunService::class.java))

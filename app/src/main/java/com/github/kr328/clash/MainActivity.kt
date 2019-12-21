@@ -94,7 +94,10 @@ class MainActivity : BaseActivity() {
                     activity_main_clash_status_icon.setImageResource(R.drawable.ic_clash_started)
                     activity_main_clash_status_title.text = getString(R.string.clash_status_started)
                     activity_main_clash_status_summary.text =
-                        getString(R.string.clash_status_forwarded_traffic, ByteFormatter.byteToString(0))
+                        getString(
+                            R.string.clash_status_forwarded_traffic,
+                            ByteFormatter.byteToString(0)
+                        )
                     activity_main_clash_proxies.visibility = View.VISIBLE
                     activity_main_clash_logs.visibility = View.VISIBLE
                 }
@@ -116,7 +119,7 @@ class MainActivity : BaseActivity() {
             val general = it.queryGeneral()
 
             runOnUiThread {
-                when ( general.mode ) {
+                when (general.mode) {
                     General.Mode.DIRECT ->
                         activity_main_clash_proxies_summary.text =
                             getText(R.string.clash_proxy_manage_summary_direct)
@@ -198,9 +201,11 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showAboutDialog() {
-        val view = LayoutInflater.from(this).inflate(R.layout.dialog_about, window.decorView as ViewGroup?, false)
+        val view = LayoutInflater.from(this)
+            .inflate(R.layout.dialog_about, window.decorView as ViewGroup?, false)
 
-        view.findViewById<TextView>(android.R.id.summary).text = packageManager.getPackageInfo(packageName, 0).let(PackageInfo::versionName)
+        view.findViewById<TextView>(android.R.id.summary).text =
+            packageManager.getPackageInfo(packageName, 0).let(PackageInfo::versionName)
 
         AlertDialog.Builder(this).setView(view).show()
     }

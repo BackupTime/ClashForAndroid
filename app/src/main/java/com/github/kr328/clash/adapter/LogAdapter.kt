@@ -12,8 +12,10 @@ import com.github.kr328.clash.core.event.LogEvent
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LogAdapter(private val content: Context,
-                 private val buffer: CircularArray<LogEvent>) : RecyclerView.Adapter<LogAdapter.Holder>() {
+class LogAdapter(
+    private val content: Context,
+    private val buffer: CircularArray<LogEvent>
+) : RecyclerView.Adapter<LogAdapter.Holder>() {
     private val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
 
     class Holder(view: View) : RecyclerView.ViewHolder(view) {
@@ -23,8 +25,10 @@ class LogAdapter(private val content: Context,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        return Holder(LayoutInflater.from(content)
-            .inflate(R.layout.adapter_log, parent, false))
+        return Holder(
+            LayoutInflater.from(content)
+                .inflate(R.layout.adapter_log, parent, false)
+        )
     }
 
     override fun getItemCount(): Int {

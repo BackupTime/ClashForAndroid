@@ -50,7 +50,7 @@ class SettingApplicationActivity : BaseActivity() {
         }
 
         override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
-            if ( !isAdded )
+            if (!isAdded)
                 return false
 
             when (preference?.key) {
@@ -60,8 +60,7 @@ class SettingApplicationActivity : BaseActivity() {
                     thread {
                         try {
                             setBootCompleteReceiverEnabled(enabled)
-                        }
-                        catch (e: Exception) {
+                        } catch (e: Exception) {
                             Log.w("Set boot complete failure", e)
                         }
                     }

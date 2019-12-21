@@ -10,7 +10,7 @@ class MarqueeTextView @JvmOverloads constructor(
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-): TextView(context, attributeSet, defStyleAttr, defStyleRes) {
+) : TextView(context, attributeSet, defStyleAttr, defStyleRes) {
     init {
         ellipsize = TextUtils.TruncateAt.MARQUEE
     }
