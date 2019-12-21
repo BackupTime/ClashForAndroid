@@ -94,6 +94,11 @@
     
     <string name="not_implemented">Not Implemented</string>
 
+    <string name="feedback_id">ID</string>
+    <string name="feedback_feedback_id">Feedback ID</string>
+    <string name="feedback_feedback_id_summary">Unknown</string>
+    <string name="feedback_feedback_id_copied">Copied</string>
+
     <string name="feedback_source">Source &amp; Issues</string>
     <string name="feedback_upstream">Upstream</string>
     <string name="feedback_github_repo">Github</string>

@@ -2,11 +2,14 @@ package com.github.kr328.clash
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import com.crashlytics.android.Crashlytics
 import com.github.kr328.clash.core.Constants
 import com.github.kr328.clash.core.utils.Log
 import com.google.firebase.FirebaseApp
 import io.fabric.sdk.android.Fabric
+import java.security.MessageDigest
+import kotlin.experimental.and
 
 
 class MainApplication : Application() {
@@ -16,10 +19,28 @@ class MainApplication : Application() {
         const val PROXY_MODE_PROXY_ONLY = "proxy_only"
 
         val GOOGLE_PLAY_INSTALLER = listOf("com.android.vending", "com.google.android.feedback")
-        const val CRASHLYTICS_GOOGLE_PLAY_KEY = "install_from_google"
+        const val CRASHLYTICS_FROM_PLAY_KEY = "install_from_google"
         const val CRASHLYTICS_SPLIT_APK_KEY = "split_apk"
 
+        val userIdentifier: String by lazy {
+            val archive = instance.packageManager.getPackageInfo(instance.packageName, 0)
+            val encoder = MessageDigest.getInstance("md5")
+
+            encoder.digest((Build.ID + archive.lastUpdateTime).toByteArray()).toHexString()
+        }
+
         lateinit var instance: MainApplication
+
+        private fun ByteArray.toHexString(): String {
+            return this.map {
+                Integer.toHexString(it.toInt() and 0xff)
+            }.map {
+                if ( it.length < 2 )
+                    "0$it"
+                else
+                    it
+            }.joinToString(separator = "")
+        }
     }
 
     override fun attachBaseContext(base: Context?) {
@@ -38,8 +59,9 @@ class MainApplication : Application() {
             Fabric.with(this, Crashlytics())
         }
 
-        Crashlytics.setBool(CRASHLYTICS_GOOGLE_PLAY_KEY, detectFromPlay())
+        Crashlytics.setBool(CRASHLYTICS_FROM_PLAY_KEY, detectFromPlay())
         Crashlytics.setBool(CRASHLYTICS_SPLIT_APK_KEY, detectSplitArchive())
+        Crashlytics.setUserIdentifier(userIdentifier)
 
         Log.handler = object: Log.LogHandler {
             override fun info(message: String, throwable: Throwable?) {

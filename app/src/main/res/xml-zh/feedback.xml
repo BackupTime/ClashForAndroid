@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/feedback_id">
+        <Preference android:title="@string/feedback_feedback_id"
+            android:key="feedback_id"
+            android:summary="@string/feedback_feedback_id_summary" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/feedback_source">
         <Preference android:title="@string/feedback_upstream"
             android:summary="@string/feedback_upstream_url">
