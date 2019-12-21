@@ -8,11 +8,16 @@ import com.github.kr328.clash.core.utils.Log
 import com.google.firebase.FirebaseApp
 import io.fabric.sdk.android.Fabric
 
+
 class MainApplication : Application() {
     companion object {
         const val KEY_PROXY_MODE = "key_proxy_mode"
         const val PROXY_MODE_VPN = "vpn"
         const val PROXY_MODE_PROXY_ONLY = "proxy_only"
+
+        val GOOGLE_PLAY_INSTALLER = listOf("com.android.vending", "com.google.android.feedback")
+        const val CRASHLYTICS_GOOGLE_PLAY_KEY = "install_from_google"
+        const val CRASHLYTICS_SPLIT_APK_KEY = "split_apk"
 
         lateinit var instance: MainApplication
     }
@@ -32,6 +37,9 @@ class MainApplication : Application() {
         runCatching {
             Fabric.with(this, Crashlytics())
         }
+
+        Crashlytics.setBool(CRASHLYTICS_GOOGLE_PLAY_KEY, detectFromPlay())
+        Crashlytics.setBool(CRASHLYTICS_SPLIT_APK_KEY, detectSplitArchive())
 
         Log.handler = object: Log.LogHandler {
             override fun info(message: String, throwable: Throwable?) {
@@ -66,5 +74,15 @@ class MainApplication : Application() {
                 android.util.Log.d(Constants.TAG, message, throwable)
             }
         }
+    }
+
+    private fun detectFromPlay(): Boolean {
+        val installer = packageManager.getInstallerPackageName(packageName)
+        return installer != null && GOOGLE_PLAY_INSTALLER.contains(installer)
+    }
+
+    private fun detectSplitArchive(): Boolean {
+        val split = applicationInfo.splitSourceDirs
+        return split != null && split.isNotEmpty()
     }
 }
