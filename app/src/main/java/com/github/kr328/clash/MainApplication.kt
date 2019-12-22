@@ -5,10 +5,15 @@ import android.content.Context
 import android.os.Build
 import com.crashlytics.android.Crashlytics
 import com.github.kr328.clash.core.Constants
+import com.github.kr328.clash.core.utils.ByteFormatter
 import com.github.kr328.clash.core.utils.Log
 import com.google.firebase.FirebaseApp
 import io.fabric.sdk.android.Fabric
+import java.io.File
+import java.lang.Exception
 import java.security.MessageDigest
+import java.util.zip.ZipFile
+import kotlin.concurrent.thread
 
 
 class MainApplication : Application() {
@@ -20,6 +25,7 @@ class MainApplication : Application() {
         val GOOGLE_PLAY_INSTALLER = listOf("com.android.vending", "com.google.android.feedback")
         const val CRASHLYTICS_FROM_PLAY_KEY = "install_from_google"
         const val CRASHLYTICS_SPLIT_APK_KEY = "split_apk"
+        const val CRASHLYTICS_BASE_SIZE_KEY = "base_size"
 
         val userIdentifier: String by lazy {
             val archive = instance.packageManager.getPackageInfo(instance.packageName, 0)
@@ -60,6 +66,7 @@ class MainApplication : Application() {
 
         Crashlytics.setBool(CRASHLYTICS_FROM_PLAY_KEY, detectFromPlay())
         Crashlytics.setBool(CRASHLYTICS_SPLIT_APK_KEY, detectSplitArchive())
+        Crashlytics.setString(CRASHLYTICS_BASE_SIZE_KEY, getBaseApkSize())
         Crashlytics.setUserIdentifier(userIdentifier)
 
         Log.handler = object : Log.LogHandler {
@@ -105,5 +112,11 @@ class MainApplication : Application() {
     private fun detectSplitArchive(): Boolean {
         val split = applicationInfo.splitSourceDirs
         return split != null && split.isNotEmpty()
+    }
+
+    private fun getBaseApkSize(): String {
+        val size = File(applicationInfo.sourceDir).length()
+
+        return ByteFormatter.byteToString(size)
     }
 }
