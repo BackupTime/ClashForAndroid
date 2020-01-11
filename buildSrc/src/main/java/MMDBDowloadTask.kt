@@ -8,7 +8,7 @@ import java.net.URL
 
 open class MMDBDowloadTask : DefaultTask() {
     companion object {
-        const val URL = "http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz"
+        const val URL = "https://github.com/Dreamacro/maxmind-geoip/releases/latest/download/Country.mmdb"
     }
 
     var output: String = ""

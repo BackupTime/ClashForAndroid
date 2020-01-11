@@ -47,7 +47,7 @@ class Clash(
             }
         }
 
-        Bridge.init(home.absolutePath)
+        Bridge.setBaseDir(home.absolutePath)
     }
 
     fun getCurrentProcessStatus(): ProcessEvent {
@@ -79,15 +79,11 @@ class Clash(
     fun startTunDevice(
         fd: Int,
         mtu: Int,
-        gateway: String,
-        dns: String,
-        onSocket: (Int) -> Unit
+        dns: String
     ) {
         enforceStarted()
 
-        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), gateway, dns) {
-            onSocket(it.toInt())
-        }
+        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns)
     }
 
     fun stopTunDevice() {

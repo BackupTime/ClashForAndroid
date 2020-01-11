@@ -1,55 +1,28 @@
 package tun
 
 import (
-	"net"
 	"strconv"
-	"syscall"
 
-	"github.com/Dreamacro/clash/global"
+	"github.com/Dreamacro/clash/dns"
 	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/proxy/tun"
 )
 
-type Callback interface {
-	OnNewSocket(fd int)
-}
+var tunInstance *tun.TunAdapter
+var dnsAddress string
 
-var tunInstance *tun.TUN
-
-func StartTunDevice(fd, mtu int, gateway string, dnsGateway string, callback Callback) error {
+func StartTunDevice(fd, mtu int, dns string) error {
 	if tunInstance != nil {
 		return nil
 	}
 
-	ip, n, err := net.ParseCIDR(gateway)
+	t, err := tun.NewTunProxy("fd://" + strconv.Itoa(fd) + "?mtu=" + strconv.Itoa(mtu))
 	if err != nil {
 		return err
 	}
 
-	n.IP = ip.To4()
-
-	global.DefaultDialer.Control = func(network, address string, c syscall.RawConn) error {
-		return c.Control(func(fd uintptr) {
-			callback.OnNewSocket(int(fd))
-		})
-	}
-	global.DefaultListenConfig.Control = func(network, address string, c syscall.RawConn) error {
-		return c.Control(func(fd uintptr) {
-			callback.OnNewSocket(int(fd))
-		})
-	}
-
-	dnsGatewayIP := net.ParseIP(dnsGateway)
-
-	t, err := tun.NewTunProxy("fd://"+strconv.Itoa(fd)+"?mtu="+strconv.Itoa(mtu), *n, dnsGatewayIP)
-
-	if err != nil {
-		global.DefaultDialer.Control = nil
-		global.DefaultListenConfig.Control = nil
-
-		return err
-	}
-	tunInstance = t
+	tunInstance = &t
+	dnsAddress = dns + ":53"
 
 	ResetDnsRedirect()
 
@@ -64,12 +37,7 @@ func StopTunDevice() {
 		return
 	}
 
-	t.Close()
-
-	global.DefaultDialer.Control = nil
-	global.DefaultListenConfig.Control = nil
-
-	tunInstance = nil
+	(*t).Close()
 }
 
 func ResetDnsRedirect() {
@@ -77,5 +45,5 @@ func ResetDnsRedirect() {
 		return
 	}
 
-	tunInstance.ResetDnsServer()
+	(*tunInstance).ReCreateDNSServer(dns.DefaultResolver, dnsAddress)
 }

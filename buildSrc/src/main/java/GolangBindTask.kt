@@ -16,11 +16,9 @@ open class GolangBindTask : DefaultTask() {
             
             require (
                 github.com/kr328/cfa v0.0.0 // redirect
-                github.com/Dreamacro/clash v0.0.0 // redirect
             )
             
             replace github.com/kr328/cfa v0.0.0 => {SOURCE_PATH}
-            replace github.com/Dreamacro/clash v0.0.0 => {SOURCE_PATH}/clash
         """.trimIndent()
         private val STUB_GO_FILE_CONTENT = """
             package main
@@ -29,6 +27,8 @@ open class GolangBindTask : DefaultTask() {
             
             func main() {}
         """.trimIndent()
+        private val REGEX_REPLACE_TARGET_LOCAL = Regex("=>\\s+\\./")
+        private val REGEX_REPLACE_SOURCE_VERSION = Regex("v.+\\s+=>")
     }
 
     private val javaOutput: File
@@ -90,7 +90,7 @@ open class GolangBindTask : DefaultTask() {
         "go get golang.org/x/mobile/cmd/gomobile".exec()
 
         FileWriter(goBindPath.resolve("go.mod")).use {
-            it.write(STUB_GO_MOD_CONTENT.replace("{SOURCE_PATH}", sourcePath.absolutePath))
+            it.write(appendReplace(sourcePath))
         }
         FileWriter(goBindPath.resolve("main.go")).use {
             it.write(STUB_GO_FILE_CONTENT)
@@ -150,6 +150,26 @@ open class GolangBindTask : DefaultTask() {
     private fun findAndroidSdkPath(): File {
         return properties.getProperty("sdk.dir")?.let { File(it) }?.takeIf { it.exists() }
             ?: throw GradleException("Android SDK not found.")
+    }
+
+    private fun appendReplace(source: File): String {
+        val replaces = source.walk()
+            .filter { it.name == "go.mod" }
+            .flatMap { file ->
+                file.readLines()
+                    .asSequence()
+                    .filter { line -> line.startsWith("replace") }
+                    .map { replace ->
+                        replace.replace(REGEX_REPLACE_TARGET_LOCAL, "=> " + file.parentFile.absolutePath + "/")
+                    }
+                    .map { replace ->
+                        replace.replace(REGEX_REPLACE_SOURCE_VERSION, " =>")
+                    }
+            }
+            .joinToString("\n")
+
+        return STUB_GO_MOD_CONTENT.replace("{SOURCE_PATH}", source.absolutePath) +
+                "\n\n" + replaces
     }
 
     private fun String.exec(pwd: File = File(".")) {

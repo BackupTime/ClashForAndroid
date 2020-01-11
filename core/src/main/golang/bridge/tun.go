@@ -4,12 +4,8 @@ import (
 	"github.com/kr328/cfa/tun"
 )
 
-type TunCallback interface {
-	OnNewSocket(fd int)
-}
-
-func StartTunDevice(fd, mtu int, gateway string, dns string, callback TunCallback) error {
-	return tun.StartTunDevice(fd, mtu, gateway, dns, callback)
+func StartTunDevice(fd, mtu int, dns string) error {
+	return tun.StartTunDevice(fd, mtu, dns)
 }
 
 func StopTunDevice() {

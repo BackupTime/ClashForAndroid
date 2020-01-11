@@ -45,41 +45,16 @@ dependencies {
 afterEvaluate {
     def ds = tasks.register("downloadMMDB", MMDBDowloadTask.class) {
         onlyIf {
-            System.currentTimeMillis() - file("$buildDir/intermediates/cache/Country.tar.gz").lastModified() > 24 * 3600 * 1000L
+            System.currentTimeMillis() - file("$buildDir/intermediates/dynamic_assets/Country.mmdb").lastModified() > 24 * 3600 * 1000L
         }
 
-        output = "$buildDir/intermediates/cache/Country.tar.gz"
-    }
-
-    def es = tasks.register("extractMMDB", Copy.class) {
-        onlyIf {
-            file("$buildDir/intermediates/cache/Country.tar.gz").lastModified() > file("$buildDir/intermediates/dynamic_assets/Country.mmdb").lastModified()
-        }
-
-        from(tarTree("$buildDir/intermediates/cache/Country.tar.gz")) {
-            include "**/*.mmdb"
-        }
-        into "$buildDir/intermediates/cache/mmdb"
-
-        doLast {
-            file("$buildDir/intermediates/dynamic_assets").mkdirs()
-            fileTree("$buildDir/intermediates/cache/mmdb").visit { FileVisitDetails details ->
-                if ( details.path.endsWith("Country.mmdb") )
-                    details.file.renameTo(file("$buildDir/intermediates/dynamic_assets/Country.mmdb"))
-            }
-        }
-
-        dependsOn ds
-    }
-
-    for ( task in tasks ) {
-        if ( task.name.contains("generate") && task.name.contains("Assets") )
-            task.dependsOn(es)
+        output = "$buildDir/intermediates/dynamic_assets/Country.mmdb"
     }
 
     def gs = tasks.register("golangBind", GolangBindTask.class)
 
-    preBuild.dependsOn(gs)
+    preBuild.dependsOn(ds, gs)
+
 }
 
 repositories {

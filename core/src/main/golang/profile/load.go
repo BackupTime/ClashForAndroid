@@ -68,7 +68,7 @@ func LoadFromFile(path string) error {
 
 	if dns.DefaultResolver == nil {
 		_, ipnet, _ := net.ParseCIDR("198.18.0.1/16")
-		pool, _ := fakeip.New(ipnet, 1000)
+		pool, _ := fakeip.New(ipnet, 1000, nil)
 
 		var defaultDNSResolver = dns.New(dns.Config{
 			Main: []dns.NameServer{
