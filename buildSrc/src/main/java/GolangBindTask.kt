@@ -90,7 +90,7 @@ open class GolangBindTask : DefaultTask() {
         "go get golang.org/x/mobile/cmd/gomobile".exec()
 
         FileWriter(goBindPath.resolve("go.mod")).use {
-            it.write(appendReplace(sourcePath))
+            it.write(buildStubGoModule(sourcePath))
         }
         FileWriter(goBindPath.resolve("main.go")).use {
             it.write(STUB_GO_FILE_CONTENT)
@@ -102,7 +102,7 @@ open class GolangBindTask : DefaultTask() {
             .copyRecursively(goPath.resolve("src"), overwrite = true)
 
         "gomobile init".exec(goBuildPath)
-        "gomobile bind -target=android github.com/kr328/cfa/bridge".exec(goBuildPath)
+        "gomobile bind -target=android \"-gcflags=all=-trimpath=$goPath\" github.com/kr328/cfa/bridge".exec(goBuildPath)
 
         nativeOutput.deleteRecursively()
         javaOutput.deleteRecursively()
@@ -152,7 +152,7 @@ open class GolangBindTask : DefaultTask() {
             ?: throw GradleException("Android SDK not found.")
     }
 
-    private fun appendReplace(source: File): String {
+    private fun buildStubGoModule(source: File): String {
         val replaces = source.walk()
             .filter { it.name == "go.mod" }
             .flatMap { file ->
