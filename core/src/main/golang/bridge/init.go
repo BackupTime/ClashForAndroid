@@ -1,13 +1,13 @@
 package bridge
 
-import "github.com/Dreamacro/clash/constant"
+import (
+	"github.com/Dreamacro/clash/component/mmdb"
+	"github.com/Dreamacro/clash/tunnel"
+	"github.com/kr328/cfa/profile"
+)
 
-import "github.com/kr328/cfa/profile"
-
-import "github.com/Dreamacro/clash/tunnel"
-
-func SetBaseDir(home string) {
-	constant.SetHomeDir(home)
+func LoadMMDB(data []byte) {
+	mmdb.LoadFromBytes(data)
 }
 
 func Reset() {

@@ -1,74 +1,150 @@
 package bridge
 
 import (
-	"context"
-	"encoding/json"
-	"time"
+	"sync"
 
 	"github.com/Dreamacro/clash/adapters/outbound"
 	"github.com/Dreamacro/clash/adapters/outboundgroup"
+	"github.com/Dreamacro/clash/adapters/provider"
 	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/tunnel"
 )
 
-type Proxy struct {
+type ProxyItem struct {
 	Name  string
-	Type  string   `json:"type"`
-	All   []string `json:"all"`
-	Now   string   `json:"now"`
+	Type  string
 	Delay int
 }
 
-type ProxyList struct {
-	proxies []*Proxy
+type ProxyGroupItem struct {
+	Name    string
+	Type    string
+	Current string
+	Delay   int
+
+	providers []provider.ProxyProvider
+}
+
+type ProxyGroupCollection interface {
+	Add(proxy *ProxyGroupItem) bool
+}
+
+type ProxyCollection interface {
+	Add(proxy *ProxyItem) bool
 }
 
 type UrlTestCallback interface {
-	OnResult(name string, delay int)
+	Done()
 }
 
-func (p Proxy) GetAllLength() int {
-	return len(p.All)
-}
-
-func (p Proxy) GetAllElement(index int) string {
-	return p.All[index]
-}
-
-func (pl *ProxyList) GetProxiesLength() int {
-	return len(pl.proxies)
-}
-
-func (pl *ProxyList) GetProxiesElement(index int) *Proxy {
-	return pl.proxies[index]
-}
-
-func QueryAllProxies() (*ProxyList, error) {
-	ps := tunnel.Instance().Proxies()
-	result := make([]*Proxy, len(ps))
-	currentIndex := 0
-
-	for k, v := range ps {
-		current := &Proxy{
-			Name:  k,
-			Type:  v.Type().String(),
-			All:   []string{},
-			Delay: int(v.LastDelay()),
+func (p *ProxyGroupItem) QueryAllProxies(collection ProxyCollection) {
+	for _, v := range p.providers {
+		for _, p := range v.Proxies() {
+			collection.Add(
+				&ProxyItem{
+					Name:  p.Name(),
+					Type:  p.Type().String(),
+					Delay: int(p.LastDelay()),
+				},
+			)
 		}
-
-		data, err := v.MarshalJSON()
-		if err != nil {
-			return nil, err
-		}
-
-		json.Unmarshal(data, current)
-
-		result[currentIndex] = current
-
-		currentIndex++
 	}
+}
 
-	return &ProxyList{proxies: result}, nil
+func StartUrlTest(group string, callback UrlTestCallback) {
+	go func() {
+		defer callback.Done()
+
+		p := tunnel.Instance().Proxies()[group]
+
+		pa, ok := p.(*outbound.Proxy)
+		if !ok {
+			return
+		}
+
+		var providers []provider.ProxyProvider
+
+		switch group := pa.ProxyAdapter.(type) {
+		case *outboundgroup.Fallback:
+			providers = group.GetProviders()
+		case *outboundgroup.URLTest:
+			providers = group.GetProviders()
+		case *outboundgroup.LoadBalance:
+			providers = group.GetProviders()
+		case *outboundgroup.Selector:
+			providers = group.GetProviders()
+		default:
+			return
+		}
+
+		wg := &sync.WaitGroup{}
+		wg.Add(len(providers))
+
+		for _, v := range providers {
+			go func(p provider.ProxyProvider) {
+				p.HealthCheck()
+				wg.Done()
+			}(v)
+		}
+
+		wg.Wait()
+	}()
+}
+
+func QueryAllProxyGroups(collection ProxyGroupCollection) {
+	ps := tunnel.Instance().Proxies()
+
+	for _, p := range ps {
+		pa, ok := p.(*outbound.Proxy)
+		if !ok {
+			continue
+		}
+
+		switch group := pa.ProxyAdapter.(type) {
+		case *outboundgroup.Fallback:
+			collection.Add(
+				&ProxyGroupItem{
+					Name:      group.Name(),
+					Type:      group.Type().String(),
+					Current:   group.Now(),
+					Delay:     int(p.LastDelay()),
+					providers: group.GetProviders(),
+				},
+			)
+		case *outboundgroup.URLTest:
+			collection.Add(
+				&ProxyGroupItem{
+					Name:      group.Name(),
+					Type:      group.Type().String(),
+					Current:   group.Now(),
+					Delay:     int(p.LastDelay()),
+					providers: group.GetProviders(),
+				},
+			)
+		case *outboundgroup.LoadBalance:
+			collection.Add(
+				&ProxyGroupItem{
+					Name:      group.Name(),
+					Type:      group.Type().String(),
+					Current:   "",
+					Delay:     int(p.LastDelay()),
+					providers: group.GetProviders(),
+				},
+			)
+		case *outboundgroup.Selector:
+			collection.Add(
+				&ProxyGroupItem{
+					Name:      group.Name(),
+					Type:      group.Type().String(),
+					Current:   group.Now(),
+					Delay:     int(p.LastDelay()),
+					providers: group.GetProviders(),
+				},
+			)
+		default:
+			continue
+		}
+	}
 }
 
 func SetSelectedProxy(name, proxy string) bool {
@@ -94,26 +170,4 @@ func SetSelectedProxy(name, proxy string) bool {
 	log.Infoln("Set " + name + " -> " + proxy)
 
 	return true
-}
-
-func StartUrlTest(name, url string, timeout int, callback UrlTestCallback) {
-	go func() {
-		p := tunnel.Instance().Proxies()[name]
-
-		if p == nil {
-			callback.OnResult(name, -1)
-			return
-		}
-
-		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(timeout))
-		defer cancel()
-
-		delay, err := p.URLTest(ctx, url)
-		if ctx.Err() != nil || err != nil {
-			callback.OnResult(name, -1)
-			return
-		}
-
-		callback.OnResult(name, int(delay))
-	}()
 }

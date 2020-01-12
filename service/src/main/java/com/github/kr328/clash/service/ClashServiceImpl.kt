@@ -48,7 +48,7 @@ class ClashServiceImpl(clashService: ClashService) : IClashService.Stub() {
 
     override fun queryAllProxies(): CompressedProxyList {
         return try {
-            clash.queryProxies().compress()
+            clash.queryProxyGroups().compress()
         }
         catch (e: Exception) {
             Log.w("Query proxies", e)
@@ -65,14 +65,7 @@ class ClashServiceImpl(clashService: ClashService) : IClashService.Stub() {
         val count = AtomicInteger(proxies.size)
 
         proxies.forEach {
-            clash.startUrlTest(it) { n, d ->
-                callback.onResult(n, d)
-
-                count.getAndDecrement()
-
-                if ( count.get() == 0 )
-                    callback.onResult(null, 0)
-            }
+            clash.startUrlTest(it)
         }
     }
 

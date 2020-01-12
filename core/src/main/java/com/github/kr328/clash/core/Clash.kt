@@ -9,9 +9,12 @@ import com.github.kr328.clash.core.event.ProcessEvent
 import com.github.kr328.clash.core.event.TrafficEvent
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
-import java.io.FileOutputStream
-import java.lang.Exception
+import com.github.kr328.clash.core.model.ProxyGroup
+import com.github.kr328.clash.core.transact.ProxyCollectionImpl
+import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
+import java.io.InputStream
 import java.lang.IllegalStateException
+import java.util.concurrent.CompletableFuture
 
 class Clash(
     context: Context,
@@ -33,21 +36,10 @@ class Clash(
     private var currentProcess = ProcessEvent.STOPPED
 
     init {
-        val home = context.filesDir.resolve(CLASH_DIR)
-        val countryDatabase = home.resolve("Country.mmdb")
+        val country = context.assets.open("Country.mmdb")
+            .use(InputStream::readBytes)
 
-        home.resolve("ui").mkdirs()
-
-        if ( context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime >
-            countryDatabase.lastModified() ) {
-            FileOutputStream(countryDatabase).use { output ->
-                context.assets.open("Country.mmdb").use { input ->
-                    input.copyTo(output)
-                }
-            }
-        }
-
-        Bridge.setBaseDir(home.absolutePath)
+        Bridge.loadMMDB(country)
     }
 
     fun getCurrentProcessStatus(): ProcessEvent {
@@ -90,58 +82,50 @@ class Clash(
         Bridge.stopTunDevice()
     }
 
-    fun loadProfile(path: String) {
+    fun loadProfile(path: String, baseDir: String) {
         enforceStarted()
 
-        Bridge.loadProfileFile(path)
+        Bridge.loadProfileFile(path, baseDir)
     }
 
-    fun checkProfileValid(data: String): String? {
-        return try {
-            Bridge.checkProfileValid(data)
-            null
-        }
-        catch (e: Exception) {
-            e.message
-        }
+    fun downloadProfile(url: String, output: String) {
+        Bridge.downloadProfileAndCheck(url, output)
     }
 
-    fun queryProxies(): List<Proxy> {
+    fun saveProfile(data: ByteArray, output: String) {
+        Bridge.saveProfileAndCheck(data, output)
+    }
+
+    fun queryProxyGroups(): List<ProxyGroup> {
         enforceStarted()
 
-        val list = Bridge.queryAllProxies()
-        val result = mutableListOf<Proxy>()
-
-        for (i in 0 until list.proxiesLength) {
-            val p = list.getProxiesElement(i)
-            val all = mutableListOf<String>()
-
-            for (index in 0 until p.allLength) {
-                all.add(p.getAllElement(index))
+        return ProxyGroupCollectionImpl().also { Bridge.queryAllProxyGroups(it) }
+            .filterNotNull()
+            .map { group ->
+                ProxyGroup(group.name,
+                    Proxy.Type.fromString(group.type),
+                    group.delay,
+                    group.current,
+                    ProxyCollectionImpl().also { pc ->
+                        group.queryAllProxies(pc)
+                    }.filterNotNull().map {
+                        Proxy(it.name, Proxy.Type.fromString(it.type), it.delay)
+                    })
             }
-
-            result.add(
-                Proxy(
-                    p.name,
-                    Proxy.Type.fromString(p.type),
-                    p.now,
-                    all,
-                    if ( p.delay < Short.MAX_VALUE ) p.delay else 0
-                )
-            )
-        }
-
-        return result
     }
 
     fun setSelectedProxy(name: String, selected: String): Boolean {
         return Bridge.setSelectedProxy(name, selected)
     }
 
-    fun startUrlTest(name: String, callback: (String, Long) -> Unit) {
-        Bridge.startUrlTest(name, DEFAULT_URL_TEST_URL, DEFAULT_URL_TEST_TIMEOUT.toLong()) { n, delay ->
-            callback(n, delay)
+    fun startUrlTest(name: String): CompletableFuture<Unit> {
+        val future = CompletableFuture<Unit>()
+
+        Bridge.startUrlTest(name) {
+            future.complete(Unit)
         }
+
+        return future
     }
 
     fun queryGeneral(): General {

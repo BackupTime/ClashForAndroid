@@ -6,8 +6,6 @@ import kotlinx.serialization.Serializable
 data class Proxy(
     val name: String,
     val type: Type,
-    val now: String,
-    val all: List<String>,
     val delay: Long
 ) {
     enum class Type {

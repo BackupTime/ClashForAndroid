@@ -84,6 +84,7 @@ open class GolangBindTask : DefaultTask() {
         else
             environment.put("PATH", System.getenv("PATH") + ":" + goPath.resolve("bin"))
 
+        goPath.resolve("src/github.com/kr328").deleteRecursively()
         goBindPath.deleteRecursively()
         goBindPath.mkdirs()
 

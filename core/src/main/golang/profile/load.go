@@ -1,10 +1,12 @@
 package profile
 
 import (
+	"io/ioutil"
 	"net"
 
 	"github.com/Dreamacro/clash/component/fakeip"
 	"github.com/Dreamacro/clash/config"
+	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/dns"
 	"github.com/Dreamacro/clash/hub/executor"
 	"github.com/kr328/cfa/tun"
@@ -40,9 +42,26 @@ func LoadDefault() {
 }
 
 // LoadFromFile - load file
-func LoadFromFile(path string) error {
-	cfg, err := executor.ParseWithPath(path)
+func LoadFromFile(path, baseDir string) error {
+	data, err := ioutil.ReadFile(path)
 	if err != nil {
+		return err
+	}
+
+	rawCfg, err := config.UnmarshalRawConfig(data)
+	if err != nil {
+		return err
+	}
+
+	rawCfg.ExternalController = ""
+	rawCfg.ExternalUI = ""
+
+	fallbackBaseDir := constant.Path.HomeDir()
+	constant.SetHomeDir(baseDir)
+
+	cfg, err := config.ParseRawConfig(rawCfg)
+	if err != nil {
+		constant.SetHomeDir(fallbackBaseDir)
 		return err
 	}
 
@@ -93,9 +112,4 @@ func LoadFromFile(path string) error {
 	tun.ResetDnsRedirect()
 
 	return nil
-}
-
-func CheckValid(data string) error {
-	_, err := config.Parse([]byte(data))
-	return err
 }
