@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/Dreamacro/clash/adapters/inbound"
 	"github.com/Dreamacro/clash/component/socks5"
@@ -43,7 +44,11 @@ var client = &http.Client{
 	},
 }
 
-func DownloadAndCheck(url, output string) error {
+func DownloadAndCheck(url, output, baseDir string) error {
+	original := constant.Path.HomeDir()
+	constant.SetHomeDir(baseDir)
+	defer constant.SetHomeDir(original)
+
 	response, err := client.Get(url)
 	if err != nil {
 		return err
@@ -63,11 +68,39 @@ func DownloadAndCheck(url, output string) error {
 	return ioutil.WriteFile(output, data, defaultFileMode)
 }
 
-func SaveAndCheck(data []byte, output string) error {
+func SaveAndCheck(data []byte, output, baseDir string) error {
+	original := constant.Path.HomeDir()
+	constant.SetHomeDir(baseDir)
+	defer constant.SetHomeDir(original)
+
 	_, err := config.Parse(data)
 	if err != nil {
 		return err
 	}
 
 	return ioutil.WriteFile(output, data, defaultFileMode)
+}
+
+func MoveAndCheck(source, target, baseDir string) error {
+	original := constant.Path.HomeDir()
+	constant.SetHomeDir(baseDir)
+	defer constant.SetHomeDir(original)
+
+	buf, err := ioutil.ReadFile(source)
+	if err != nil {
+		return err
+	}
+
+	_, err = config.Parse(buf)
+	if err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile(target, buf, defaultFileMode); err != nil {
+		return err
+	}
+
+	os.Remove(source)
+
+	return nil
 }

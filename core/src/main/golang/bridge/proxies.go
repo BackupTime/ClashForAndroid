@@ -33,10 +33,6 @@ type ProxyCollection interface {
 	Add(proxy *ProxyItem) bool
 }
 
-type UrlTestCallback interface {
-	Done()
-}
-
 func (p *ProxyGroupItem) QueryAllProxies(collection ProxyCollection) {
 	for _, v := range p.providers {
 		for _, p := range v.Proxies() {
@@ -51,7 +47,7 @@ func (p *ProxyGroupItem) QueryAllProxies(collection ProxyCollection) {
 	}
 }
 
-func StartUrlTest(group string, callback UrlTestCallback) {
+func StartUrlTest(group string, callback DoneCallback) {
 	go func() {
 		defer callback.Done()
 

@@ -10,6 +10,7 @@ import com.github.kr328.clash.core.event.TrafficEvent
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.core.model.ProxyGroup
+import com.github.kr328.clash.core.transact.DoneCallbackImpl
 import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
 import java.io.InputStream
@@ -20,13 +21,6 @@ class Clash(
     context: Context,
     private val listener: (ProcessEvent) -> Unit
 ) {
-    companion object {
-        const val CLASH_DIR = "clash"
-
-        const val DEFAULT_URL_TEST_TIMEOUT = 5000
-        const val DEFAULT_URL_TEST_URL = "https://www.gstatic.com/generate_204"
-    }
-
     class Poll(private val poll: EventPoll) {
         fun stop() {
             poll.stop()
@@ -82,18 +76,30 @@ class Clash(
         Bridge.stopTunDevice()
     }
 
-    fun loadProfile(path: String, baseDir: String) {
+    fun loadProfile(path: String, baseDir: String): CompletableFuture<Unit> {
         enforceStarted()
 
-        Bridge.loadProfileFile(path, baseDir)
+        return DoneCallbackImpl().apply {
+            Bridge.loadProfileFile(path, baseDir, this)
+        }
     }
 
-    fun downloadProfile(url: String, output: String) {
-        Bridge.downloadProfileAndCheck(url, output)
+    fun downloadProfile(url: String, output: String, baseDir: String): CompletableFuture<Unit> {
+        return DoneCallbackImpl().apply {
+            Bridge.downloadProfileAndCheck(url, output, baseDir,this)
+        }
     }
 
-    fun saveProfile(data: ByteArray, output: String) {
-        Bridge.saveProfileAndCheck(data, output)
+    fun saveProfile(data: ByteArray, output: String, baseDir: String): CompletableFuture<Unit> {
+        return DoneCallbackImpl().apply {
+            Bridge.saveProfileAndCheck(data, output, baseDir, this)
+        }
+    }
+
+    fun moveProfile(source: String, target: String, baseDir: String): CompletableFuture<Unit> {
+        return DoneCallbackImpl().apply {
+            Bridge.moveProfileAndCheck(source, target, baseDir, this)
+        }
     }
 
     fun queryProxyGroups(): List<ProxyGroup> {
@@ -119,13 +125,9 @@ class Clash(
     }
 
     fun startUrlTest(name: String): CompletableFuture<Unit> {
-        val future = CompletableFuture<Unit>()
-
-        Bridge.startUrlTest(name) {
-            future.complete(Unit)
+        return DoneCallbackImpl().apply {
+            Bridge.startUrlTest(name, this)
         }
-
-        return future
     }
 
     fun queryGeneral(): General {
