@@ -1,20 +1,26 @@
 package com.github.kr328.clash.service;
 
-import com.github.kr328.clash.service.IClashEventObserver;
-import com.github.kr328.clash.service.IClashEventService;
-import com.github.kr328.clash.service.IClashProfileService;
-import com.github.kr328.clash.service.IClashSettingService;
 import com.github.kr328.clash.service.ipc.IPCParcelables;
-import com.github.kr328.clash.callback.IUrlTestCallback;
-import com.github.kr328.clash.core.event.Event;
 import com.github.kr328.clash.core.model.Packet;
 
 interface IClashManager {
     // Control
-    ParcelableCompletedFuture setSelectProxy(String proxy, String selected);
+    boolean setSelectProxy(String proxy, String selected);
+    ParcelableCompletedFuture startHealthCheck(String group);
 
     // Query
-    CompressedProxyList queryAllProxies();
+    ProxyGroup[] queryAllProxies();
     General queryGeneral();
-    ParcelableCompletedFuture startUrlTest(String group);
+
+    // Profiles
+    ParcelableCompletedFuture addProfile(String url);
+    ParcelableCompletedFuture updateProfile(int id);
+    ParcelableCompletedFuture queryAllProfiles();
+
+    // Events
+    ParcelablePipe openBandwidthEvent();
+    ParcelablePipe openLogEvent();
+
+    // Settings
+
 }

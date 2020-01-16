@@ -122,7 +122,7 @@ class Clash(
         return Bridge.setSelectedProxy(name, selected)
     }
 
-    fun startUrlTest(name: String): CompletableFuture<Unit> {
+    fun startHealthCheck(name: String): CompletableFuture<Unit> {
         return DoneCallbackImpl().apply {
             Bridge.startUrlTest(name, this)
         }

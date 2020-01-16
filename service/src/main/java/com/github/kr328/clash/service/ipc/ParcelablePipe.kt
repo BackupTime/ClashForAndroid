@@ -5,30 +5,40 @@ import android.os.IBinder
 import android.os.Parcel
 import android.os.Parcelable
 
-class ParcelablePipe() : Parcelable {
-    private inner class Slave: Binder() {
+open class ParcelablePipe private constructor(val type: Type) : Parcelable {
+    enum class Type {
+        MASTER, SLAVE
+    }
+
+    private inner class Slave : Binder() {
         override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
-            if ( code == TRANSACT_CODE_SEND_PARCELABLE ) {
+            if (code == TRANSACT_CODE_SEND_PARCELABLE) {
                 receiveCallback(data.readParcelable(ParcelablePipe::class.java.classLoader))
                 return true
             }
             return false
         }
     }
-    private inner class Master: Binder() {
+
+    private inner class Master : Binder() {
         override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
-            if ( code == TRANSACT_CODE_SET_SLAVE ) {
-                slave = data.readStrongBinder()
+            if (code == TRANSACT_CODE_SET_SLAVE) {
+                connection = data.readStrongBinder()
                 return true
+            }
+            if (code == TRANSACT_CODE_CLOSE) {
+                onClose()
             }
             return false
         }
     }
 
-    private var slave: IBinder? = null
+    private var connection: IBinder? = null
     private var receiveCallback: (Parcelable?) -> Unit = {}
 
-    constructor(parcel: Parcel) : this() {
+    constructor() : this(Type.MASTER)
+
+    constructor(parcel: Parcel) : this(Type.SLAVE) {
         val master = parcel.readStrongBinder()
         val data = Parcel.obtain()
 
@@ -36,14 +46,15 @@ class ParcelablePipe() : Parcelable {
             data.writeStrongBinder(Slave())
 
             master.transact(TRANSACT_CODE_SET_SLAVE, data, null, 0)
-        }
-        finally {
+
+            connection = master
+        } finally {
             data.recycle()
         }
     }
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
-        if ( dest == null )
+        if (dest == null)
             return
 
         dest.writeStrongBinder(Master())
@@ -52,28 +63,44 @@ class ParcelablePipe() : Parcelable {
     override fun describeContents(): Int = 0
 
     fun send(parcelable: Parcelable?): Boolean {
-        val s = slave ?: return false
+        if (type != Type.MASTER)
+            return false
+
+        val s = connection ?: return false
         val data = Parcel.obtain()
 
         try {
             data.writeParcelable(parcelable, 0)
 
             s.transact(TRANSACT_CODE_SEND_PARCELABLE, data, null, 0)
-        }
-        finally {
+        } finally {
             data.recycle()
         }
 
         return true
     }
 
+    fun close() {
+        val s = connection ?: return
+        val data = Parcel.obtain()
+
+        try {
+            s.transact(TRANSACT_CODE_CLOSE, data, null, 0)
+        } finally {
+            data.recycle()
+        }
+    }
+
     fun onReceive(callback: (Parcelable?) -> Unit) {
         this.receiveCallback = callback
     }
 
+    open fun onClose() {}
+
     companion object {
         private const val TRANSACT_CODE_SET_SLAVE = 1
         private const val TRANSACT_CODE_SEND_PARCELABLE = 2
+        private const val TRANSACT_CODE_CLOSE = 3
 
         @JvmField
         val CREATOR = object : Parcelable.Creator<ParcelablePipe> {

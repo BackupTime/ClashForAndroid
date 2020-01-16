@@ -65,7 +65,7 @@ class ClashServiceImpl(clashService: ClashService) : IClashService.Stub() {
         val count = AtomicInteger(proxies.size)
 
         proxies.forEach {
-            clash.startUrlTest(it)
+            clash.startHealthCheck(it)
         }
     }
 
