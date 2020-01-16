@@ -6,7 +6,7 @@ import com.github.kr328.clash.core.serialization.Parcels
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BandwidthEvent(val total: Long): Parcelable {
+data class BandwidthEvent(val total: Long): Event {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         Parcels.dump(serializer(), this, parcel)
     }

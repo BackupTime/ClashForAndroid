@@ -4,29 +4,17 @@ import com.github.kr328.clash.service.IClashEventObserver;
 import com.github.kr328.clash.service.IClashEventService;
 import com.github.kr328.clash.service.IClashProfileService;
 import com.github.kr328.clash.service.IClashSettingService;
+import com.github.kr328.clash.service.ipc.IPCParcelables;
 import com.github.kr328.clash.callback.IUrlTestCallback;
 import com.github.kr328.clash.core.event.Event;
 import com.github.kr328.clash.core.model.Packet;
 
-interface IClashService {
-    // Services
-    IClashEventService getEventService();
-    IClashProfileService getProfileService();
-    IClashSettingService getSettingService();
-
-    // Status
-    ProcessEvent getCurrentProcessStatus();
-
+interface IClashManager {
     // Control
-    void setSelectProxy(String proxy, String selected);
-    void start();
-    void stop();
+    ParcelableCompletedFuture setSelectProxy(String proxy, String selected);
 
     // Query
     CompressedProxyList queryAllProxies();
     General queryGeneral();
-    void startUrlTest(in String[] proxies, IUrlTestCallback callback);
-
-    // Utils
-    String checkProfileValid(in ParcelFileDescriptor pipe);
+    ParcelableCompletedFuture startUrlTest(String group);
 }

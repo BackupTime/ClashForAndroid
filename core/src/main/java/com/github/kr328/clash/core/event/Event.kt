@@ -1,6 +1,8 @@
 package com.github.kr328.clash.core.event
 
-interface Event {
+import android.os.Parcelable
+
+interface Event: Parcelable {
     companion object {
         const val EVENT_LOG = 1
         const val EVENT_TRAFFIC = 3

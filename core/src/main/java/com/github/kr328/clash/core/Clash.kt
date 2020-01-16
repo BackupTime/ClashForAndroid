@@ -3,10 +3,7 @@ package com.github.kr328.clash.core
 import android.content.Context
 import bridge.Bridge
 import bridge.EventPoll
-import com.github.kr328.clash.core.event.BandwidthEvent
-import com.github.kr328.clash.core.event.LogEvent
-import com.github.kr328.clash.core.event.ProcessEvent
-import com.github.kr328.clash.core.event.TrafficEvent
+import com.github.kr328.clash.core.event.*
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.core.model.ProxyGroup
@@ -15,6 +12,7 @@ import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
 import java.io.InputStream
 import java.lang.IllegalStateException
+import java.util.concurrent.BrokenBarrierException
 import java.util.concurrent.CompletableFuture
 
 class Clash(
@@ -41,7 +39,7 @@ class Clash(
     }
 
     fun start() {
-        if ( currentProcess == ProcessEvent.STARTED )
+        if (currentProcess == ProcessEvent.STARTED)
             return
 
         currentProcess = ProcessEvent.STARTED
@@ -52,7 +50,7 @@ class Clash(
     }
 
     fun stop() {
-        if ( currentProcess == ProcessEvent.STOPPED )
+        if (currentProcess == ProcessEvent.STOPPED)
             return
 
         currentProcess = ProcessEvent.STOPPED
@@ -86,7 +84,7 @@ class Clash(
 
     fun downloadProfile(url: String, output: String, baseDir: String): CompletableFuture<Unit> {
         return DoneCallbackImpl().apply {
-            Bridge.downloadProfileAndCheck(url, output, baseDir,this)
+            Bridge.downloadProfileAndCheck(url, output, baseDir, this)
         }
     }
 
@@ -133,30 +131,49 @@ class Clash(
     fun queryGeneral(): General {
         val t = Bridge.queryGeneral()
 
-        return General(General.Mode.fromString(t.mode),
-            t.httpPort.toInt(), t.socksPort.toInt(), t.redirectPort.toInt())
+        return General(
+            General.Mode.fromString(t.mode),
+            t.httpPort.toInt(), t.socksPort.toInt(), t.redirectPort.toInt()
+        )
     }
 
-    fun pollTraffic(onEvent: (TrafficEvent) -> Unit): Poll {
-        return Poll(Bridge.pollTraffic { down, up ->
-            onEvent(TrafficEvent(down, up))
-        })
+    fun openTrafficEvent(): EventStream<TrafficEvent> {
+        return object: EventStream<TrafficEvent>() {
+            val traffic = Bridge.pollTraffic { down, up ->
+                send(TrafficEvent(down, up))
+            }
+
+            override fun onClose() {
+                traffic.stop()
+            }
+        }
     }
 
-    fun pollBandwidth(onEvent: (BandwidthEvent) -> Unit): Poll {
-        return Poll(Bridge.pollBandwidth {
-            onEvent(BandwidthEvent(it))
-        })
+    fun openBandwidthEvent(): EventStream<BandwidthEvent> {
+        return object: EventStream<BandwidthEvent>() {
+            val bandwidth = Bridge.pollBandwidth {
+                send(BandwidthEvent(it))
+            }
+
+            override fun onClose() {
+                bandwidth.stop()
+            }
+        }
     }
 
-    fun pollLogs(onEvent: (LogEvent) -> Unit): Poll {
-        return Poll(Bridge.pollLogs { level, payload ->
-            onEvent(LogEvent(LogEvent.Level.fromString(level), payload))
-        })
+    fun openLogEvent(): EventStream<LogEvent> {
+        return object: EventStream<LogEvent>() {
+            val log = Bridge.pollLogs { level, payload ->
+                send(LogEvent(LogEvent.Level.fromString(level), payload))
+            }
+
+            override fun onClose() {
+                log.stop()
+            }
+        }
     }
 
     private fun enforceStarted() {
-        if ( currentProcess == ProcessEvent.STOPPED )
-            throw IllegalStateException("Clash Stopped")
+        check(currentProcess != ProcessEvent.STOPPED) { "Clash Stopped" }
     }
 }
