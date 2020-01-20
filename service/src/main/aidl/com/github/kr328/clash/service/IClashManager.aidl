@@ -12,15 +12,11 @@ interface IClashManager {
     ProxyGroup[] queryAllProxies();
     General queryGeneral();
 
-    // Profiles
-    ParcelableCompletedFuture addProfile(String url);
-    ParcelableCompletedFuture updateProfile(int id);
-    ParcelableCompletedFuture queryAllProfiles();
-
     // Events
     ParcelablePipe openBandwidthEvent();
     ParcelablePipe openLogEvent();
 
     // Settings
-
+    boolean putSetting(String key, String value);
+    String getSetting(String key);
 }

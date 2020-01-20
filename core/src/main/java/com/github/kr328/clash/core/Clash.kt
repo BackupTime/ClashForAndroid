@@ -15,48 +15,31 @@ import java.lang.IllegalStateException
 import java.util.concurrent.BrokenBarrierException
 import java.util.concurrent.CompletableFuture
 
-class Clash(
-    context: Context,
-    private val listener: (ProcessEvent) -> Unit
-) {
+object Clash{
+    private var initialized = false
+
     class Poll(private val poll: EventPoll) {
         fun stop() {
             poll.stop()
         }
     }
 
-    private var currentProcess = ProcessEvent.STOPPED
+    fun initialize(context: Context) {
+        if ( initialized )
+            return
+        initialized = true
 
-    init {
         val country = context.assets.open("Country.mmdb")
             .use(InputStream::readBytes)
 
         Bridge.loadMMDB(country)
     }
 
-    fun getCurrentProcessStatus(): ProcessEvent {
-        return currentProcess
-    }
-
     fun start() {
-        if (currentProcess == ProcessEvent.STARTED)
-            return
-
-        currentProcess = ProcessEvent.STARTED
-
-        listener(currentProcess)
-
         Bridge.reset()
     }
 
     fun stop() {
-        if (currentProcess == ProcessEvent.STOPPED)
-            return
-
-        currentProcess = ProcessEvent.STOPPED
-
-        listener(currentProcess)
-
         Bridge.reset()
     }
 
@@ -65,8 +48,6 @@ class Clash(
         mtu: Int,
         dns: String
     ) {
-        enforceStarted()
-
         Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns)
     }
 
@@ -75,8 +56,6 @@ class Clash(
     }
 
     fun loadProfile(path: String, baseDir: String): CompletableFuture<Unit> {
-        enforceStarted()
-
         return DoneCallbackImpl().apply {
             Bridge.loadProfileFile(path, baseDir, this)
         }
@@ -101,8 +80,6 @@ class Clash(
     }
 
     fun queryProxyGroups(): List<ProxyGroup> {
-        enforceStarted()
-
         return ProxyGroupCollectionImpl().also { Bridge.queryAllProxyGroups(it) }
             .filterNotNull()
             .map { group ->
@@ -171,9 +148,5 @@ class Clash(
                 log.stop()
             }
         }
-    }
-
-    private fun enforceStarted() {
-        check(currentProcess != ProcessEvent.STOPPED) { "Clash Stopped" }
     }
 }

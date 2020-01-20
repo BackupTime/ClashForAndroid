@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(version = 1, exportSchema = false, entities = [ClashProfileEntity::class, ClashProfileProxyEntity::class])
+@Database(version = 2, exportSchema = false, entities = [ClashProfileEntity::class, ClashProfileProxyEntity::class])
 abstract class ClashDatabase : RoomDatabase() {
     abstract fun openClashProfileDao(): ClashProfileDao
     abstract fun openClashProfileProxyDao(): ClashProfileProxyDao
@@ -19,7 +19,7 @@ abstract class ClashDatabase : RoomDatabase() {
                     context.applicationContext,
                     ClashDatabase::class.java,
                     "clash-config"
-                ).build()
+                ).addMigrations(ClashDatabaseMigrations.VERSION_1_2).build()
             return instance ?: throw NullPointerException()
         }
     }

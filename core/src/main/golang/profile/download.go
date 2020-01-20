@@ -60,7 +60,7 @@ func DownloadAndCheck(url, output, baseDir string) error {
 		return err
 	}
 
-	_, err = config.Parse(data)
+	_, err = parseConfig(data)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func SaveAndCheck(data []byte, output, baseDir string) error {
 	constant.SetHomeDir(baseDir)
 	defer constant.SetHomeDir(original)
 
-	_, err := config.Parse(data)
+	_, err := parseConfig(data)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func MoveAndCheck(source, target, baseDir string) error {
 		return err
 	}
 
-	_, err = config.Parse(buf)
+	_, err = parseConfig(buf)
 	if err != nil {
 		return err
 	}
@@ -103,4 +103,16 @@ func MoveAndCheck(source, target, baseDir string) error {
 	os.Remove(source)
 
 	return nil
+}
+
+func parseConfig(data []byte) (*config.Config, error) {
+	raw, err := config.UnmarshalRawConfig(data)
+	if err != nil {
+		return nil, err
+	}
+
+	raw.ExternalUI = ""
+	raw.ExternalController = ""
+
+	return config.ParseRawConfig(raw)
 }

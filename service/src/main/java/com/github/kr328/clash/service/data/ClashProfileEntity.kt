@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import com.github.kr328.clash.core.serialization.Parcels
 import kotlinx.serialization.Serializable
 
@@ -12,12 +13,18 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ClashProfileEntity(
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "token") val token: String,
+    @ColumnInfo(name = "type") val type: Type,
+    @ColumnInfo(name = "uri") val uri: String,
     @ColumnInfo(name = "file") val file: String,
+    @ColumnInfo(name = "base") val base: String,
     @ColumnInfo(name = "active") val active: Boolean,
     @ColumnInfo(name = "last_update") val lastUpdate: Long,
     @ColumnInfo(name = "id") @PrimaryKey(autoGenerate = true) val id: Int = 0
 ) : Parcelable {
+    enum class Type(val id: Int) {
+        URL(1), FILE(2), UNKNOWN(-1)
+    }
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         Parcels.dump(serializer(), this, parcel)
     }
@@ -27,24 +34,19 @@ data class ClashProfileEntity(
     }
 
     companion object {
-        fun fileToken(content: String): String {
-            return "file|$content"
+        @TypeConverter
+        fun typeToInt(value: Type?): Int {
+            return value?.id ?: -1
         }
 
-        fun urlToken(content: String): String {
-            return "url|$content"
-        }
-
-        fun isFileToken(token: String): Boolean {
-            return token.startsWith("file|")
-        }
-
-        fun isUrlToken(token: String): Boolean {
-            return token.startsWith("url|")
-        }
-
-        fun getUrl(token: String): String {
-            return token.removePrefix("url|")
+        @TypeConverter
+        fun intToType(value: Int?): Type {
+            return when ( value ) {
+                Type.URL.id -> Type.URL
+                Type.FILE.id -> Type.FILE
+                Type.UNKNOWN.id -> Type.UNKNOWN
+                else -> Type.UNKNOWN
+            }
         }
 
         @JvmField

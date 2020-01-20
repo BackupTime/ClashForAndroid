@@ -16,6 +16,9 @@ interface ClashProfileDao {
     @Query("SELECT * FROM profiles")
     fun queryProfiles(): Array<ClashProfileEntity>
 
+    @Query("SELECT * FROM profiles WHERE id = :id")
+    fun queryProfileById(id: Int): ClashProfileEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addProfile(profile: ClashProfileEntity)
 
