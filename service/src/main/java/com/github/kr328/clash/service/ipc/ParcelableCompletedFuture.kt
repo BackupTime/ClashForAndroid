@@ -5,8 +5,9 @@ import android.os.Parcelable
 import android.os.RemoteException
 import java.util.concurrent.CompletableFuture
 
-class ParcelableCompletedFuture(private val pipe: ParcelablePipe = ParcelablePipe()) :
+class ParcelableCompletedFuture private constructor(private val pipe: ParcelablePipe) :
     CompletableFuture<Parcelable?>(), Parcelable {
+    constructor(): this(ParcelablePipe())
     constructor(parcel: Parcel) : this(
         parcel.readParcelable<ParcelablePipe>(
             ParcelableCompletedFuture::class.java.classLoader

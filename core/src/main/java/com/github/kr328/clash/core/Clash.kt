@@ -10,6 +10,7 @@ import com.github.kr328.clash.core.model.ProxyGroup
 import com.github.kr328.clash.core.transact.DoneCallbackImpl
 import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
+import java.io.File
 import java.io.InputStream
 import java.lang.IllegalStateException
 import java.util.concurrent.BrokenBarrierException
@@ -55,27 +56,27 @@ object Clash{
         Bridge.stopTunDevice()
     }
 
-    fun loadProfile(path: String, baseDir: String): CompletableFuture<Unit> {
+    fun loadProfile(path: File, baseDir: File): CompletableFuture<Unit> {
         return DoneCallbackImpl().apply {
-            Bridge.loadProfileFile(path, baseDir, this)
+            Bridge.loadProfileFile(path.absolutePath, baseDir.absolutePath, this)
         }
     }
 
-    fun downloadProfile(url: String, output: String, baseDir: String): CompletableFuture<Unit> {
+    fun downloadProfile(url: String, output: File, baseDir: File): CompletableFuture<Unit> {
         return DoneCallbackImpl().apply {
-            Bridge.downloadProfileAndCheck(url, output, baseDir, this)
+            Bridge.downloadProfileAndCheck(url, output.absolutePath, baseDir.absolutePath, this)
         }
     }
 
-    fun saveProfile(data: ByteArray, output: String, baseDir: String): CompletableFuture<Unit> {
+    fun saveProfile(data: ByteArray, output: File, baseDir: File): CompletableFuture<Unit> {
         return DoneCallbackImpl().apply {
-            Bridge.saveProfileAndCheck(data, output, baseDir, this)
+            Bridge.saveProfileAndCheck(data, output.absolutePath, baseDir.absolutePath, this)
         }
     }
 
-    fun moveProfile(source: String, target: String, baseDir: String): CompletableFuture<Unit> {
+    fun moveProfile(source: File, target: File, baseDir: File): CompletableFuture<Unit> {
         return DoneCallbackImpl().apply {
-            Bridge.moveProfileAndCheck(source, target, baseDir, this)
+            Bridge.moveProfileAndCheck(source.absolutePath, target.absolutePath, baseDir.absolutePath, this)
         }
     }
 
