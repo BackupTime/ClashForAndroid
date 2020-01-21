@@ -5,11 +5,16 @@ import androidx.core.content.edit
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroup
+import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.ipc.ParcelableCompletedFuture
 import com.github.kr328.clash.service.ipc.ParcelablePipe
 
-class ClashManager(context: Context) : IClashManager.Stub() {
+class ClashManager(private val context: Context) : IClashManager.Stub() {
     private val settings = context.getSharedPreferences("service", Context.MODE_PRIVATE)
+
+    override fun getProfileManager(): IClashProfileManager {
+        return ClashProfileManager(context, ClashDatabase.getInstance(context))
+    }
 
     override fun queryAllProxies(): Array<ProxyGroup> {
         return Clash.queryProxyGroups().toTypedArray()

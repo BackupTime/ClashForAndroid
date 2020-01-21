@@ -7,16 +7,22 @@
     <application>
         <service
             android:name="ClashService"
+            android:label="@string/clash_service_label"
             android:exported="false"
-            android:process=":clash" />
+            android:process=":background" />
         <service
             android:name="TunService"
+            android:label="@string/tun_service_label"
             android:exported="false"
-            android:process=":clash"
+            android:process=":background"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
+        <service android:name=".ClashManagerService"
+            android:label="@string/clash_manager_service_label"
+            android:exported="false"
+            android:process=":background" />
     </application>
 </manifest>

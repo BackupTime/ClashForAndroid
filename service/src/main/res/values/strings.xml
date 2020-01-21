@@ -12,4 +12,8 @@
 
     <!-- from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/res/values/strings.xml -->
     <string name="clash_notification_content">"%1$s↑\t%2$s↓"</string>
+
+    <string name="clash_service_label">Clash Core Service</string>
+    <string name="tun_service_label">Tun Device Service</string>
+    <string name="clash_manager_service_label">Clash Manager Service</string>
 </resources>
