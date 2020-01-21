@@ -14,22 +14,25 @@ object ClashDatabaseMigrations {
 
             database.execSQL("ALTER TABLE profiles RENAME TO _profiles")
 
-            database.execSQL("CREATE TABLE profiles(" +
-                    "name TEXT NOT NULL, " +
-                    "type INTEGER NOT NULL, " +
-                    "uri TEXT NOT NULL, " +
-                    "file TEXT NOT NULL, " +
-                    "base TEXT NOT NULL" +
-                    "active INTEGER NOT NULL, " +
-                    "last_update INTEGER NOT NULL, " +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+            database.execSQL(
+                "CREATE TABLE profiles(" +
+                        "name TEXT NOT NULL, " +
+                        "type INTEGER NOT NULL, " +
+                        "uri TEXT NOT NULL, " +
+                        "file TEXT NOT NULL, " +
+                        "base TEXT NOT NULL" +
+                        "active INTEGER NOT NULL, " +
+                        "last_update INTEGER NOT NULL, " +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)"
+            )
 
-            val cursor = database.query("SELECT name, token, file, active, last_update FROM _profile")
+            val cursor =
+                database.query("SELECT name, token, file, active, last_update FROM _profile")
             val random = SecureRandom()
             val bases = mutableSetOf<Long>()
 
             cursor.moveToFirst()
-            while ( !cursor.isAfterLast ) {
+            while (!cursor.isAfterLast) {
                 // old
                 val name = cursor.getString(0)
                 val token = cursor.getString(1)
@@ -46,7 +49,7 @@ object ClashDatabaseMigrations {
                 val uri = token.removePrefix("url|").removePrefix("file|")
                 var base = random.nextLong().absoluteValue
 
-                while ( bases.contains(base) )
+                while (bases.contains(base))
                     base = random.nextLong().absoluteValue
 
                 database.insert("profiles",
@@ -59,7 +62,7 @@ object ClashDatabaseMigrations {
                         put("active", active)
                         put("last_update", lastUpdate)
                         put("base", base.toString())
-                })
+                    })
             }
             cursor.close()
 

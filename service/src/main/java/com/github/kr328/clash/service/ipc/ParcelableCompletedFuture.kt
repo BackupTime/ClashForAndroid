@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture
 
 class ParcelableCompletedFuture private constructor(private val pipe: ParcelablePipe) :
     CompletableFuture<Parcelable?>(), Parcelable {
-    constructor(): this(ParcelablePipe())
+    constructor() : this(ParcelablePipe())
     constructor(parcel: Parcel) : this(
         parcel.readParcelable<ParcelablePipe>(
             ParcelableCompletedFuture::class.java.classLoader
@@ -16,17 +16,16 @@ class ParcelableCompletedFuture private constructor(private val pipe: Parcelable
         pipe.onReceive {
             val result = (it ?: throw NullPointerException()) as ParcelableResult
 
-            if ( result.exception != null ) {
+            if (result.exception != null) {
                 completeExceptionally(RemoteException(result.exception))
-            }
-            else {
+            } else {
                 complete(result.data)
             }
         }
     }
 
     override fun complete(value: Parcelable?): Boolean {
-        if ( super.complete(value) ) {
+        if (super.complete(value)) {
             pipe.send(ParcelableResult(value, null))
             return true
         }
@@ -34,7 +33,7 @@ class ParcelableCompletedFuture private constructor(private val pipe: Parcelable
     }
 
     override fun completeExceptionally(ex: Throwable?): Boolean {
-        if ( super.completeExceptionally(ex) ) {
+        if (super.completeExceptionally(ex)) {
             pipe.send(ParcelableResult(null, ex?.message ?: "Unknown"))
             return true
         }

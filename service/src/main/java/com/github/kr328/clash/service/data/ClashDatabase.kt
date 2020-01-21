@@ -5,7 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(version = 2, exportSchema = false, entities = [ClashProfileEntity::class, ClashProfileProxyEntity::class])
+@Database(
+    version = 2,
+    exportSchema = false,
+    entities = [ClashProfileEntity::class, ClashProfileProxyEntity::class]
+)
 abstract class ClashDatabase : RoomDatabase() {
     abstract fun openClashProfileDao(): ClashProfileDao
     abstract fun openClashProfileProxyDao(): ClashProfileProxyDao

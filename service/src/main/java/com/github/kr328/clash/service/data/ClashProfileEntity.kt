@@ -41,7 +41,7 @@ data class ClashProfileEntity(
 
         @TypeConverter
         fun intToType(value: Int?): Type {
-            return when ( value ) {
+            return when (value) {
                 Type.URL.id -> Type.URL
                 Type.FILE.id -> Type.FILE
                 Type.UNKNOWN.id -> Type.UNKNOWN

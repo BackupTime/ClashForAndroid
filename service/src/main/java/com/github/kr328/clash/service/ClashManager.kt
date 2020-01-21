@@ -1,7 +1,6 @@
 package com.github.kr328.clash.service
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.model.General
@@ -9,7 +8,7 @@ import com.github.kr328.clash.core.model.ProxyGroup
 import com.github.kr328.clash.service.ipc.ParcelableCompletedFuture
 import com.github.kr328.clash.service.ipc.ParcelablePipe
 
-class ClashManager(context: Context): IClashManager.Stub() {
+class ClashManager(context: Context) : IClashManager.Stub() {
     private val settings = context.getSharedPreferences("service", Context.MODE_PRIVATE)
 
     override fun queryAllProxies(): Array<ProxyGroup> {
@@ -27,7 +26,7 @@ class ClashManager(context: Context): IClashManager.Stub() {
     }
 
     override fun openBandwidthEvent(): ParcelablePipe {
-        return object: ParcelablePipe() {
+        return object : ParcelablePipe() {
             val stream = Clash.openBandwidthEvent().apply {
                 onEvent {
                     send(it)
@@ -45,7 +44,7 @@ class ClashManager(context: Context): IClashManager.Stub() {
 
         return ParcelableCompletedFuture().apply {
             Clash.startHealthCheck(group).whenComplete { _: Unit?, u: Throwable? ->
-                if ( u != null )
+                if (u != null)
                     this.completeExceptionally(u)
                 else
                     this.complete(null)
@@ -54,7 +53,7 @@ class ClashManager(context: Context): IClashManager.Stub() {
     }
 
     override fun openLogEvent(): ParcelablePipe {
-        return object: ParcelablePipe() {
+        return object : ParcelablePipe() {
             val stream = Clash.openLogEvent().apply {
                 onEvent {
                     send(it)

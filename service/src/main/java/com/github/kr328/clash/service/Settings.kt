@@ -20,11 +20,11 @@ class Settings(private val clashManager: IClashManager) {
         return clashManager.getSetting(key)
     }
 
-    fun <T>get(setting: Setting<T>): T {
+    fun <T> get(setting: Setting<T>): T {
         return setting.parseValue(get(setting.key))
     }
 
-    fun <T>put(setting: Setting<T>, value: T) {
+    fun <T> put(setting: Setting<T>, value: T) {
         put(setting.key, setting.valueToString(value))
     }
 
@@ -34,41 +34,46 @@ class Settings(private val clashManager: IClashManager) {
         fun valueToString(value: T): String
     }
 
-    class BooleanSetting(override val key: String, private val def: Boolean): Setting<Boolean> {
+    class BooleanSetting(override val key: String, private val def: Boolean) : Setting<Boolean> {
         override fun parseValue(value: String?): Boolean {
             val v = value ?: return def
             return v.toBoolean()
         }
+
         override fun valueToString(value: Boolean): String {
             return value.toString()
         }
     }
 
-    class IntSetting(override val key: String, private val def: Int): Setting<Int> {
+    class IntSetting(override val key: String, private val def: Int) : Setting<Int> {
         override fun parseValue(value: String?): Int {
             val v = value ?: return def
             return v.toIntOrNull() ?: def
         }
+
         override fun valueToString(value: Int): String {
             return value.toString()
         }
     }
 
-    class StringSetting(override val key: String, val def: String): Setting<String> {
+    class StringSetting(override val key: String, val def: String) : Setting<String> {
         override fun parseValue(value: String?): String {
             return value ?: def
         }
+
         override fun valueToString(value: String): String {
             return value
         }
     }
 
-    class PackageListSetting(override val key: String, private val def: List<String>): Setting<List<String>> {
+    class PackageListSetting(override val key: String, private val def: List<String>) :
+        Setting<List<String>> {
         override fun parseValue(value: String?): List<String> {
             val v = value ?: return def
 
             return v.split(":")
         }
+
         override fun valueToString(value: List<String>): String {
             return value.joinToString(":")
         }

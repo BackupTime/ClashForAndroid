@@ -3,7 +3,7 @@ package com.github.kr328.clash.service.ipc
 import android.os.Parcel
 import android.os.Parcelable
 
-data class ParcelableResult(val data: Parcelable?, val exception: String?): Parcelable {
+data class ParcelableResult(val data: Parcelable?, val exception: String?) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readParcelable(ParcelableResult::class.java.classLoader),
         parcel.readString()

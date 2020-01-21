@@ -50,7 +50,8 @@ class DefaultNetworkObserver(val context: Context, val listener: (Network?) -> U
         return try {
             connectivity.allNetworks
                 .flatMap { network ->
-                    connectivity.getNetworkCapabilities(network)?.let { listOf(it to network) } ?: emptyList()
+                    connectivity.getNetworkCapabilities(network)?.let { listOf(it to network) }
+                        ?: emptyList()
                 }
                 .asSequence()
                 .filterNot {

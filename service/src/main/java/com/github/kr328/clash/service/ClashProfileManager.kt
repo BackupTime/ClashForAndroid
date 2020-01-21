@@ -17,8 +17,10 @@ class ClashProfileManager(private val context: Context, private val database: Cl
     override fun updateProfile(id: Int): ParcelableCompletedFuture {
         val entity = database.openClashProfileDao().queryProfileById(id)
 
-        require(entity != null && (entity.type == ClashProfileEntity.Type.URL ||
-                    entity.type == ClashProfileEntity.Type.FILE))
+        require(
+            entity != null && (entity.type == ClashProfileEntity.Type.URL ||
+                    entity.type == ClashProfileEntity.Type.FILE)
+        )
 
         val result = ParcelableCompletedFuture()
 

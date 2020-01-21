@@ -39,12 +39,12 @@ class MainApplication : Application() {
         private fun ByteArray.toHexString(): String {
             return this.map {
                 Integer.toHexString(it.toInt() and 0xff)
-            }.map {
+            }.joinToString(separator = "") {
                 if (it.length < 2)
                     "0$it"
                 else
                     it
-            }.joinToString(separator = "")
+            }
         }
     }
 
@@ -68,40 +68,6 @@ class MainApplication : Application() {
         Crashlytics.setBool(CRASHLYTICS_SPLIT_APK_KEY, detectSplitArchive())
         Crashlytics.setString(CRASHLYTICS_BASE_SIZE_KEY, getBaseApkSize())
         Crashlytics.setUserIdentifier(userIdentifier)
-
-        Log.handler = object : Log.LogHandler {
-            override fun info(message: String, throwable: Throwable?) {
-                android.util.Log.i(Constants.TAG, message, throwable)
-            }
-
-            override fun warn(message: String, throwable: Throwable?) {
-                throwable?.also {
-                    Crashlytics.logException(it)
-                }
-
-                android.util.Log.w(Constants.TAG, message, throwable)
-            }
-
-            override fun error(message: String, throwable: Throwable?) {
-                throwable?.also {
-                    Crashlytics.logException(it)
-                }
-
-                android.util.Log.e(Constants.TAG, message, throwable)
-            }
-
-            override fun wtf(message: String, throwable: Throwable?) {
-                throwable?.also {
-                    Crashlytics.logException(it)
-                }
-
-                android.util.Log.wtf(Constants.TAG, message, throwable)
-            }
-
-            override fun debug(message: String, throwable: Throwable?) {
-                android.util.Log.d(Constants.TAG, message, throwable)
-            }
-        }
     }
 
     private fun detectFromPlay(): Boolean {
