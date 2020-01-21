@@ -1,6 +1,7 @@
 package com.github.kr328.clash.service
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
@@ -8,6 +9,7 @@ import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.ipc.ParcelableCompletedFuture
 import com.github.kr328.clash.service.util.DefaultThreadPool
 import com.github.kr328.clash.service.util.FileUtils
+import com.github.kr328.clash.service.util.sendBroadcastSelf
 
 class ClashProfileManager(private val context: Context, private val database: ClashDatabase) :
     IClashProfileManager.Stub() {
@@ -29,6 +31,8 @@ class ClashProfileManager(private val context: Context, private val database: Cl
                 result.complete(null)
 
                 database.openClashProfileDao().touchProfile(id)
+
+                sendChangedBroadcast()
             },
             onFailure = {
                 result.completeExceptionally(it)
@@ -61,6 +65,8 @@ class ClashProfileManager(private val context: Context, private val database: Cl
                         System.currentTimeMillis()
                     )
                 )
+
+                sendChangedBroadcast()
 
                 result.complete(null)
             },
@@ -112,5 +118,14 @@ class ClashProfileManager(private val context: Context, private val database: Cl
                 }
             }
         }
+    }
+
+    private fun sendChangedBroadcast() {
+        val active = database.openClashProfileDao().queryActiveProfile()
+
+        context.sendBroadcastSelf(
+            Intent(Intents.INTENT_ACTION_PROFILE_CHANGED)
+                .putExtra(Intents.INTENT_ACTION_PROFILE_ACTIVE_NAME, active?.name)
+        )
     }
 }

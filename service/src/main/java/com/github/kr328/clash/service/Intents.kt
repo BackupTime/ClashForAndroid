@@ -12,4 +12,6 @@ object Intents {
 
     const val INTENT_ACTION_CLASH_STOP_REASON =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.clash.stop.reason"
+    const val INTENT_ACTION_PROFILE_ACTIVE_NAME =
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.active.name"
 }
