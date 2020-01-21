@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.kr328.clash.service.ClashSettingService
 import kotlinx.android.synthetic.main.activity_setting_access.*
 import kotlin.concurrent.thread
 
