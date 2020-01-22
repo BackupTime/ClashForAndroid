@@ -125,7 +125,7 @@ class ClashProfileManager(private val context: Context, private val database: Cl
 
         context.sendBroadcastSelf(
             Intent(Intents.INTENT_ACTION_PROFILE_CHANGED)
-                .putExtra(Intents.INTENT_ACTION_PROFILE_ACTIVE_NAME, active?.name)
+                .putExtra(Intents.INTENT_EXTRA_PROFILE_ACTIVE, active)
         )
     }
 }

@@ -1,103 +1,65 @@
 package com.github.kr328.clash
 
-import android.content.ComponentName
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
-import android.os.Bundle
-import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.github.kr328.clash.core.event.*
-import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.ClashService
-import com.github.kr328.clash.service.IClashEventObserver
-import com.github.kr328.clash.service.IClashService
-import java.util.concurrent.LinkedBlockingQueue
-import kotlin.concurrent.thread
+import com.github.kr328.clash.service.data.ClashProfileEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
-abstract class BaseActivity : AppCompatActivity(), IClashEventObserver {
-    companion object {
-        private var activityCount: Int = 0
+abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
+    class EmptyBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {}
+    }
 
-        private val paddingRequest = LinkedBlockingQueue<(IClashService) -> Unit>()
-        private var clashConnection: ClashConnection? = null
-
-        class ClashConnection : ServiceConnection {
-            private var requestHandler: Thread? = null
-            private var clash: IClashService? = null
-
-            override fun onServiceDisconnected(name: ComponentName?) {
-                synchronized(BaseActivity::class.java) {
-                    Log.i("ClashService disconnected")
-
-                    requestHandler?.interrupt()
-                    requestHandler = null
-                }
+    private val receiver = object : Broadcasts.Receiver {
+        override fun onStarted() {
+            launch {
+                onClashStarted()
             }
+        }
 
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                synchronized(BaseActivity::class) {
-                    Log.i("ClashService connected")
+        override fun onStopped(cause: String?) {
+            launch {
+                onClashStopped(cause)
+            }
+        }
 
-                    clash = IClashService.Stub.asInterface(service)
-                    requestHandler = thread {
-                        try {
-                            while (!Thread.currentThread().isInterrupted) {
-                                val block = paddingRequest.take()
-
-                                clash?.run(block)
-                            }
-                        } catch (e: InterruptedException) {
-                        }
-
-                        Log.i("ClashConnect exited")
-
-                        synchronized(BaseActivity::class.java) {
-                            clash = null
-                            requestHandler = null
-                        }
-                    }
-                }
+        override fun onProfileChanged(active: ClashProfileEntity?) {
+            launch {
+                onClashProfileChanged(active)
             }
         }
     }
 
-    protected fun runClash(block: (IClashService) -> Unit) {
-        paddingRequest.offer(block)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        synchronized(BaseActivity::class.java) {
-            if (clashConnection == null) {
-                clashConnection = ClashConnection()
-
-                applicationContext.bindService(
-                    Intent(this, ClashService::class.java),
-                    clashConnection!!,
-                    Context.BIND_AUTO_CREATE
-                )
-            }
-
-            activityCount++
-        }
-    }
-
-    override fun onDestroy() {
-        synchronized(BaseActivity::class.java) {
-            if (--activityCount <= 0) {
-                if (clashConnection != null) {
-                    applicationContext.unbindService(clashConnection!!)
-                    clashConnection?.onServiceDisconnected(null)
-
-                    clashConnection = null
-                }
-            }
+    val isClashRunning: Boolean
+        get() {
+            return EmptyBroadcastReceiver().peekService(
+                this,
+                Intent(this, ClashService::class.java)
+            ) != null
         }
 
-        super.onDestroy()
+    open suspend fun onClashStarted() {}
+    open suspend fun onClashStopped(reason: String?) {}
+    open suspend fun onClashProfileChanged(active: ClashProfileEntity?) {}
+
+    override fun onStart() {
+        super.onStart()
+
+        Broadcasts.register(receiver)
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        Broadcasts.unregister(receiver)
     }
 
     override fun setSupportActionBar(toolbar: Toolbar?) {
@@ -116,39 +78,9 @@ abstract class BaseActivity : AppCompatActivity(), IClashEventObserver {
         return true
     }
 
-    private val observerBinder = object : IClashEventObserver.Stub() {
-        override fun onLogEvent(event: LogEvent?) =
-            this@BaseActivity.onLogEvent(event)
+    override fun onDestroy() {
+        cancel()
 
-        override fun onProcessEvent(event: ProcessEvent?) =
-            this@BaseActivity.onProcessEvent(event)
-
-        override fun onErrorEvent(event: ErrorEvent?) =
-            this@BaseActivity.onErrorEvent(event)
-
-        override fun onTrafficEvent(event: TrafficEvent?) =
-            this@BaseActivity.onTrafficEvent(event)
-
-        override fun onBandwidthEvent(event: BandwidthEvent?) {
-            this@BaseActivity.onBandwidthEvent(event)
-        }
-
-        override fun onProfileChanged(event: ProfileChangedEvent?) =
-            this@BaseActivity.onProfileChanged(event)
-
-        override fun onProfileReloaded(event: ProfileReloadEvent?) {
-            this@BaseActivity.onProfileReloaded(event)
-        }
-    }
-
-    override fun onLogEvent(event: LogEvent?) {}
-    override fun onErrorEvent(event: ErrorEvent?) {}
-    override fun onProfileChanged(event: ProfileChangedEvent?) {}
-    override fun onProcessEvent(event: ProcessEvent?) {}
-    override fun onTrafficEvent(event: TrafficEvent?) {}
-    override fun onBandwidthEvent(event: BandwidthEvent?) {}
-    override fun onProfileReloaded(event: ProfileReloadEvent?) {}
-    override fun asBinder(): IBinder {
-        return observerBinder
+        super.onDestroy()
     }
 }

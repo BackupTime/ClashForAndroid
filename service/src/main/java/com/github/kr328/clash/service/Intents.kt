@@ -10,8 +10,8 @@ object Intents {
     const val INTENT_ACTION_PROFILE_CHANGED =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.changed"
 
-    const val INTENT_ACTION_CLASH_STOP_REASON =
+    const val INTENT_EXTRA_CLASH_STOP_REASON =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.clash.stop.reason"
-    const val INTENT_ACTION_PROFILE_ACTIVE_NAME =
+    const val INTENT_EXTRA_PROFILE_ACTIVE =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.active.name"
 }

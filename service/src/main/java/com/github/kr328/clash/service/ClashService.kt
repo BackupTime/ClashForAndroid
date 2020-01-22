@@ -85,7 +85,7 @@ class ClashService : Service() {
 
         sendBroadcastSelf(
             Intent(Intents.INTENT_ACTION_CLASH_STOPPED)
-                .putExtra(Intents.INTENT_ACTION_CLASH_STOP_REASON, stopReason)
+                .putExtra(Intents.INTENT_EXTRA_CLASH_STOP_REASON, stopReason)
         )
 
         unregisterReceiver(profileObserver)
