@@ -3,6 +3,7 @@ package com.github.kr328.clash.remote
 import android.app.Application
 import android.content.*
 import android.os.IBinder
+import android.os.RemoteException
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -13,6 +14,8 @@ import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroup
 import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager
+import com.github.kr328.clash.service.ipc.IStreamCallback
+import com.github.kr328.clash.service.ipc.ParcelableContainer
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -25,6 +28,7 @@ class ClashClient(val service: IClashManager) {
 
         private val connection = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
+                instance?.close()
                 instance = null
             }
 
@@ -58,12 +62,15 @@ class ClashClient(val service: IClashManager) {
 
     suspend fun startHealthCheck(group: String) = withContext(Dispatchers.IO) {
         CompletableDeferred<Unit>().apply {
-            service.startHealthCheck(group).whenComplete { _, u ->
-                if (u != null)
-                    completeExceptionally(u)
-                else
-                    complete(Unit)
-            }
+            service.startHealthCheck(group, object: IStreamCallback.Default() {
+                override fun complete() {
+                    this@apply.complete(Unit)
+                }
+
+                override fun completeExceptionally(reason: String?) {
+                    this@apply.completeExceptionally(RemoteException(reason))
+                }
+            })
         }
     }.await()
 
@@ -76,16 +83,14 @@ class ClashClient(val service: IClashManager) {
     }
 
     suspend fun openLogChannel(): ReceiveChannel<LogEvent> = withContext(Dispatchers.IO) {
-        LogChannel(service.openLogEvent()).also {
-            openedChannel.add(it)
+        LogChannel().apply {
+            service.openLogEvent(createCallback())
         }
     }
 
-    suspend fun openBandwidthChannel(): ReceiveChannel<BandwidthEvent> =
-        withContext(Dispatchers.IO) {
-            BandwidthChannel(service.openBandwidthEvent()).also {
-                openedChannel.add(it)
-            }
+    suspend fun queryBandwidth(): Long =
+        withContext(Dispatchers.IO){
+            service.queryBandwidth()
         }
 
     fun close() {

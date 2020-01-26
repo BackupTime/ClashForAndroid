@@ -127,16 +127,8 @@ object Clash{
         }
     }
 
-    fun openBandwidthEvent(): EventStream<BandwidthEvent> {
-        return object: EventStream<BandwidthEvent>() {
-            val bandwidth = Bridge.pollBandwidth {
-                send(BandwidthEvent(it))
-            }
-
-            override fun onClose() {
-                bandwidth.stop()
-            }
-        }
+    fun queryBandwidth(): Long {
+        return Bridge.queryBandwidth()
     }
 
     fun openLogEvent(): EventStream<LogEvent> {

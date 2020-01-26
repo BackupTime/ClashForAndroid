@@ -27,6 +27,12 @@ type Logs interface {
 	OnEvent(level, payload string)
 }
 
+func QueryBandwidth() int64 {
+	current := tunnel.DefaultManager.Snapshot()
+
+	return current.DownloadTotal + current.UploadTotal
+}
+
 func PollTraffic(traffic Traffic) *EventPoll {
 	stopChannel := make(chan int, 1)
 	ticker := time.NewTicker(time.Second)
@@ -41,38 +47,6 @@ func PollTraffic(traffic Traffic) *EventPoll {
 	go func() {
 		defer close(stopChannel)
 		defer log.Infoln("Traffic Poll Stopped")
-
-		for {
-			select {
-			case <-stopChannel:
-				return
-			case <-ticker.C:
-				tick()
-			}
-		}
-	}()
-
-	return &EventPoll{
-		onStop: func() {
-			stopChannel <- 0
-		},
-	}
-}
-
-func PollBandwidth(bandwidth Bandwidth) *EventPoll {
-	stopChannel := make(chan int, 1)
-	ticker := time.NewTicker(time.Second)
-
-	tick := func() {
-		s := tunnel.DefaultManager.Snapshot()
-		bandwidth.OnEvent(s.DownloadTotal + s.UploadTotal)
-	}
-
-	tick()
-
-	go func() {
-		defer close(stopChannel)
-		defer log.Infoln("Bandwidth Poll Stopped")
 
 		for {
 			select {

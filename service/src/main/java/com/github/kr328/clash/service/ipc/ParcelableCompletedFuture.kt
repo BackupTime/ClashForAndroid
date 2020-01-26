@@ -26,7 +26,7 @@ class ParcelableCompletedFuture private constructor(private val pipe: Parcelable
 
     override fun complete(value: Parcelable?): Boolean {
         if (super.complete(value)) {
-            pipe.send(ParcelableResult(value, null))
+            pipe.sendRemote(ParcelableResult(value, null))
             return true
         }
         return false
@@ -34,7 +34,7 @@ class ParcelableCompletedFuture private constructor(private val pipe: Parcelable
 
     override fun completeExceptionally(ex: Throwable?): Boolean {
         if (super.completeExceptionally(ex)) {
-            pipe.send(ParcelableResult(null, ex?.message ?: "Unknown"))
+            pipe.sendRemote(ParcelableResult(null, ex?.message ?: "Unknown"))
             return true
         }
         return false

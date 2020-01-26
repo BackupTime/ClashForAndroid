@@ -33,7 +33,7 @@
             android:paddingEnd="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/clashBlue"
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         <TextView
@@ -49,6 +49,6 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/colorAccent" />
+            android:background="@color/clashBlue" />
     </LinearLayout>
 </LinearLayout>

@@ -1,2 +1,2 @@
-include ':app', ':core', ':service'
+include ':app', ':core', ':service', ':design'
 rootProject.name='Clash'

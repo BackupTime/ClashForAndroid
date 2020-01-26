@@ -3,6 +3,10 @@ package com.github.kr328.clash
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.github.kr328.clash.remote.Broadcasts
@@ -38,22 +42,49 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         }
     }
 
-    val isClashRunning: Boolean
-        get() {
-            return EmptyBroadcastReceiver().peekService(
-                this,
-                Intent(this, ClashService::class.java)
-            ) != null
+    var clashRunning: Boolean = false
+        private set
+
+    open suspend fun onClashStarted() {
+        clashRunning = true
+    }
+
+    open suspend fun onClashStopped(reason: String?) {
+        clashRunning = false
+    }
+
+    open suspend fun onClashProfileChanged(active: ClashProfileEntity?) {}
+
+    override fun setContentView(layoutResID: Int) {
+        val base = FrameLayout(this).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+
+            val displayMetrics = resources.displayMetrics
+
+            if (displayMetrics.widthPixels > displayMetrics.heightPixels) {
+                val padding = (displayMetrics.widthPixels - displayMetrics.heightPixels) / 2
+
+                setPadding(padding, 0, padding, 0)
+            }
         }
 
-    open suspend fun onClashStarted() {}
-    open suspend fun onClashStopped(reason: String?) {}
-    open suspend fun onClashProfileChanged(active: ClashProfileEntity?) {}
+        LayoutInflater.from(this).inflate(layoutResID, base, true)
+
+        super.setContentView(base)
+    }
 
     override fun onStart() {
         super.onStart()
 
         Broadcasts.register(receiver)
+
+        clashRunning = EmptyBroadcastReceiver().peekService(
+            this,
+            Intent(this, ClashService::class.java)
+        ) != null
     }
 
     override fun onStop() {
@@ -82,5 +113,11 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         cancel()
 
         super.onDestroy()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        recreate()
     }
 }

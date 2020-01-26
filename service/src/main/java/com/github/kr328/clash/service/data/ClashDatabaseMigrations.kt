@@ -42,9 +42,9 @@ object ClashDatabaseMigrations {
 
                 // new
                 val type = when {
-                    token.startsWith("url") -> ClashProfileEntity.Type.URL.id
-                    token.startsWith("file") -> ClashProfileEntity.Type.FILE.id
-                    else -> ClashProfileEntity.Type.UNKNOWN.id
+                    token.startsWith("url") -> ClashProfileEntity.TYPE_URL
+                    token.startsWith("file") -> ClashProfileEntity.TYPE_FILE
+                    else -> ClashProfileEntity.TYPE_UNKNOWN
                 }
                 val uri = token.removePrefix("url|").removePrefix("file|")
                 var base = random.nextLong().absoluteValue

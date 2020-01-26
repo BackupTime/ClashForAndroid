@@ -6,8 +6,11 @@ import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroup
 import com.github.kr328.clash.service.data.ClashDatabase
+import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableCompletedFuture
+import com.github.kr328.clash.service.ipc.ParcelableContainer
 import com.github.kr328.clash.service.ipc.ParcelablePipe
+import java.lang.Exception
 
 class ClashManager(private val context: Context) : IClashManager.Stub() {
     private val settings = context.getSharedPreferences("service", Context.MODE_PRIVATE)
@@ -15,6 +18,7 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
     override fun getProfileManager(): IClashProfileManager {
         return ClashProfileManager(context, ClashDatabase.getInstance(context))
     }
+
 
     override fun queryAllProxies(): Array<ProxyGroup> {
         return Clash.queryProxyGroups().toTypedArray()
@@ -30,52 +34,41 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
         return Clash.setSelectedProxy(proxy, selected)
     }
 
-    override fun openBandwidthEvent(): ParcelablePipe {
-        return object : ParcelablePipe() {
-            val stream = Clash.openBandwidthEvent().apply {
-                onEvent {
-                    send(it)
-                }
-            }
-
-            override fun onClose() {
-                stream.close()
-            }
-        }
-    }
-
-    override fun startHealthCheck(group: String?): ParcelableCompletedFuture {
-        require(group != null)
-
-        return ParcelableCompletedFuture().apply {
-            Clash.startHealthCheck(group).whenComplete { _: Unit?, u: Throwable? ->
-                if (u != null)
-                    this.completeExceptionally(u)
-                else
-                    this.complete(null)
-            }
-        }
-    }
-
-    override fun openLogEvent(): ParcelablePipe {
-        return object : ParcelablePipe() {
-            val stream = Clash.openLogEvent().apply {
-                onEvent {
-                    send(it)
-                }
-            }
-
-            override fun onClose() {
-                stream.close()
-            }
-        }
-    }
-
     override fun putSetting(key: String?, value: String?): Boolean {
         settings.edit {
             putString(key, value)
         }
         return true
+    }
+
+    override fun queryBandwidth(): Long {
+        return Clash.queryBandwidth()
+    }
+
+    override fun openLogEvent(callback: IStreamCallback?) {
+        require(callback != null)
+
+        Clash.openLogEvent().apply {
+            onEvent {
+                try {
+                    callback.send(ParcelableContainer(it))
+                }
+                catch (e: Exception) {
+                    close()
+                }
+            }
+        }
+    }
+
+    override fun startHealthCheck(group: String?, callback: IStreamCallback?) {
+        require(group != null && callback != null)
+
+        Clash.startHealthCheck(group).whenComplete { _, u ->
+            if ( u != null )
+                callback.completeExceptionally(u.message)
+            else
+                callback.complete()
+        }
     }
 
     override fun getSetting(key: String?): String {

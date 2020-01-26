@@ -4,6 +4,8 @@
     <attr name="title" format="string" />
     <attr name="summary" format="string" />
     <attr name="operation" format="string" />
+    <attr name="clashColor" format="color" />
+    <attr name="primaryCardColor" format="color" />
 
     <declare-styleable name="FatItem">
         <attr name="icon" />

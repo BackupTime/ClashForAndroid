@@ -1,216 +1,80 @@
 package com.github.kr328.clash
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.content.Intent
-import android.content.pm.PackageInfo
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import com.github.kr328.clash.core.event.*
-import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.utils.ByteFormatter
-import com.github.kr328.clash.service.TunService
-import com.github.kr328.clash.utils.ServiceUtils
-import com.google.android.material.snackbar.Snackbar
+import com.github.kr328.clash.remote.withClash
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main_clash_status.*
-import kotlinx.android.synthetic.main.activity_main_profiles.*
-import kotlinx.android.synthetic.main.activity_main_proxy_manage.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
-    companion object {
-        const val VPN_REQUEST_CODE = 233
-    }
-
-    private var lastEvent: ProcessEvent? = null
+    private var bandwidthJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
-
-        activity_main_clash_proxies.setOnClickListener {
-            startActivity(Intent(this, ProxyActivity::class.java))
-        }
-
-        activity_main_clash_profiles.setOnClickListener {
-            startActivity(Intent(this, ProfilesActivity::class.java))
-        }
-
-        activity_main_clash_settings.setOnClickListener {
-            startActivity(Intent(this, SettingMainActivity::class.java))
-        }
-
-        activity_main_clash_logs.setOnClickListener {
-            startActivity(Intent(this, LogActivity::class.java))
-        }
-
-        activity_main_clash_feedback.setOnClickListener {
-            startActivity(Intent(this, FeedbackActivity::class.java))
-        }
-
-        activity_main_clash_about.setOnClickListener {
-            showAboutDialog()
-        }
-
-        activity_main_clash_status_icon.setImageResource(R.drawable.ic_clash_stopped)
-        activity_main_clash_status_title.text = getString(R.string.clash_status_stopped)
-        activity_main_clash_status_summary.text = getString(R.string.clash_status_tap_to_start)
-        activity_main_clash_proxies.visibility = View.GONE
-        activity_main_clash_logs.visibility = View.GONE
-
-        activity_main_clash_status.setOnClickListener {
-            runClash {
-                when (it.currentProcessStatus) {
-                    ProcessEvent.STARTED -> {
-                        it.stop()
-                    }
-                    else -> runOnUiThread {
-                        ServiceUtils.startProxyService(this)?.also {
-                            startActivityForResult(it, VPN_REQUEST_CODE)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    override fun shouldDisplayHomeAsUpEnabled(): Boolean {
-        return false
-    }
-
-    override fun onProcessEvent(event: ProcessEvent?) {
-        runOnUiThread {
-            if (event == lastEvent)
-                return@runOnUiThread
-
-            lastEvent = event
-
-            when (event) {
-                ProcessEvent.STARTED -> {
-                    activity_main_clash_status.setCardBackgroundColor(getColor(R.color.colorAccent))
-                    activity_main_clash_status_icon.setImageResource(R.drawable.ic_clash_started)
-                    activity_main_clash_status_title.text = getString(R.string.clash_status_started)
-                    activity_main_clash_status_summary.text =
-                        getString(
-                            R.string.clash_status_forwarded_traffic,
-                            ByteFormatter.byteToString(0)
-                        )
-                    activity_main_clash_proxies.visibility = View.VISIBLE
-                    activity_main_clash_logs.visibility = View.VISIBLE
-                }
-                else -> {
-                    activity_main_clash_status.setCardBackgroundColor(getColor(R.color.gray))
-                    activity_main_clash_status_icon.setImageResource(R.drawable.ic_clash_stopped)
-                    activity_main_clash_status_title.text = getString(R.string.clash_status_stopped)
-                    activity_main_clash_status_summary.text =
-                        getString(R.string.clash_status_tap_to_start)
-                    activity_main_clash_proxies.visibility = View.GONE
-                    activity_main_clash_logs.visibility = View.GONE
-                }
-            }
-        }
-    }
-
-    override fun onProfileReloaded(event: ProfileReloadEvent?) {
-        runClash {
-            val general = it.queryGeneral()
-
-            runOnUiThread {
-                when (general.mode) {
-                    General.Mode.DIRECT ->
-                        activity_main_clash_proxies_summary.text =
-                            getText(R.string.clash_proxy_manage_summary_direct)
-                    General.Mode.GLOBAL ->
-                        activity_main_clash_proxies_summary.text =
-                            getText(R.string.clash_proxy_manage_summary_global)
-                    General.Mode.RULE ->
-                        activity_main_clash_proxies_summary.text =
-                            getText(R.string.clash_proxy_manage_summary_rule)
-                }
-            }
-        }
-    }
-
-    override fun onBandwidthEvent(event: BandwidthEvent?) {
-        runOnUiThread {
-            if (lastEvent == ProcessEvent.STARTED) {
-                activity_main_clash_status_summary.text =
-                    getString(
-                        R.string.clash_status_forwarded_traffic,
-                        ByteFormatter.byteToString(event?.total ?: 0)
-                    )
-            }
-        }
-    }
-
-    override fun onProfileChanged(event: ProfileChangedEvent?) {
-        loadActiveProfile()
     }
 
     override fun onStart() {
         super.onStart()
 
-        runClash {
-            it.eventService.registerEventObserver(
-                MainActivity::class.java.simpleName,
-                this,
-                intArrayOf(Event.EVENT_BANDWIDTH)
-            )
-        }
+        launch {
+            if (clashRunning) {
+                status.icon = getDrawable(R.drawable.ic_started)
+                status.title = getText(R.string.clash_status_started)
+                status.summary = getString(
+                    R.string.clash_status_forwarded_traffic,
+                    ByteFormatter.byteToString(0L)
+                )
+            }
 
-        onProfileReloaded(ProfileReloadEvent())
-        onProfileChanged(ProfileChangedEvent())
+            startBandwidthPolling()
+        }
     }
 
     override fun onStop() {
         super.onStop()
 
-        runClash {
-            it.eventService.unregisterEventObserver(MainActivity::class.java.simpleName)
-        }
+        stopBandwidthPolling()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            VPN_REQUEST_CODE -> {
-                if (resultCode == Activity.RESULT_OK)
-                    startService(Intent(this, TunService::class.java))
-            }
-        }
+    override suspend fun onClashStarted() {
+        super.onClashStarted()
 
-        super.onActivityResult(requestCode, resultCode, data)
+        startBandwidthPolling()
     }
 
-    private fun loadActiveProfile() {
-        runClash {
-            val profile = it.profileService.queryActiveProfile()
+    override suspend fun onClashStopped(reason: String?) {
+        super.onClashStopped(reason)
 
-            runOnUiThread {
-                if (profile != null) {
-                    activity_main_clash_profiles_summary.text =
-                        getString(R.string.clash_profiles_summary_selected, profile.name)
-                } else {
-                    activity_main_clash_profiles_summary.text =
-                        getString(R.string.clash_profiles_summary_unselected)
+        stopBandwidthPolling()
+    }
+
+    private fun startBandwidthPolling() {
+        if ( bandwidthJob != null )
+            return
+
+        launch {
+            withClash {
+                bandwidthJob = launch {
+                    while (clashRunning) {
+                        val bandwidth = queryBandwidth()
+                        status.summary = getString(
+                            R.string.clash_status_forwarded_traffic,
+                            ByteFormatter.byteToString(bandwidth)
+                        )
+                        delay(1000)
+                    }
+                    bandwidthJob = null
                 }
             }
         }
     }
 
-    private fun showAboutDialog() {
-        val view = LayoutInflater.from(this)
-            .inflate(R.layout.dialog_about, window.decorView as ViewGroup?, false)
-
-        view.findViewById<TextView>(android.R.id.summary).text =
-            packageManager.getPackageInfo(packageName, 0).let(PackageInfo::versionName)
-
-        AlertDialog.Builder(this).setView(view).show()
-    }
-
-    override fun onErrorEvent(event: ErrorEvent?) {
-        Snackbar.make(activity_main_root, event?.message ?: "Unknown", Snackbar.LENGTH_LONG).show()
+    private fun stopBandwidthPolling() {
+        bandwidthJob?.cancel()
+        bandwidthJob = null
     }
 }

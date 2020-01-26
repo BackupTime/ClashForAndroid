@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FAFAFA</color>
-    <color name="colorPrimaryDark">#FAFAFA</color>
-    <color name="colorAccent">#1E4376</color>
+    <color name="clashIconColor">#1E4376</color>
+    <color name="primaryCardColor">#FF888888</color>
+    <color name="statusBarColor">#FAFAFA</color>
+    <color name="backgroundColor">#FAFAFA</color>
+    <color name="nightSurface">#121212</color>
+
+    <color name="clashBlue">#1E4376</color>
     <color name="ic_launcher_background">#FFFFFF</color>
 
     <color name="lightGray">#d3d3d3</color>

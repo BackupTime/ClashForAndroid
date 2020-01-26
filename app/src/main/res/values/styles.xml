@@ -1,15 +1,19 @@
 <resources>
-
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:ambientShadowAlpha">0.08</item>
         <item name="android:spotShadowAlpha">0.08</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="materialAlertDialogTheme">
-            @style/ThemeOverlay.MaterialComponents.MaterialAlertDialog
-        </item>
+        <item name="colorPrimary">@color/clashBlue</item>
+        <item name="colorPrimaryDark">@color/statusBarColor</item>
+        <item name="colorAccent">@color/clashBlue</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="android:windowLightStatusBar">@bool/lightStatusBar</item>
+    </style>
+
+    <style name="AppTheme.ThemeOverlay" />
+
+    <style name="AppTheme.ThemeOverlay.ForceDarkSurface">
+        <item name="colorOnSurface">@android:color/white</item>
+        <item name="colorSurface">@color/nightSurface</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 </resources>

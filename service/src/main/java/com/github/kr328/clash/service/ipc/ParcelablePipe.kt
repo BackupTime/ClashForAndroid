@@ -62,7 +62,7 @@ open class ParcelablePipe private constructor(val type: Type) : Parcelable {
 
     override fun describeContents(): Int = 0
 
-    fun send(parcelable: Parcelable?): Boolean {
+    fun sendRemote(parcelable: Parcelable?): Boolean {
         if (type != Type.MASTER)
             return false
 

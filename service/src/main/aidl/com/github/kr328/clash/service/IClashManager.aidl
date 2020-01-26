@@ -1,7 +1,7 @@
 package com.github.kr328.clash.service;
 
 import com.github.kr328.clash.service.IClashProfileManager;
-import com.github.kr328.clash.service.ipc.IPCParcelables;
+import com.github.kr328.clash.service.ipc.IStreamCallback;
 import com.github.kr328.clash.core.model.Packet;
 
 interface IClashManager {
@@ -10,15 +10,15 @@ interface IClashManager {
 
     // Control
     boolean setSelectProxy(String proxy, String selected);
-    ParcelableCompletedFuture startHealthCheck(String group);
+    void startHealthCheck(String group, IStreamCallback callback);
 
     // Query
     ProxyGroup[] queryAllProxies();
     General queryGeneral();
+    long queryBandwidth();
 
     // Events
-    ParcelablePipe openBandwidthEvent();
-    ParcelablePipe openLogEvent();
+    void openLogEvent(IStreamCallback callback);
 
     // Settings
     boolean putSetting(String key, String value);

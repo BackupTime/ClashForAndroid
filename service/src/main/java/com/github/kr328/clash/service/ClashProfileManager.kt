@@ -6,6 +6,7 @@ import android.net.Uri
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableCompletedFuture
 import com.github.kr328.clash.service.util.DefaultThreadPool
 import com.github.kr328.clash.service.util.FileUtils
@@ -16,39 +17,34 @@ class ClashProfileManager(private val context: Context, private val database: Cl
     private val clashDir = context.filesDir.resolve(Constants.CLASH_DIR)
     private val profileDir = context.filesDir.resolve(Constants.PROFILES_DIR)
 
-    override fun updateProfile(id: Int): ParcelableCompletedFuture {
+    override fun updateProfile(id: Int, callback: IStreamCallback?) {
         val entity = database.openClashProfileDao().queryProfileById(id)
 
         require(
-            entity != null && (entity.type == ClashProfileEntity.Type.URL ||
-                    entity.type == ClashProfileEntity.Type.FILE)
+            entity != null && callback != null && (entity.type == ClashProfileEntity.TYPE_URL ||
+                    entity.type == ClashProfileEntity.TYPE_FILE)
         )
-
-        val result = ParcelableCompletedFuture()
 
         downloadProfile(Uri.parse(entity.uri), entity.file, entity.base,
             onSuccess = {
-                result.complete(null)
+                callback.complete()
 
                 database.openClashProfileDao().touchProfile(id)
 
                 sendChangedBroadcast()
             },
             onFailure = {
-                result.completeExceptionally(it)
+                callback.completeExceptionally(it.message)
             })
-
-        return result
     }
 
     override fun queryAllProfiles(): Array<ClashProfileEntity> {
         return database.openClashProfileDao().queryProfiles()
     }
 
-    override fun addProfile(name: String, type: Int, uri: String?): ParcelableCompletedFuture {
-        require(uri != null && (uri.startsWith("http") || uri.startsWith("content")))
+    override fun addProfile(name: String, type: Int, uri: String?, callback: IStreamCallback?) {
+        require(uri != null && callback != null && (uri.startsWith("http") || uri.startsWith("content")))
 
-        val result = ParcelableCompletedFuture()
         val fileName = FileUtils.generateRandomFileName(profileDir, ".yaml")
         val baseDirName = FileUtils.generateRandomFileName(clashDir)
 
@@ -57,7 +53,7 @@ class ClashProfileManager(private val context: Context, private val database: Cl
                 database.openClashProfileDao().addProfile(
                     ClashProfileEntity(
                         name,
-                        ClashProfileEntity.intToType(type),
+                        type,
                         uri,
                         fileName,
                         baseDirName,
@@ -68,13 +64,11 @@ class ClashProfileManager(private val context: Context, private val database: Cl
 
                 sendChangedBroadcast()
 
-                result.complete(null)
+                callback.complete()
             },
             onFailure = {
-                result.completeExceptionally(it)
+                callback.completeExceptionally(it.message)
             })
-
-        return result
     }
 
     private fun downloadProfile(
