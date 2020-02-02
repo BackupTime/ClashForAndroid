@@ -1,11 +1,13 @@
 package com.github.kr328.clash
 
+import android.content.Intent
 import android.os.Bundle
-import com.github.kr328.clash.core.utils.ByteFormatter
+import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.remote.withClash
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
@@ -15,6 +17,10 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+
+        profiles.setOnClickListener {
+            startActivity(Intent(this, ProfilesActivity::class.java))
+        }
     }
 
     override fun onStart() {
@@ -26,7 +32,7 @@ class MainActivity : BaseActivity() {
                 status.title = getText(R.string.clash_status_started)
                 status.summary = getString(
                     R.string.clash_status_forwarded_traffic,
-                    ByteFormatter.byteToString(0L)
+                    0L.asBytesString()
                 )
             }
 
@@ -53,28 +59,25 @@ class MainActivity : BaseActivity() {
     }
 
     private fun startBandwidthPolling() {
-        if ( bandwidthJob != null )
+        if (bandwidthJob != null)
             return
 
-        launch {
+        bandwidthJob = launch {
             withClash {
-                bandwidthJob = launch {
-                    while (clashRunning) {
-                        val bandwidth = queryBandwidth()
-                        status.summary = getString(
-                            R.string.clash_status_forwarded_traffic,
-                            ByteFormatter.byteToString(bandwidth)
-                        )
-                        delay(1000)
-                    }
-                    bandwidthJob = null
+                while (clashRunning && isActive) {
+                    val bandwidth = queryBandwidth()
+                    status.summary = getString(
+                        R.string.clash_status_forwarded_traffic,
+                        bandwidth.asBytesString()
+                    )
+                    delay(1000)
                 }
+                bandwidthJob = null
             }
         }
     }
 
     private fun stopBandwidthPolling() {
         bandwidthJob?.cancel()
-        bandwidthJob = null
     }
 }

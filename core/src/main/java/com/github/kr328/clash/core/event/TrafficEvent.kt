@@ -2,6 +2,7 @@ package com.github.kr328.clash.core.event
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.github.kr328.clash.core.serialization.Parcels
 import kotlinx.serialization.Serializable
 
@@ -15,13 +16,17 @@ data class TrafficEvent(val down: Long, val up: Long) : Event, Parcelable {
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<TrafficEvent> {
-        override fun createFromParcel(parcel: Parcel): TrafficEvent {
-            return Parcels.load(serializer(), parcel)
-        }
+    companion object {
+        @JvmField
+        @Keep
+        val CREATOR = object : Parcelable.Creator<TrafficEvent> {
+            override fun createFromParcel(parcel: Parcel): TrafficEvent {
+                return Parcels.load(serializer(), parcel)
+            }
 
-        override fun newArray(size: Int): Array<TrafficEvent?> {
-            return arrayOfNulls(size)
+            override fun newArray(size: Int): Array<TrafficEvent?> {
+                return arrayOfNulls(size)
+            }
         }
     }
 }

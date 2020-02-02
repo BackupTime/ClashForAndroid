@@ -20,9 +20,9 @@ object Broadcasts {
 
     private val receivers = mutableListOf<Receiver>()
 
-    private val broadcastReceiver = object: BroadcastReceiver() {
+    private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            when ( intent?.action ) {
+            when (intent?.action) {
                 Intents.INTENT_ACTION_CLASH_STARTED ->
                     receivers.forEach {
                         it.onStarted()
@@ -48,7 +48,7 @@ object Broadcasts {
     }
 
     fun init(application: Application) {
-        ProcessLifecycleOwner.get().lifecycle.addObserver(object: DefaultLifecycleObserver {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 application.registerReceiver(broadcastReceiver, IntentFilter().apply {
                     addAction(Intents.INTENT_ACTION_PROFILE_CHANGED)

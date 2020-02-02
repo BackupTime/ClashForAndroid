@@ -3,11 +3,14 @@ package com.github.kr328.clash.core.event
 import android.os.Parcel
 import android.os.Parcelable
 import com.github.kr328.clash.core.serialization.Parcels
-import kotlinx.serialization.*
-import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.Serializable
 
 @Serializable
-data class LogEvent(val level: Level, val message: String, val time: Long = System.currentTimeMillis()) :
+data class LogEvent(
+    val level: Level,
+    val message: String,
+    val time: Long = System.currentTimeMillis()
+) :
     Event {
     companion object {
         const val DEBUG_VALUE = "debug"
@@ -37,7 +40,7 @@ data class LogEvent(val level: Level, val message: String, val time: Long = Syst
 
         companion object {
             fun fromString(type: String): Level {
-                return when ( type ) {
+                return when (type) {
                     DEBUG_VALUE -> DEBUG
                     INFO_VALUE -> INFO
                     WARN_VALUE -> WARN

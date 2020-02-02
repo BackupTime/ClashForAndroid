@@ -20,8 +20,19 @@
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
-        <service android:name=".ClashManagerService"
+        <service
+            android:name=".ClashManagerService"
             android:label="@string/clash_manager_service_label"
+            android:exported="false"
+            android:process=":background" />
+        <service
+            android:name=".ClashProfileService"
+            android:label="@string/clash_profile_service_label"
+            android:exported="false"
+            android:process=":background" />
+
+        <receiver
+            android:name=".ClashProfileReceiver"
             android:exported="false"
             android:process=":background" />
     </application>

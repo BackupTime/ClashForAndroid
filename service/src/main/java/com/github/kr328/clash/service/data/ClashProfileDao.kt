@@ -1,14 +1,11 @@
 package com.github.kr328.clash.service.data
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface ClashProfileDao {
     @Query("UPDATE profiles SET active = CASE WHEN id = :id THEN 1 ELSE 0 END")
-    fun setActiveProfile(id: Int)
+    fun setActiveProfile(id: Long)
 
     @Query("SELECT * FROM profiles WHERE active = 1 LIMIT 1")
     fun queryActiveProfile(): ClashProfileEntity?
@@ -17,14 +14,17 @@ interface ClashProfileDao {
     fun queryProfiles(): Array<ClashProfileEntity>
 
     @Query("SELECT * FROM profiles WHERE id = :id")
-    fun queryProfileById(id: Int): ClashProfileEntity?
+    fun queryProfileById(id: Long): ClashProfileEntity?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addProfile(profile: ClashProfileEntity)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    fun addProfile(profile: ClashProfileEntity): Long
+
+    @Update(onConflict = OnConflictStrategy.ABORT)
+    fun updateProfile(profile: ClashProfileEntity)
 
     @Query("DELETE FROM profiles WHERE id = :id")
-    fun removeProfile(id: Int)
+    fun removeProfile(id: Long)
 
-    @Query("UPDATE profiles SET last_update = :lastUpdate WHERE id = :id")
-    fun touchProfile(id: Int, lastUpdate: Long = System.currentTimeMillis())
+    @Query("SELECT id FROM profiles WHERE rowId = :rowId")
+    fun getId(rowId: Long): Long
 }

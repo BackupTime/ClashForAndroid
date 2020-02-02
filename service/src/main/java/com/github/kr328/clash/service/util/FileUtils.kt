@@ -1,21 +1,10 @@
 package com.github.kr328.clash.service.util
 
+import android.content.Context
+import com.github.kr328.clash.service.Constants
 import java.io.File
-import java.security.SecureRandom
-import kotlin.math.absoluteValue
 
-object FileUtils {
-    private val random = SecureRandom()
-
-    fun generateRandomFileName(dir: File, suffix: String = ""): String {
-        dir.mkdirs()
-
-        var fileName: String
-
-        do {
-            fileName = random.nextLong().absoluteValue.toString() + suffix
-        } while (dir.resolve(fileName).exists())
-
-        return fileName
-    }
-}
+val Context.profileDir: File
+    get() = this.filesDir.resolve(Constants.PROFILES_DIR)
+val Context.clashDir: File
+    get() = this.filesDir.resolve(Constants.CLASH_DIR)

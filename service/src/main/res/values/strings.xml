@@ -13,7 +13,18 @@
     <!-- from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/res/values/strings.xml -->
     <string name="clash_notification_content">"%1$s↑\t%2$s↓"</string>
 
+    <string name="profile_service_status_channel">Profile Service Status</string>
+    <string name="profile_service_status_title">Processing Profiles</string>
+    <string name="profile_service_status_waiting">Waiting Request</string>
+    <string name="profile_service_status_updating">Updating %s</string>
+    <string name="profile_service_result">Profile Service Result</string>
+    <string name="profile_process_result">Process Result</string>
+    <string name="profile_update_completed">Update %s Completed</string>
+    <string name="profile_update_failure">Update %s Failure</string>
+    <string name="profile_deleted">Profile %s deleted</string>
+
     <string name="clash_service_label">Clash Core Service</string>
     <string name="tun_service_label">Tun Device Service</string>
     <string name="clash_manager_service_label">Clash Manager Service</string>
+    <string name="clash_profile_service_label">Clash Profile Manager Service</string>
 </resources>

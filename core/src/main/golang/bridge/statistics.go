@@ -1,8 +1,6 @@
 package bridge
 
 import (
-	"time"
-
 	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/tunnel"
 )
@@ -15,8 +13,9 @@ func (e *EventPoll) Stop() {
 	e.onStop()
 }
 
-type Traffic interface {
-	OnEvent(down int64, up int64)
+type Traffic struct {
+	Download int64
+	Upload   int64
 }
 
 type Bandwidth interface {
@@ -28,40 +27,15 @@ type Logs interface {
 }
 
 func QueryBandwidth() int64 {
-	current := tunnel.DefaultManager.Snapshot()
-
-	return current.DownloadTotal + current.UploadTotal
+	return tunnel.DefaultManager.Forwarded()
 }
 
-func PollTraffic(traffic Traffic) *EventPoll {
-	stopChannel := make(chan int, 1)
-	ticker := time.NewTicker(time.Second)
+func QueryTraffic() *Traffic {
+	up, down := tunnel.DefaultManager.Now()
 
-	tick := func() {
-		up, down := tunnel.DefaultManager.Now()
-		traffic.OnEvent(down, up)
-	}
-
-	tick()
-
-	go func() {
-		defer close(stopChannel)
-		defer log.Infoln("Traffic Poll Stopped")
-
-		for {
-			select {
-			case <-stopChannel:
-				return
-			case <-ticker.C:
-				tick()
-			}
-		}
-	}()
-
-	return &EventPoll{
-		onStop: func() {
-			stopChannel <- 0
-		},
+	return &Traffic{
+		Upload:   up,
+		Download: down,
 	}
 }
 

@@ -5,7 +5,6 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import com.github.kr328.clash.core.serialization.Parcels
 import kotlinx.serialization.Serializable
 
@@ -19,7 +18,8 @@ data class ClashProfileEntity(
     @ColumnInfo(name = "base") val base: String,
     @ColumnInfo(name = "active") val active: Boolean,
     @ColumnInfo(name = "last_update") val lastUpdate: Long,
-    @ColumnInfo(name = "id") @PrimaryKey(autoGenerate = true) val id: Int = 0
+    @ColumnInfo(name = "update_interval") val updateInterval: Long,
+    @ColumnInfo(name = "id") @PrimaryKey(autoGenerate = true) val id: Long = 0
 ) : Parcelable {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         Parcels.dump(serializer(), this, parcel)
@@ -30,8 +30,8 @@ data class ClashProfileEntity(
     }
 
     companion object {
-        const val TYPE_FILE = 1
-        const val TYPE_URL = 2
+        const val TYPE_LOCAL = 1
+        const val TYPE_REMOTE = 2
         const val TYPE_UNKNOWN = -1
 
         @JvmField

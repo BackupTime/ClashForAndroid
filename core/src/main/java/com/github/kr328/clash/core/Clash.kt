@@ -3,37 +3,32 @@ package com.github.kr328.clash.core
 import android.content.Context
 import bridge.Bridge
 import bridge.EventPoll
-import com.github.kr328.clash.core.event.*
+import com.github.kr328.clash.core.event.EventStream
+import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.core.model.ProxyGroup
+import com.github.kr328.clash.core.model.Traffic
 import com.github.kr328.clash.core.transact.DoneCallbackImpl
 import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
 import java.io.File
 import java.io.InputStream
-import java.lang.IllegalStateException
-import java.util.concurrent.BrokenBarrierException
 import java.util.concurrent.CompletableFuture
 
-object Clash{
+object Clash {
     private var initialized = false
 
-    class Poll(private val poll: EventPoll) {
-        fun stop() {
-            poll.stop()
-        }
-    }
-
+    @Synchronized
     fun initialize(context: Context) {
-        if ( initialized )
+        if (initialized)
             return
         initialized = true
 
-        val country = context.assets.open("Country.mmdb")
+        val bytes = context.assets.open("Country.mmdb")
             .use(InputStream::readBytes)
 
-        Bridge.loadMMDB(country)
+        Bridge.loadMMDB(bytes)
     }
 
     fun start() {
@@ -62,22 +57,20 @@ object Clash{
         }
     }
 
-    fun downloadProfile(url: String, output: File, baseDir: File): CompletableFuture<Unit> {
-        return DoneCallbackImpl().apply {
-            Bridge.downloadProfileAndCheck(url, output.absolutePath, baseDir.absolutePath, this)
-        }
+    fun downloadProfile(url: String, output: File, baseDir: File) {
+        Bridge.downloadProfileAndCheck(url, output.absolutePath, baseDir.absolutePath)
     }
 
-    fun saveProfile(data: ByteArray, output: File, baseDir: File): CompletableFuture<Unit> {
-        return DoneCallbackImpl().apply {
-            Bridge.saveProfileAndCheck(data, output.absolutePath, baseDir.absolutePath, this)
-        }
+    fun copyProfile(fd: Int, output: File, baseDir: File) {
+        Bridge.readProfileAndCheck(fd.toLong(), output.absolutePath, baseDir.absolutePath)
     }
 
-    fun moveProfile(source: File, target: File, baseDir: File): CompletableFuture<Unit> {
-        return DoneCallbackImpl().apply {
-            Bridge.moveProfileAndCheck(source.absolutePath, target.absolutePath, baseDir.absolutePath, this)
-        }
+    fun saveProfile(data: ByteArray, output: File, baseDir: File) {
+        Bridge.saveProfileAndCheck(data, output.absolutePath, baseDir.absolutePath)
+    }
+
+    fun moveProfile(source: File, target: File, baseDir: File) {
+        Bridge.moveProfileAndCheck(source.absolutePath, target.absolutePath, baseDir.absolutePath)
     }
 
     fun queryProxyGroups(): List<ProxyGroup> {
@@ -115,16 +108,10 @@ object Clash{
         )
     }
 
-    fun openTrafficEvent(): EventStream<TrafficEvent> {
-        return object: EventStream<TrafficEvent>() {
-            val traffic = Bridge.pollTraffic { down, up ->
-                send(TrafficEvent(down, up))
-            }
+    fun queryTrafficEvent(): Traffic {
+        val data = Bridge.queryTraffic()
 
-            override fun onClose() {
-                traffic.stop()
-            }
-        }
+        return Traffic(data.upload, data.download)
     }
 
     fun queryBandwidth(): Long {
@@ -132,7 +119,7 @@ object Clash{
     }
 
     fun openLogEvent(): EventStream<LogEvent> {
-        return object: EventStream<LogEvent>() {
+        return object : EventStream<LogEvent>() {
             val log = Bridge.pollLogs { level, payload ->
                 send(LogEvent(LogEvent.Level.fromString(level), payload))
             }

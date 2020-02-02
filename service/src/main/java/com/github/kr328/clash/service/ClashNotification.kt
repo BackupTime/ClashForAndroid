@@ -1,30 +1,33 @@
 package com.github.kr328.clash.service
 
 import android.app.*
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Handler
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.core.Clash
-import com.github.kr328.clash.core.event.EventStream
-import com.github.kr328.clash.core.event.TrafficEvent
-import com.github.kr328.clash.core.utils.ByteFormatter
+import com.github.kr328.clash.core.utils.asSpeedString
 
 class ClashNotification(private val context: Service) {
     companion object {
         private const val CLASH_STATUS_NOTIFICATION_CHANNEL = "clash_status_channel"
         private const val CLASH_STATUS_NOTIFICATION_ID = 413
-
-        private const val MAIN_ACTIVITY_NAME = ".MainActivity"
     }
 
     private val handler = Handler()
     private var showing = false
 
+    private val contentIntent = Intent(Intent.ACTION_MAIN)
+        .addCategory(Intent.CATEGORY_LAUNCHER)
+        .setPackage(context.packageName)
+        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
     private val baseBuilder = NotificationCompat.Builder(context, CLASH_STATUS_NOTIFICATION_CHANNEL)
-        .setSmallIcon(R.drawable.ic_notification_icon)
+        .setSmallIcon(R.drawable.ic_notification)
         .setOngoing(true)
         .setColor(context.getColor(R.color.colorAccentService))
         .setOnlyAlertOnce(true)
@@ -32,24 +35,15 @@ class ClashNotification(private val context: Service) {
         .setContentIntent(
             PendingIntent.getActivity(
                 context,
-                (Math.random() * 100).toInt(),
-                Intent().setComponent(
-                    ComponentName.createRelative(
-                        context,
-                        MAIN_ACTIVITY_NAME
-                    )
-                ).setFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                ),
+                CLASH_STATUS_NOTIFICATION_ID,
+                contentIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
         )
 
+    private var auto = false
     private var vpn = false
-    private var up = 0L
-    private var down = 0L
     private var profile = "None"
-    private var traffic: EventStream<TrafficEvent>? = null
     private val observer = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -68,7 +62,7 @@ class ClashNotification(private val context: Service) {
                     NotificationChannel(
                         CLASH_STATUS_NOTIFICATION_CHANNEL,
                         context.getString(R.string.clash_service_status_channel),
-                        NotificationManager.IMPORTANCE_MIN
+                        NotificationManager.IMPORTANCE_LOW
                     )
                 )
         }
@@ -116,35 +110,31 @@ class ClashNotification(private val context: Service) {
         }
     }
 
-    private fun setSpeed(up: Long, down: Long) {
-        handler.post {
-            this.up = up
-            this.down = down
+    private fun updateSpeed() {
+        handler.postDelayed({
+            if (!auto)
+                return@postDelayed
 
             update()
-        }
+
+            updateSpeed()
+        }, 1000)
     }
 
     private fun enableUpdate() {
         handler.post {
-            if (traffic != null)
+            if (auto)
                 return@post
 
-            traffic = Clash.openTrafficEvent().apply {
-                onEvent {
-                    setSpeed(it.up, it.down)
-                }
-            }
+            auto = true
+
+            updateSpeed()
         }
     }
 
     private fun disableUpdate() {
         handler.post {
-            if (traffic == null)
-                return@post
-
-            traffic?.close()
-            traffic = null
+            auto = false
         }
     }
 
@@ -154,13 +144,15 @@ class ClashNotification(private val context: Service) {
     }
 
     private fun createNotification(): Notification {
+        val traffic = Clash.queryTrafficEvent()
+
         return baseBuilder
             .setContentTitle(profile)
             .setContentText(
                 context.getString(
                     R.string.clash_notification_content,
-                    ByteFormatter.byteToStringSecond(up),
-                    ByteFormatter.byteToStringSecond(down)
+                    traffic.upload.asSpeedString(),
+                    traffic.download.asSpeedString()
                 )
             )
             .setSubText(if (vpn) context.getText(R.string.clash_service_vpn_mode) else null)

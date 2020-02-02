@@ -18,3 +18,11 @@ object ByteFormatter {
         return byteToString(bytes) + "/s"
     }
 }
+
+fun Long.asBytesString(): String {
+    return ByteFormatter.byteToString(this)
+}
+
+fun Long.asSpeedString(): String {
+    return ByteFormatter.byteToStringSecond(this)
+}

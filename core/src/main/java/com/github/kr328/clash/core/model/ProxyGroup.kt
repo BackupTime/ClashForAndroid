@@ -3,7 +3,6 @@ package com.github.kr328.clash.core.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.github.kr328.clash.core.serialization.MergedParcels
-import com.github.kr328.clash.core.serialization.Parcels
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,7 +12,7 @@ data class ProxyGroup(
     val delay: Long,
     val current: String,
     val proxies: List<Proxy>
-): Parcelable {
+) : Parcelable {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         MergedParcels.dump(serializer(), this, parcel)
     }

@@ -45,10 +45,6 @@ var client = &http.Client{
 }
 
 func DownloadAndCheck(url, output, baseDir string) error {
-	original := constant.Path.HomeDir()
-	constant.SetHomeDir(baseDir)
-	defer constant.SetHomeDir(original)
-
 	response, err := client.Get(url)
 	if err != nil {
 		return err
@@ -60,12 +56,18 @@ func DownloadAndCheck(url, output, baseDir string) error {
 		return err
 	}
 
-	_, err = parseConfig(data)
+	return SaveAndCheck(data, output, baseDir)
+}
+
+func ReadAndCheck(fd int, output, baseDir string) error {
+	file := os.NewFile(uintptr(fd), "/dev/null")
+
+	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		return err
 	}
 
-	return ioutil.WriteFile(output, data, defaultFileMode)
+	return SaveAndCheck(data, output, baseDir)
 }
 
 func SaveAndCheck(data []byte, output, baseDir string) error {

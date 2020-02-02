@@ -2,16 +2,10 @@ package bridge
 
 import (
 	"github.com/kr328/cfa/profile"
-	"sync"
 )
-
-var mutex sync.Mutex
 
 func LoadProfileFile(path, baseDir string, callback DoneCallback) {
 	go func() {
-		mutex.Lock()
-		defer mutex.Unlock()
-
 		err := profile.LoadFromFile(path, baseDir)
 		if err != nil {
 			callback.DoneWithError(err)
@@ -21,44 +15,22 @@ func LoadProfileFile(path, baseDir string, callback DoneCallback) {
 	}()
 }
 
-func DownloadProfileAndCheck(url, output, baseDir string, callback DoneCallback) {
-	go func() {
-		mutex.Lock()
-		defer mutex.Unlock()
-
-		err := profile.DownloadAndCheck(url, output, baseDir)
-		if err != nil {
-			callback.DoneWithError(err)
-		} else {
-			callback.Done()
-		}
-	}()
+func DownloadProfileAndCheck(url, output, baseDir string) error {
+	err := profile.DownloadAndCheck(url, output, baseDir)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func SaveProfileAndCheck(data []byte, output, baseDir string, callback DoneCallback) {
-	go func() {
-		mutex.Lock()
-		defer mutex.Unlock()
-
-		err := profile.SaveAndCheck(data, output, baseDir)
-		if err != nil {
-			callback.DoneWithError(err)
-		} else {
-			callback.Done()
-		}
-	}()
+func ReadProfileAndCheck(fd int, output, baseDir string) error {
+	return profile.ReadAndCheck(fd, output, baseDir)
 }
 
-func MoveProfileAndCheck(source, target, baseDir string, callback DoneCallback) {
-	go func() {
-		mutex.Lock()
-		defer mutex.Unlock()
+func SaveProfileAndCheck(data []byte, output, baseDir string) error {
+	return profile.SaveAndCheck(data, output, baseDir)
+}
 
-		err := profile.MoveAndCheck(source, target, baseDir)
-		if err != nil {
-			callback.DoneWithError(err)
-		} else {
-			callback.Done()
-		}
-	}()
+func MoveProfileAndCheck(source, target, baseDir string) error {
+	return profile.MoveAndCheck(source, target, baseDir)
 }

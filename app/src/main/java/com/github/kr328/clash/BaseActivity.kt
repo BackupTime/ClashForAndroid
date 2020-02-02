@@ -4,7 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
+import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -76,6 +79,12 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         super.setContentView(base)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        resetLightNavigationBar()
+    }
+
     override fun onStart() {
         super.onStart()
 
@@ -119,5 +128,22 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         super.onConfigurationChanged(newConfig)
 
         recreate()
+    }
+
+    private fun resetLightNavigationBar() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            return
+
+        val light = resources.getBoolean(R.bool.lightStatusBar)
+
+        if (light) {
+            window.decorView.systemUiVisibility =
+                window.decorView.systemUiVisibility or SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        } else {
+            window.decorView.systemUiVisibility =
+                window.decorView.systemUiVisibility and SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+        }
+
+        window.navigationBarColor = getColor(R.color.backgroundColor)
     }
 }

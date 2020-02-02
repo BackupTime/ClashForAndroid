@@ -7,6 +7,8 @@ import android.os.IBinder
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.util.DefaultThreadPool
+import com.github.kr328.clash.service.util.clashDir
+import com.github.kr328.clash.service.util.profileDir
 import com.github.kr328.clash.service.util.sendBroadcastSelf
 
 class ClashService : Service() {
@@ -99,11 +101,13 @@ class ClashService : Service() {
                 ?: return@submit stopSelf("Empty active profile")
 
             Clash.loadProfile(
-                filesDir.resolve(Constants.PROFILES_DIR).resolve(active.file),
-                filesDir.resolve(Constants.CLASH_DIR).resolve(active.base)
+                profileDir.resolve(active.file),
+                clashDir.resolve(active.base)
             ).whenComplete { _, u ->
                 if (u != null)
                     return@whenComplete stopSelf(u.message ?: "Load profile failure")
+                else
+                    notification.setProfile(active.name)
             }
         }
     }

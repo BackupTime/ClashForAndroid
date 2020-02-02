@@ -4,37 +4,27 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import com.crashlytics.android.Crashlytics
-import com.github.kr328.clash.core.Constants
-import com.github.kr328.clash.core.utils.ByteFormatter
-import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.core.Global
+import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.remote.ClashClient
 import com.google.firebase.FirebaseApp
 import io.fabric.sdk.android.Fabric
-import java.io.File
-import java.lang.Exception
 import java.security.MessageDigest
-import java.util.zip.ZipFile
-import kotlin.concurrent.thread
 
+@Suppress("unused")
 class MainApplication : Application() {
     companion object {
         const val KEY_PROXY_MODE = "key_proxy_mode"
         const val PROXY_MODE_VPN = "vpn"
         const val PROXY_MODE_PROXY_ONLY = "proxy_only"
 
-        val GOOGLE_PLAY_INSTALLER = listOf("com.android.vending", "com.google.android.feedback")
-        const val CRASHLYTICS_FROM_PLAY_KEY = "install_from_google"
-        const val CRASHLYTICS_SPLIT_APK_KEY = "split_apk"
-        const val CRASHLYTICS_BASE_SIZE_KEY = "base_size"
-
         val userIdentifier: String by lazy {
-            val archive = instance.packageManager.getPackageInfo(instance.packageName, 0)
+            val archive =
+                Global.application.packageManager.getPackageInfo(Global.application.packageName, 0)
             val encoder = MessageDigest.getInstance("md5")
 
             encoder.digest((Build.ID + archive.lastUpdateTime).toByteArray()).toHexString()
         }
-
-        lateinit var instance: MainApplication
 
         private fun ByteArray.toHexString(): String {
             return this.map {
@@ -51,7 +41,7 @@ class MainApplication : Application() {
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
 
-        instance = this
+        Global.init(this)
     }
 
     override fun onCreate() {
@@ -64,27 +54,9 @@ class MainApplication : Application() {
             Fabric.with(this, Crashlytics())
         }
 
-        Crashlytics.setBool(CRASHLYTICS_FROM_PLAY_KEY, detectFromPlay())
-        Crashlytics.setBool(CRASHLYTICS_SPLIT_APK_KEY, detectSplitArchive())
-        Crashlytics.setString(CRASHLYTICS_BASE_SIZE_KEY, getBaseApkSize())
         Crashlytics.setUserIdentifier(userIdentifier)
 
         ClashClient.init(this)
-    }
-
-    private fun detectFromPlay(): Boolean {
-        val installer = packageManager.getInstallerPackageName(packageName)
-        return installer != null && GOOGLE_PLAY_INSTALLER.contains(installer)
-    }
-
-    private fun detectSplitArchive(): Boolean {
-        val split = applicationInfo.splitSourceDirs
-        return split != null && split.isNotEmpty()
-    }
-
-    private fun getBaseApkSize(): String {
-        val size = File(applicationInfo.sourceDir).length()
-
-        return ByteFormatter.byteToString(size)
+        Broadcasts.init(this)
     }
 }

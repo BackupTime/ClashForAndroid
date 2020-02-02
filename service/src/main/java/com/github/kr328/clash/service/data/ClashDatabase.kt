@@ -1,7 +1,9 @@
 package com.github.kr328.clash.service.data
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
 
 @Database(
     version = 2,

@@ -6,19 +6,12 @@ import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroup
 import com.github.kr328.clash.service.data.ClashDatabase
+import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.ipc.IStreamCallback
-import com.github.kr328.clash.service.ipc.ParcelableCompletedFuture
 import com.github.kr328.clash.service.ipc.ParcelableContainer
-import com.github.kr328.clash.service.ipc.ParcelablePipe
-import java.lang.Exception
 
 class ClashManager(private val context: Context) : IClashManager.Stub() {
     private val settings = context.getSharedPreferences("service", Context.MODE_PRIVATE)
-
-    override fun getProfileManager(): IClashProfileManager {
-        return ClashProfileManager(context, ClashDatabase.getInstance(context))
-    }
-
 
     override fun queryAllProxies(): Array<ProxyGroup> {
         return Clash.queryProxyGroups().toTypedArray()
@@ -41,6 +34,10 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
         return true
     }
 
+    override fun queryAllProfiles(): Array<ClashProfileEntity> {
+        return ClashDatabase.getInstance(context).openClashProfileDao().queryProfiles()
+    }
+
     override fun queryBandwidth(): Long {
         return Clash.queryBandwidth()
     }
@@ -52,8 +49,7 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
             onEvent {
                 try {
                     callback.send(ParcelableContainer(it))
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     close()
                 }
             }
@@ -64,7 +60,7 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
         require(group != null && callback != null)
 
         Clash.startHealthCheck(group).whenComplete { _, u ->
-            if ( u != null )
+            if (u != null)
                 callback.completeExceptionally(u.message)
             else
                 callback.complete()

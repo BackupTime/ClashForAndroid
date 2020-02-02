@@ -1,13 +1,13 @@
 package com.github.kr328.clash.utils
 
 import android.util.TypedValue
-import com.github.kr328.clash.MainApplication
+import com.github.kr328.clash.core.Global
 
 val Int.dp: Float
     get() {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             this.toFloat(),
-            MainApplication.instance.resources.displayMetrics
+            Global.application.resources.displayMetrics
         )
     }
