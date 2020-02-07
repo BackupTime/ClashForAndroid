@@ -18,16 +18,18 @@ type Traffic struct {
 	Upload   int64
 }
 
-type Bandwidth interface {
-	OnEvent(bandwidth int64)
-}
-
 type Logs interface {
 	OnEvent(level, payload string)
 }
 
-func QueryBandwidth() int64 {
-	return tunnel.DefaultManager.Forwarded()
+func QueryBandwidth() *Traffic {
+	upload := tunnel.DefaultManager.UploadTotal()
+	download := tunnel.DefaultManager.DownloadTotal()
+
+	return &Traffic{
+		Upload:   upload,
+		Download: download,
+	}
 }
 
 func QueryTraffic() *Traffic {

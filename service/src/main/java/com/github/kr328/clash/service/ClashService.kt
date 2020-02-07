@@ -1,51 +1,43 @@
 package com.github.kr328.clash.service
 
-import android.app.Service
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Binder
 import android.os.IBinder
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
-import com.github.kr328.clash.service.util.DefaultThreadPool
-import com.github.kr328.clash.service.util.clashDir
-import com.github.kr328.clash.service.util.profileDir
-import com.github.kr328.clash.service.util.sendBroadcastSelf
+import com.github.kr328.clash.service.util.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 
-class ClashService : Service() {
+class ClashService : BaseService() {
     companion object {
         const val INTENT_EXTRA_START_TUN =
             "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.start.tun"
     }
 
+    private val service = this
+    private val notification by lazy { ClashNotification(service) }
     private var stopReason: String? = null
-    private lateinit var notification: ClashNotification
-    private val tunConnection = object : ServiceConnection {
-        override fun onServiceDisconnected(name: ComponentName?) {}
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            require(service != null)
-
-            val tun = service.queryLocalInterface(TunService::class.java.name) as TunService
-
-            tun.startTun().whenComplete { _, u ->
-                if (u != null)
-                    return@whenComplete stopSelf(u.message ?: "Start tun failure")
-
-                notification.setVpn(true)
-            }
-        }
-    }
+    private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
     private val profileObserver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            reloadProfile()
+            reloadChannel.offer(Unit)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        notification = ClashNotification(this)
+        launch {
+            while (isActive) {
+                reloadChannel.receive()
 
-        Clash.initialize(this)
+                reloadProfile()
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -53,21 +45,16 @@ class ClashService : Service() {
 
         Clash.start()
 
-        sendBroadcastSelf(Intent(Intents.INTENT_ACTION_CLASH_STARTED))
+        broadcastClashStarted(this)
 
         val startVpn = intent?.getBooleanExtra(INTENT_EXTRA_START_TUN, true) ?: true
 
         if (startVpn)
-            bindService(
-                Intent(this, TunService::class.java)
-                    .setAction(Intents.INTENT_ACTION_BIND_TUN_SERVICE),
-                tunConnection,
-                Context.BIND_AUTO_CREATE
-            )
-
-        reloadProfile()
+            startService(TunService::class.intent)
 
         registerReceiver(profileObserver, IntentFilter(Intents.INTENT_ACTION_PROFILE_CHANGED))
+
+        reloadChannel.offer(Unit)
 
         return START_NOT_STICKY
     }
@@ -77,38 +64,33 @@ class ClashService : Service() {
     }
 
     override fun onDestroy() {
-        runCatching {
-            unbindService(tunConnection)
-        }
+        cancel()
 
+        Clash.stopTunDevice()
         Clash.stop()
 
         notification.destroy()
 
-        sendBroadcastSelf(
-            Intent(Intents.INTENT_ACTION_CLASH_STOPPED)
-                .putExtra(Intents.INTENT_EXTRA_CLASH_STOP_REASON, stopReason)
-        )
+        broadcastClashStopped(this, stopReason)
 
         unregisterReceiver(profileObserver)
 
         super.onDestroy()
     }
 
-    private fun reloadProfile() {
-        DefaultThreadPool.submit {
-            val active = ClashDatabase.getInstance(this).openClashProfileDao().queryActiveProfile()
-                ?: return@submit stopSelf("Empty active profile")
+    private suspend fun reloadProfile() = withContext(Dispatchers.IO) {
+        val active = ClashDatabase.getInstance(service).openClashProfileDao().queryActiveProfile()
+            ?: return@withContext stopSelf("Empty active profile")
 
+        try {
             Clash.loadProfile(
                 profileDir.resolve(active.file),
                 clashDir.resolve(active.base)
-            ).whenComplete { _, u ->
-                if (u != null)
-                    return@whenComplete stopSelf(u.message ?: "Load profile failure")
-                else
-                    notification.setProfile(active.name)
-            }
+            ).await()
+
+            notification.setProfile(active.name)
+        } catch (e: Exception) {
+            stopSelf("Load profile failure")
         }
     }
 

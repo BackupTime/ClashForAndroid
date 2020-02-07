@@ -2,24 +2,37 @@
     <string name="launch_name">Clash</string>
     <string name="application_name">Clash for Android</string>
 
-    <string name="clash_status_stopped">Stopped</string>
-    <string name="clash_status_tap_to_start">Tap to start</string>
-    <string name="clash_status_started">Running</string>
-    <string name="clash_status_forwarded_traffic">%s Forwarded</string>
+    <string name="stopped">Stopped</string>
+    <string name="tap_to_start">Tap to start</string>
+    <string name="running">Running</string>
+    <string name="format_traffic_forwarded">%s Forwarded</string>
 
-    <string name="clash_proxy_manage">Proxy</string>
-    <string name="clash_proxy_manage_summary_rule">Rule Mode</string>
-    <string name="clash_proxy_manage_summary_direct">Direct Mode</string>
-    <string name="clash_proxy_manage_summary_global">Global Mode</string>
+    <string name="proxy">Proxy</string>
+    <string name="rule_mode">Rule Mode</string>
+    <string name="direct_mode">Direct Mode</string>
+    <string name="global_mode">Global Mode</string>
 
-    <string name="clash_profiles">Profiles</string>
-    <string name="clash_profiles_summary_selected">%s Activated</string>
-    <string name="clash_profiles_summary_unselected">Not selected</string>
+    <string name="profiles">Profiles</string>
+    <string name="format_profile_activated">%s Activated</string>
+    <string name="not_selected">Not selected</string>
 
-    <string name="clash_logs">Logs</string>
-    <string name="clash_settings">Settings</string>
-    <string name="clash_feedback">Feedback</string>
-    <string name="clash_about">About</string>
+    <string name="logs">Logs</string>
+    <string name="settings">Settings</string>
+    <string name="feedback">Feedback</string>
+    <string name="about">About</string>
+
+    <string name="local">Local</string>
+    <string name="remote">Remote</string>
+    <string name="unknown">Unknown</string>
+
+    <string name="recently">Recently</string>
+    <string name="format_minutes">%d minutes</string>
+    <string name="format_hours">%d hours</string>
+    <string name="format_days">%d days</string>
+    <string name="format_months">%d months</string>
+    <string name="format_years">%d years</string>
+
+    <string name="create_profile">Create Profile</string>
 
     <string name="clash_profile_item_summary_file">%s (File)</string>
     <string name="clash_profile_item_summary_url">%s (URL)</string>

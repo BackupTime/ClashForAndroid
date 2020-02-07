@@ -28,8 +28,13 @@
         </activity>
         <activity
             android:name=".ProfilesActivity"
-            android:label="@string/clash_profiles"
+            android:label="@string/profiles"
             android:exported="false"
             android:configChanges="uiMode"/>
+        <activity
+            android:name=".CreateProfileActivity"
+            android:label="@string/create_profile"
+            android:exported="false"
+            android:configChanges="uiMode" />
     </application>
 </manifest>

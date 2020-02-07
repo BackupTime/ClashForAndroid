@@ -13,7 +13,6 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.github.kr328.clash.remote.Broadcasts
-import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -45,17 +44,11 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         }
     }
 
-    var clashRunning: Boolean = false
-        private set
+    val clashRunning: Boolean
+        get() = Broadcasts.clashRunning
 
-    open suspend fun onClashStarted() {
-        clashRunning = true
-    }
-
-    open suspend fun onClashStopped(reason: String?) {
-        clashRunning = false
-    }
-
+    open suspend fun onClashStarted() {}
+    open suspend fun onClashStopped(reason: String?) {}
     open suspend fun onClashProfileChanged(active: ClashProfileEntity?) {}
 
     override fun setContentView(layoutResID: Int) {
@@ -89,11 +82,6 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         super.onStart()
 
         Broadcasts.register(receiver)
-
-        clashRunning = EmptyBroadcastReceiver().peekService(
-            this,
-            Intent(this, ClashService::class.java)
-        ) != null
     }
 
     override fun onStop() {

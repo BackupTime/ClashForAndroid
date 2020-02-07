@@ -48,8 +48,8 @@
             app:cardCornerRadius="8dp"
             app:cardBackgroundColor="@color/primaryCardColor"
             app:icon="@drawable/ic_stopped"
-            app:title="@string/clash_status_stopped"
-            app:summary="@string/clash_status_tap_to_start"/>
+            app:title="@string/stopped"
+            app:summary="@string/tap_to_start"/>
 
         <com.github.kr328.clash.design.view.TextCard
             android:id="@+id/proxies"
@@ -65,8 +65,8 @@
             app:cardCornerRadius="8dp"
             app:cardBackgroundColor="?attr/colorSurface"
             app:icon="@drawable/ic_proxies"
-            app:title="@string/clash_proxy_manage"
-            app:summary="@string/clash_proxy_manage_summary_direct"/>
+            app:title="@string/proxy"
+            app:summary="@string/direct_mode"/>
 
         <com.github.kr328.clash.design.view.TextCard
             android:id="@+id/profiles"
@@ -82,8 +82,8 @@
             app:cardCornerRadius="8dp"
             app:cardBackgroundColor="?attr/colorSurface"
             app:icon="@drawable/ic_profiles"
-            app:title="@string/clash_profiles"
-            app:summary="@string/clash_profiles_summary_unselected"/>
+            app:title="@string/profiles"
+            app:summary="@string/not_selected"/>
 
         <LinearLayout
             android:id="@+id/logs"
@@ -99,7 +99,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:contentDescription="@string/clash_logs"
+                android:contentDescription="@string/logs"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:src="@drawable/ic_logs" />
@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:text="@string/clash_logs" />
+                android:text="@string/logs" />
         </LinearLayout>
 
         <LinearLayout
@@ -126,7 +126,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:contentDescription="@string/clash_settings"
+                android:contentDescription="@string/settings"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:src="@drawable/ic_settings" />
@@ -136,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:text="@string/clash_settings" />
+                android:text="@string/settings" />
         </LinearLayout>
 
         <LinearLayout
@@ -153,7 +153,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:contentDescription="@string/clash_feedback"
+                android:contentDescription="@string/feedback"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:src="@drawable/ic_feedback" />
@@ -163,7 +163,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:text="@string/clash_feedback" />
+                android:text="@string/feedback" />
         </LinearLayout>
 
         <LinearLayout
@@ -180,7 +180,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:contentDescription="@string/clash_about"
+                android:contentDescription="@string/about"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:src="@drawable/ic_about" />
@@ -190,7 +190,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:text="@string/clash_about" />
+                android:text="@string/about" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

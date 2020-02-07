@@ -29,14 +29,14 @@ class MainActivity : BaseActivity() {
         launch {
             if (clashRunning) {
                 status.icon = getDrawable(R.drawable.ic_started)
-                status.title = getText(R.string.clash_status_started)
+                status.title = getText(R.string.running)
                 status.summary = getString(
-                    R.string.clash_status_forwarded_traffic,
+                    R.string.format_traffic_forwarded,
                     0L.asBytesString()
                 )
-            }
 
-            startBandwidthPolling()
+                startBandwidthPolling()
+            }
         }
     }
 
@@ -47,14 +47,10 @@ class MainActivity : BaseActivity() {
     }
 
     override suspend fun onClashStarted() {
-        super.onClashStarted()
-
         startBandwidthPolling()
     }
 
     override suspend fun onClashStopped(reason: String?) {
-        super.onClashStopped(reason)
-
         stopBandwidthPolling()
     }
 
@@ -67,7 +63,7 @@ class MainActivity : BaseActivity() {
                 while (clashRunning && isActive) {
                     val bandwidth = queryBandwidth()
                     status.summary = getString(
-                        R.string.clash_status_forwarded_traffic,
+                        R.string.format_traffic_forwarded,
                         bandwidth.asBytesString()
                     )
                     delay(1000)

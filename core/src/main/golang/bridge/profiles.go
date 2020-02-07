@@ -6,31 +6,38 @@ import (
 
 func LoadProfileFile(path, baseDir string, callback DoneCallback) {
 	go func() {
-		err := profile.LoadFromFile(path, baseDir)
-		if err != nil {
-			callback.DoneWithError(err)
-		} else {
-			callback.Done()
-		}
+		call(profile.LoadFromFile(path, baseDir), callback)
 	}()
 }
 
-func DownloadProfileAndCheck(url, output, baseDir string) error {
-	err := profile.DownloadAndCheck(url, output, baseDir)
+func DownloadProfileAndCheck(url, output, baseDir string, callback DoneCallback) {
+	go func() {
+		call(profile.DownloadAndCheck(url, output, baseDir), callback)
+	}()
+}
+
+func ReadProfileAndCheck(fd int, output, baseDir string, callback DoneCallback) {
+	go func() {
+		call(profile.ReadAndCheck(fd, output, baseDir), callback)
+	}()
+}
+
+func SaveProfileAndCheck(data []byte, output, baseDir string, callback DoneCallback) {
+	go func() {
+		call(profile.SaveAndCheck(data, output, baseDir), callback)
+	}()
+}
+
+func MoveProfileAndCheck(source, target, baseDir string, callback DoneCallback) {
+	go func() {
+		call(profile.MoveAndCheck(source, target, baseDir), callback)
+	}()
+}
+
+func call(err error, callback DoneCallback) {
 	if err != nil {
-		return err
+		callback.DoneWithError(err)
+	} else {
+		callback.Done()
 	}
-	return nil
-}
-
-func ReadProfileAndCheck(fd int, output, baseDir string) error {
-	return profile.ReadAndCheck(fd, output, baseDir)
-}
-
-func SaveProfileAndCheck(data []byte, output, baseDir string) error {
-	return profile.SaveAndCheck(data, output, baseDir)
-}
-
-func MoveProfileAndCheck(source, target, baseDir string) error {
-	return profile.MoveAndCheck(source, target, baseDir)
 }

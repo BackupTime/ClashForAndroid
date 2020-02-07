@@ -4,10 +4,24 @@ import (
 	"github.com/kr328/cfa/tun"
 )
 
-func StartTunDevice(fd, mtu int, dns string) error {
+type TunCallback interface {
+	OnStop()
+}
+
+var callback TunCallback
+
+func StartTunDevice(fd, mtu int, dns string, cb TunCallback) error {
+	callback = cb
+
 	return tun.StartTunDevice(fd, mtu, dns)
 }
 
 func StopTunDevice() {
+	if c := callback; c != nil {
+		c.OnStop()
+	}
+
+	callback = nil
+
 	tun.StopTunDevice()
 }

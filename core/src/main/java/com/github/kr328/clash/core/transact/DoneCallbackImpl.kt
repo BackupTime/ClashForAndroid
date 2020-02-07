@@ -1,14 +1,12 @@
 package com.github.kr328.clash.core.transact
 
 import bridge.DoneCallback
+import kotlinx.coroutines.CompletableDeferred
 import java.util.concurrent.CompletableFuture
 
-class DoneCallbackImpl : DoneCallback, CompletableFuture<Unit>() {
+class DoneCallbackImpl : DoneCallback, CompletableDeferred<Unit> by CompletableDeferred() {
     override fun doneWithError(e: Exception?) {
-        if (e == null)
-            complete(Unit)
-        else
-            completeExceptionally(e)
+        completeExceptionally(e ?: return done())
     }
 
     override fun done() {

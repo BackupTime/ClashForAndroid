@@ -12,6 +12,7 @@ import com.github.kr328.clash.core.model.Traffic
 import com.github.kr328.clash.core.transact.DoneCallbackImpl
 import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
+import kotlinx.coroutines.CompletableDeferred
 import java.io.File
 import java.io.InputStream
 import java.util.concurrent.CompletableFuture
@@ -42,35 +43,32 @@ object Clash {
     fun startTunDevice(
         fd: Int,
         mtu: Int,
-        dns: String
+        dns: String,
+        onStop: () -> Unit
     ) {
-        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns)
+        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns, onStop)
     }
 
     fun stopTunDevice() {
         Bridge.stopTunDevice()
     }
 
-    fun loadProfile(path: File, baseDir: File): CompletableFuture<Unit> {
+    fun loadProfile(path: File, baseDir: File): CompletableDeferred<Unit> {
         return DoneCallbackImpl().apply {
             Bridge.loadProfileFile(path.absolutePath, baseDir.absolutePath, this)
         }
     }
 
-    fun downloadProfile(url: String, output: File, baseDir: File) {
-        Bridge.downloadProfileAndCheck(url, output.absolutePath, baseDir.absolutePath)
+    fun downloadProfile(url: String, output: File, baseDir: File): CompletableDeferred<Unit> {
+        return DoneCallbackImpl().apply {
+            Bridge.downloadProfileAndCheck(url, output.absolutePath, baseDir.absolutePath, this)
+        }
     }
 
-    fun copyProfile(fd: Int, output: File, baseDir: File) {
-        Bridge.readProfileAndCheck(fd.toLong(), output.absolutePath, baseDir.absolutePath)
-    }
-
-    fun saveProfile(data: ByteArray, output: File, baseDir: File) {
-        Bridge.saveProfileAndCheck(data, output.absolutePath, baseDir.absolutePath)
-    }
-
-    fun moveProfile(source: File, target: File, baseDir: File) {
-        Bridge.moveProfileAndCheck(source.absolutePath, target.absolutePath, baseDir.absolutePath)
+    fun downloadProfile(fd: Int, output: File, baseDir: File): CompletableDeferred<Unit> {
+        return DoneCallbackImpl().apply {
+            Bridge.readProfileAndCheck(fd.toLong(), output.absolutePath, baseDir.absolutePath, this)
+        }
     }
 
     fun queryProxyGroups(): List<ProxyGroup> {
@@ -93,7 +91,7 @@ object Clash {
         return Bridge.setSelectedProxy(name, selected)
     }
 
-    fun startHealthCheck(name: String): CompletableFuture<Unit> {
+    fun startHealthCheck(name: String): CompletableDeferred<Unit> {
         return DoneCallbackImpl().apply {
             Bridge.startUrlTest(name, this)
         }
@@ -108,14 +106,16 @@ object Clash {
         )
     }
 
-    fun queryTrafficEvent(): Traffic {
+    fun queryTraffic(): Traffic {
         val data = Bridge.queryTraffic()
 
         return Traffic(data.upload, data.download)
     }
 
-    fun queryBandwidth(): Long {
-        return Bridge.queryBandwidth()
+    fun queryBandwidth(): Traffic {
+        val data = Bridge.queryBandwidth()
+
+        return Traffic(data.upload, data.download)
     }
 
     fun openLogEvent(): EventStream<LogEvent> {

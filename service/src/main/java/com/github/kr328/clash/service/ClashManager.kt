@@ -39,7 +39,9 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
     }
 
     override fun queryBandwidth(): Long {
-        return Clash.queryBandwidth()
+        val data = Clash.queryBandwidth()
+
+        return data.download + data.upload
     }
 
     override fun openLogEvent(callback: IStreamCallback?) {
@@ -59,7 +61,7 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
     override fun startHealthCheck(group: String?, callback: IStreamCallback?) {
         require(group != null && callback != null)
 
-        Clash.startHealthCheck(group).whenComplete { _, u ->
+        Clash.startHealthCheck(group).invokeOnCompletion { u ->
             if (u != null)
                 callback.completeExceptionally(u.message)
             else

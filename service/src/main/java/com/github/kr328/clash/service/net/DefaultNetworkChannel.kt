@@ -6,35 +6,35 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.Handler
 import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.core.utils.Log.handler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class DefaultNetworkObserver(val context: Context, val listener: (Network?) -> Unit) {
-    private val handler = Handler()
+class DefaultNetworkChannel(val context: Context, scope: CoroutineScope):
+    CoroutineScope by scope, Channel<Network?> by Channel(Channel.CONFLATED) {
     private val connectivity = context.getSystemService(ConnectivityManager::class.java)!!
     private val callback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
-            handler.removeMessages(0)
-            handler.postDelayed({
-                listener(rebuildNetworkList())
-            }, 500)
+            launch {
+                send(rebuildNetworkList())
+            }
         }
-
         override fun onLost(network: Network) {
-            handler.removeMessages(0)
-            handler.postDelayed({
-                listener(rebuildNetworkList())
-            }, 500)
+            launch {
+                send(rebuildNetworkList())
+            }
         }
-
         override fun onCapabilitiesChanged(
             network: Network,
             networkCapabilities: NetworkCapabilities
         ) {
-            handler.removeMessages(0)
-            handler.postDelayed({
-                listener(rebuildNetworkList())
-            }, 500)
+            launch {
+                send(rebuildNetworkList())
+            }
         }
     }
 
@@ -46,14 +46,13 @@ class DefaultNetworkObserver(val context: Context, val listener: (Network?) -> U
         connectivity.unregisterNetworkCallback(callback)
     }
 
-    private fun rebuildNetworkList(): Network? {
-        return try {
+    private suspend fun rebuildNetworkList(): Network? = withContext(Dispatchers.Default) {
+        return@withContext try {
             connectivity.allNetworks
-                .flatMap { network ->
-                    connectivity.getNetworkCapabilities(network)?.let { listOf(it to network) }
-                        ?: emptyList()
-                }
                 .asSequence()
+                .mapNotNull { network ->
+                    connectivity.getNetworkCapabilities(network)?.let { it to network }
+                }
                 .filterNot {
                     it.first.hasTransport(NetworkCapabilities.TRANSPORT_VPN) ||
                             !it.first.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)

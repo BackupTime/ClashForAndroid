@@ -19,16 +19,16 @@ class ProfileRequest private constructor(private val bundle: Bundle) : Parcelabl
 
     val action: Action
         get() = Action.valueOf(requireNotNull(bundle.getString(KEY_ACTION)))
-    val type: Int?
-        get() = bundle.getInt(KEY_TYPE)
-    val id: Long?
-        get() = bundle.getLong(KEY_ID)
+    val type: Int
+        get() = bundle.getInt(KEY_TYPE, -1)
+    val id: Long
+        get() = bundle.getLong(KEY_ID, 0)
     val name: String?
         get() = bundle.getString(KEY_NAME)
     val url: String?
         get() = bundle.getString(KEY_URL)
-    val interval: Long?
-        get() = bundle.getLong(KEY_UPDATE_INTERVAL)
+    val interval: Long
+        get() = bundle.getLong(KEY_UPDATE_INTERVAL, -1)
     val callback: IStreamCallback?
         get() = IStreamCallback.Stub.asInterface(bundle.getBinder(KEY_CALLBACK))
 

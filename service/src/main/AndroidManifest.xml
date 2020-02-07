@@ -26,13 +26,16 @@
             android:exported="false"
             android:process=":background" />
         <service
-            android:name=".ClashProfileService"
+            android:name=".ProfileProcessService"
             android:label="@string/clash_profile_service_label"
             android:exported="false"
             android:process=":background" />
-
+        <service android:name=".ProfileBackgroundService"
+            android:label="@string/clash_profile_service_label"
+            android:exported="false"
+            android:process=":background" />
         <receiver
-            android:name=".ClashProfileReceiver"
+            android:name=".ProfileRequestReceiver"
             android:exported="false"
             android:process=":background" />
     </application>

@@ -8,8 +8,10 @@ import android.content.IntentFilter
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.Intents
 import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.service.util.componentName
 
 object Broadcasts {
     interface Receiver {
@@ -18,8 +20,9 @@ object Broadcasts {
         fun onProfileChanged(active: ClashProfileEntity?)
     }
 
-    private val receivers = mutableListOf<Receiver>()
+    var clashRunning: Boolean = false
 
+    private val receivers = mutableListOf<Receiver>()
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -55,10 +58,17 @@ object Broadcasts {
                     addAction(Intents.INTENT_ACTION_CLASH_STOPPED)
                     addAction(Intents.INTENT_ACTION_CLASH_STARTED)
                 })
+
+                clashRunning = broadcastReceiver.peekService(
+                    application,
+                    Intent().setComponent(ClashService::class.componentName)
+                ) != null
             }
 
             override fun onStop(owner: LifecycleOwner) {
                 application.unregisterReceiver(broadcastReceiver)
+
+                clashRunning = false
             }
         })
     }
