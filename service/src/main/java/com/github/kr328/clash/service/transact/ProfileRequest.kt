@@ -74,24 +74,6 @@ class ProfileRequest private constructor(private val bundle: Bundle) : Parcelabl
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (other !is ProfileRequest)
-            return false
-
-        for (key in bundle.keySet()) {
-            if (bundle.get(key) != other.bundle.get(key))
-                return false
-        }
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return bundle.keySet()
-            .joinToString { it + bundle.get(it)?.hashCode() }
-            .hashCode()
-    }
-
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeBundle(bundle)
     }

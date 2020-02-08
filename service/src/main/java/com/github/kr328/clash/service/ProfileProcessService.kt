@@ -59,6 +59,8 @@ class ProfileProcessService : BaseService() {
 
     private suspend fun handleRequest(request: ProfileRequest) {
         try {
+            request.callback?.send(null)
+
             when (request.action) {
                 ProfileRequest.Action.UPDATE_OR_CREATE ->
                     handleUpdateOrCreate(request)

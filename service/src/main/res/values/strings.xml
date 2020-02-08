@@ -14,14 +14,13 @@
     <string name="clash_notification_content">"%1$s↑\t%2$s↓"</string>
 
     <string name="profile_service_status_channel">Profile Service Status</string>
-    <string name="profile_service_status_title">Processing Profiles</string>
-    <string name="profile_service_status_waiting">Waiting Request</string>
-    <string name="profile_service_status_updating">Updating %s</string>
-    <string name="profile_service_result">Profile Service Result</string>
-    <string name="profile_process_result">Process Result</string>
-    <string name="profile_update_completed">Update %s Completed</string>
-    <string name="profile_update_failure">Update %s Failure</string>
-    <string name="profile_deleted">Profile %s deleted</string>
+    <string name="profile_service_status_title">Profile Updater Running</string>
+
+    <string name="profile_status_channel">Profile Processing Status</string>
+    <string name="profile_status_title">Processing Profile</string>
+    <string name="profile_status_updating">Updating %s</string>
+    <string name="profile_status_update_failure">Update %s Failure</string>
+    <string name="profile_status_update_completed">Update %s Completed</string>
 
     <string name="clash_service_label">Clash Core Service</string>
     <string name="tun_service_label">Tun Device Service</string>
