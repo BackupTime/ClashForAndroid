@@ -24,8 +24,8 @@
         android:layout_toEndOf="@id/radio"
         android:layout_centerVertical="true"
         android:layout_marginStart="23dp"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:orientation="vertical">
 
         <TextView
@@ -53,8 +53,8 @@
         android:id="@+id/menu"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_margin="25dp"
+        android:layout_margin="20dp"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/ic_vertex"
-        android:foreground="?attr/selectableItemBackgroundBorderless"/>
+        android:foreground="@drawable/ic_vertex"
+        android:background="?attr/selectableItemBackgroundBorderless" />
 </RelativeLayout>

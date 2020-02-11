@@ -42,8 +42,8 @@ object ClashDatabaseMigrations {
 
                 // new
                 val type = when {
-                    token.startsWith("url") -> ClashProfileEntity.TYPE_REMOTE
-                    token.startsWith("file") -> ClashProfileEntity.TYPE_LOCAL
+                    token.startsWith("url") -> ClashProfileEntity.TYPE_URL
+                    token.startsWith("file") -> ClashProfileEntity.TYPE_FILE
                     else -> ClashProfileEntity.TYPE_UNKNOWN
                 }
                 val uri = token.removePrefix("url|").removePrefix("file|")

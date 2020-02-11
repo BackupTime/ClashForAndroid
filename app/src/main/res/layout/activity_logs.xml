@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -10,13 +11,12 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/activity_logs_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </androidx.appcompat.widget.Toolbar>
+            android:layout_height="wrap_content" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:descendantFocusability="blocksDescendants"
         android:id="@+id/activity_logs_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 </LinearLayout>

@@ -1,7 +1,6 @@
 package com.github.kr328.clash.design.view
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -45,14 +44,15 @@ class ColorfulTextCard @JvmOverloads constructor(
         }
 
         // Custom attrs
-        context.theme.obtainStyledAttributes(attributeSet, R.styleable.ColorfulTextCard, 0, 0).apply {
-            try {
-                iconView.background = getDrawable(R.styleable.ColorfulTextCard_icon)
-                titleView.text = getString(R.styleable.ColorfulTextCard_title)
-                summaryView.text = getString(R.styleable.ColorfulTextCard_summary)
-            } finally {
-                recycle()
+        context.theme.obtainStyledAttributes(attributeSet, R.styleable.ColorfulTextCard, 0, 0)
+            .apply {
+                try {
+                    iconView.background = getDrawable(R.styleable.ColorfulTextCard_icon)
+                    titleView.text = getString(R.styleable.ColorfulTextCard_title)
+                    summaryView.text = getString(R.styleable.ColorfulTextCard_summary)
+                } finally {
+                    recycle()
+                }
             }
-        }
     }
 }

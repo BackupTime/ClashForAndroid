@@ -62,7 +62,7 @@ class ProfileBackgroundService : BaseService() {
 
         startForeground()
 
-        bindService(ProfileProcessService::class.intent, connection, Context.BIND_AUTO_CREATE)
+        bindService(ProfileService::class.intent, connection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onDestroy() {

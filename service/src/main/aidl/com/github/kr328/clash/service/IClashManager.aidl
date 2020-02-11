@@ -13,7 +13,6 @@ interface IClashManager {
     ProxyGroup[] queryAllProxies();
     General queryGeneral();
     long queryBandwidth();
-    ClashProfileEntity[] queryAllProfiles();
 
     // Events
     void openLogEvent(IStreamCallback callback);

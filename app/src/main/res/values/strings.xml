@@ -33,6 +33,35 @@
     <string name="format_years">%d years</string>
 
     <string name="create_profile">Create Profile</string>
+    <string name="file">File</string>
+    <string name="import_from_file">Import from File</string>
+    <string name="url">URL</string>
+    <string name="import_from_url">Import from URL</string>
+    <string name="external">External</string>
+    <string name="format_import_from_external">Import from %s</string>
+    
+    <string name="application_broken">Application Broken</string>
+
+    <string name="profile">Profile</string>
+    <string name="name">Name</string>
+    <string name="source">Source</string>
+    <string name="profile_name">Profile Name</string>
+    <string name="profile_url">Profile URL</string>
+
+    <string name="auto_update">Auto Update</string>
+    <string name="auto_update_interval">Auto Update Interval</string>
+    <string name="in_minutes">In minutes</string>
+    <string name="invalid_interval">Invalid Interval</string>
+    <string name="invalid_profile">Invalid Profile</string>
+    <string name="detail">Detail</string>
+
+    <string name="exit_without_save">Exit without Save</string>
+    <string name="exit_without_save_warning">All changed will *LOST*</string>
+
+    <string name="disabled">Disabled</string>
+    <string name="empty_name">Empty Name</string>
+    <string name="invalid_url">Invalid URL</string>
+    <string name="processing">Processing</string>
 
     <string name="clash_profile_item_summary_file">%s (File)</string>
     <string name="clash_profile_item_summary_url">%s (URL)</string>

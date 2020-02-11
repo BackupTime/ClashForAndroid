@@ -8,7 +8,7 @@
     <TextView
         android:padding="2dp"
         android:layout_marginStart="2dp"
-        android:textColor="@color/clashBlue"
+        android:textColor="?attr/colorPrimary"
         android:text="@string/launch_name"
         android:id="@+id/adapter_proxy_header_name"
         android:layout_width="wrap_content"

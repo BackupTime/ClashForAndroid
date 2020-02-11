@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="clashIconColor">#FFFFFF</color>
+    <color name="colorPrimaryClashBlue">#FFFFFF</color>
     <color name="primaryCardColor">#121212</color>
     <color name="statusBarColor">#000000</color>
     <color name="backgroundColor">#000000</color>

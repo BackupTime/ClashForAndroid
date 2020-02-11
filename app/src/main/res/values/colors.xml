@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="clashIconColor">#1E4376</color>
     <color name="primaryCardColor">#FF888888</color>
     <color name="statusBarColor">#FAFAFA</color>
     <color name="backgroundColor">#FAFAFA</color>
     <color name="toolbarColor">#FAFAFA</color>
 
+    <color name="colorPrimaryClashBlue">#1E4376</color>
+
     <color name="nightSurface">#121212</color>
 
-    <color name="clashBlue">#1E4376</color>
     <color name="ic_launcher_background">#FFFFFF</color>
 
     <color name="lightGray">#d3d3d3</color>

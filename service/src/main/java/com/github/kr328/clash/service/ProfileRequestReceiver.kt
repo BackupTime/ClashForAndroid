@@ -11,7 +11,7 @@ class ProfileRequestReceiver : BroadcastReceiver() {
         if (intent?.action != Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST || context == null)
             return
 
-        intent.component = ProfileProcessService::class.componentName
+        intent.component = ProfileService::class.componentName
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             context.startForegroundService(intent)

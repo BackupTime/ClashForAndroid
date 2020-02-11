@@ -7,13 +7,16 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -44,8 +47,12 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         }
     }
 
+    private var overrideRootView: View? = null
+
     val clashRunning: Boolean
         get() = Broadcasts.clashRunning
+    val rootView: View
+        get() = overrideRootView ?: window.decorView
 
     open suspend fun onClashStarted() {}
     open suspend fun onClashStopped(reason: String?) {}
@@ -67,7 +74,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
             }
         }
 
-        LayoutInflater.from(this).inflate(layoutResID, base, true)
+        overrideRootView = LayoutInflater.from(this).inflate(layoutResID, base, true)
 
         super.setContentView(base)
     }
@@ -116,6 +123,12 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         super.onConfigurationChanged(newConfig)
 
         recreate()
+    }
+
+    protected fun makeSnackbarException(title: String, detail: String) {
+        Snackbar.make(rootView, title, Snackbar.LENGTH_LONG).setAction(R.string.detail) {
+            AlertDialog.Builder(this).setTitle(R.string.detail).setMessage(detail).show()
+        }.show()
     }
 
     private fun resetLightNavigationBar() {

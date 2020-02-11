@@ -27,6 +27,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ApkBrokenActivity"
+            android:label="@string/application_broken"
+            android:exported="false"
+            android:configChanges="uiMode"/>
+        <activity
             android:name=".ProfilesActivity"
             android:label="@string/profiles"
             android:exported="false"
@@ -34,6 +39,11 @@
         <activity
             android:name=".CreateProfileActivity"
             android:label="@string/create_profile"
+            android:exported="false"
+            android:configChanges="uiMode" />
+        <activity
+            android:name=".ProfileEditActivity"
+            android:label="@string/profile"
             android:exported="false"
             android:configChanges="uiMode" />
     </application>

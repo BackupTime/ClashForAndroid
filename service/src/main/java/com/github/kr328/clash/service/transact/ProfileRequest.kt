@@ -25,8 +25,10 @@ class ProfileRequest private constructor(private val bundle: Bundle) : Parcelabl
         get() = bundle.getLong(KEY_ID, 0)
     val name: String?
         get() = bundle.getString(KEY_NAME)
-    val url: String?
-        get() = bundle.getString(KEY_URL)
+    val url: Uri?
+        get() = bundle.getParcelable(KEY_URL)
+    val source: Uri?
+        get() = bundle.getParcelable(KEY_SOURCE)
     val interval: Long
         get() = bundle.getLong(KEY_UPDATE_INTERVAL, -1)
     val callback: IStreamCallback?
@@ -58,7 +60,13 @@ class ProfileRequest private constructor(private val bundle: Bundle) : Parcelabl
 
     fun withURL(url: Uri): ProfileRequest {
         return apply {
-            bundle.putString(KEY_URL, url.toString())
+            bundle.putParcelable(KEY_URL, url)
+        }
+    }
+
+    fun withSource(source: Uri?): ProfileRequest {
+        return apply {
+            bundle.putParcelable(KEY_SOURCE, source)
         }
     }
 
@@ -87,6 +95,7 @@ class ProfileRequest private constructor(private val bundle: Bundle) : Parcelabl
         private const val KEY_ID = "id"
         private const val KEY_NAME = "name"
         private const val KEY_URL = "url"
+        private const val KEY_SOURCE = "source"
         private const val KEY_TYPE = "type"
         private const val KEY_CALLBACK = "callback"
         private const val KEY_UPDATE_INTERVAL = "update_interval"

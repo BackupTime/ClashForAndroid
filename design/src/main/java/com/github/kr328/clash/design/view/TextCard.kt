@@ -1,7 +1,6 @@
 package com.github.kr328.clash.design.view
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater

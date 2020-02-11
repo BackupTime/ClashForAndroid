@@ -5,7 +5,7 @@ import android.content.Context
 import com.crashlytics.android.Crashlytics
 import com.github.kr328.clash.core.Global
 import com.github.kr328.clash.remote.Broadcasts
-import com.github.kr328.clash.remote.ClashClient
+import com.github.kr328.clash.remote.Remote
 import com.google.firebase.FirebaseApp
 import io.fabric.sdk.android.Fabric
 
@@ -27,7 +27,7 @@ class MainApplication : Application() {
             Fabric.with(this, Crashlytics())
         }
 
-        ClashClient.init(this)
+        Remote.init(this)
         Broadcasts.init(this)
     }
 }

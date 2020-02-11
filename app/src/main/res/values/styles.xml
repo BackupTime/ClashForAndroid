@@ -2,9 +2,9 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:ambientShadowAlpha">0.08</item>
         <item name="android:spotShadowAlpha">0.08</item>
-        <item name="colorPrimary">@color/clashBlue</item>
+        <item name="colorPrimary">@color/colorPrimaryClashBlue</item>
         <item name="colorPrimaryDark">@color/statusBarColor</item>
-        <item name="colorAccent">@color/clashBlue</item>
+        <item name="colorSecondary">@color/colorPrimaryClashBlue</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
         <item name="android:windowLightStatusBar">@bool/lightStatusBar</item>
     </style>

@@ -10,14 +10,20 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
 import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.utils.IntervalUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class ProfileAdapter(private val context: Context) :
+class ProfileAdapter(private val context: Context, private val callback: Callback) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    var entities: List<ClashProfileEntity> = emptyList()
-        private set
+    interface Callback {
+        fun onProfileClicked(entity: ClashProfileEntity)
+        fun onMenuClicked(entity: ClashProfileEntity)
+        fun onNewProfile()
+    }
+
+    private var entities: List<ClashProfileEntity> = emptyList()
 
     class EntityHolder(view: View) : RecyclerView.ViewHolder(view) {
         val root: View = view.findViewById(R.id.root)
@@ -40,7 +46,7 @@ class ProfileAdapter(private val context: Context) :
         val result = withContext(Dispatchers.Default) {
             DiffUtil.calculateDiff(object : DiffUtil.Callback() {
                 override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                    old[oldItemPosition] === new[newItemPosition]
+                    old[oldItemPosition].id == new[newItemPosition].id
 
                 override fun areContentsTheSame(
                     oldItemPosition: Int,
@@ -53,7 +59,7 @@ class ProfileAdapter(private val context: Context) :
         }
 
         withContext(Dispatchers.Main) {
-            entities = old
+            entities = new
             result.dispatchUpdatesTo(this@ProfileAdapter)
         }
     }
@@ -97,43 +103,36 @@ class ProfileAdapter(private val context: Context) :
                 holder.name.text = current.name
                 holder.type.text = getTypeName(current.type)
                 holder.interval.text = offsetDate(current.lastUpdate)
+
+                holder.root.setOnClickListener {
+                    callback.onProfileClicked(current)
+                }
+                holder.menu.setOnClickListener {
+                    callback.onMenuClicked(current)
+                }
             }
             is FooterHolder -> {
-
+                holder.root.setOnClickListener {
+                    callback.onNewProfile()
+                }
             }
         }
     }
 
     private fun getTypeName(type: Int): CharSequence {
         return when (type) {
-            ClashProfileEntity.TYPE_LOCAL ->
-                context.getText(R.string.local)
-            ClashProfileEntity.TYPE_REMOTE ->
-                context.getText(R.string.remote)
+            ClashProfileEntity.TYPE_FILE ->
+                context.getText(R.string.file)
+            ClashProfileEntity.TYPE_URL ->
+                context.getText(R.string.url)
+            ClashProfileEntity.TYPE_EXTERNAL ->
+                context.getText(R.string.external)
             else ->
                 context.getText(R.string.unknown)
         }
     }
 
     private fun offsetDate(date: Long): CharSequence {
-        val current = Calendar.getInstance()
-        val base = Calendar.getInstance().apply {
-            timeInMillis = date
-        }
-
-        val year = current.get(Calendar.YEAR) - base.get(Calendar.YEAR)
-        val month = current.get(Calendar.MONTH) - base.get(Calendar.MONTH)
-        val day = current.get(Calendar.DAY_OF_YEAR) - base.get(Calendar.DAY_OF_YEAR)
-        val hour = current.get(Calendar.HOUR) - base.get(Calendar.HOUR)
-        val minute = current.get(Calendar.MINUTE) - base.get(Calendar.MINUTE)
-
-        return when {
-            year > 0 -> context.getString(R.string.format_years, year)
-            month > 0 -> context.getString(R.string.format_months, month)
-            day > 0 -> context.getString(R.string.format_days, day)
-            hour > 0 -> context.getString(R.string.format_hours, hour)
-            minute > 0 -> context.getString(R.string.format_minutes, minute)
-            else -> context.getText(R.string.recently)
-        }
+        return IntervalUtils.intervalString(System.currentTimeMillis() - date)
     }
 }

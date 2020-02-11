@@ -14,6 +14,7 @@ data class ClashProfileEntity(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "type") val type: Int,
     @ColumnInfo(name = "uri") val uri: String,
+    @ColumnInfo(name = "source") val source: String?,
     @ColumnInfo(name = "file") val file: String,
     @ColumnInfo(name = "base") val base: String,
     @ColumnInfo(name = "active") val active: Boolean,
@@ -30,8 +31,9 @@ data class ClashProfileEntity(
     }
 
     companion object {
-        const val TYPE_LOCAL = 1
-        const val TYPE_REMOTE = 2
+        const val TYPE_FILE = 1
+        const val TYPE_URL = 2
+        const val TYPE_EXTERNAL = 3
         const val TYPE_UNKNOWN = -1
 
         @JvmField

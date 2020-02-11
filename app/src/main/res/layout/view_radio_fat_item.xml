@@ -58,7 +58,7 @@
             android:layout_marginBottom="5dp"
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/lightGray"/>
+            android:background="@color/lightGray" />
 
         <View
             android:id="@+id/view_radio_fat_item_operation"

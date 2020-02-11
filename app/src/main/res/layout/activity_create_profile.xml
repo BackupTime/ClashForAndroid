@@ -9,16 +9,16 @@
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/activity_new_profile_toolbar"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@color/toolbarColor" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <ListView
-        android:id="@+id/activity_new_profile_list"
+        android:id="@+id/mainList"
         android:dividerHeight="0dp"
         android:divider="@null"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 </LinearLayout>

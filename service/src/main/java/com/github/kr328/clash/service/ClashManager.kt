@@ -34,10 +34,6 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
         return true
     }
 
-    override fun queryAllProfiles(): Array<ClashProfileEntity> {
-        return ClashDatabase.getInstance(context).openClashProfileDao().queryProfiles()
-    }
-
     override fun queryBandwidth(): Long {
         val data = Clash.queryBandwidth()
 
