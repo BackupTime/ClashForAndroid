@@ -14,7 +14,7 @@ class ProfileRequest private constructor(private val bundle: Bundle) : Parcelabl
     )
 
     enum class Action {
-        UPDATE_OR_CREATE, REMOVE
+        UPDATE_OR_CREATE, REMOVE, CLEAR
     }
 
     val action: Action

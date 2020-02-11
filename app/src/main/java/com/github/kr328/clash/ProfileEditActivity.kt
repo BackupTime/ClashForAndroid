@@ -55,7 +55,7 @@ class ProfileEditActivity : BaseActivity() {
 
         override fun completeExceptionally(reason: String?) {
             launch {
-                makeSnackbarException(getString(R.string.invalid_profile), reason ?: "Unknown")
+                makeSnackbarException(getString(R.string.download_failure), reason ?: "Unknown")
                 processing = false
             }
         }
@@ -221,15 +221,12 @@ class ProfileEditActivity : BaseActivity() {
         launch {
             val source = intent?.getParcelableExtra<Intent>("intent")?.toUri(0)?.run(Uri::parse)
             val type = when( intent?.getStringExtra("type") ) {
-                Constants.URL_PROVIDER_TYPE_FILE -> {
+                Constants.URL_PROVIDER_TYPE_FILE ->
                     ClashProfileEntity.TYPE_FILE
-                }
-                Constants.URL_PROVIDER_TYPE_URL -> {
+                Constants.URL_PROVIDER_TYPE_URL ->
                     ClashProfileEntity.TYPE_URL
-                }
-                Constants.URL_PROVIDER_TYPE_EXTERNAL -> {
+                Constants.URL_PROVIDER_TYPE_EXTERNAL ->
                     ClashProfileEntity.TYPE_EXTERNAL
-                }
                 else -> throw IllegalArgumentException()
             }
 

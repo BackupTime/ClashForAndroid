@@ -14,6 +14,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.google.android.material.snackbar.Snackbar
@@ -59,7 +60,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     open suspend fun onClashProfileChanged(active: ClashProfileEntity?) {}
 
     override fun setContentView(layoutResID: Int) {
-        val base = FrameLayout(this).apply {
+        val base = CoordinatorLayout(this).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT

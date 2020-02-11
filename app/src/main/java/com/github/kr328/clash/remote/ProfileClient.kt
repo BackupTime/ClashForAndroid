@@ -18,4 +18,8 @@ class ProfileClient(private val service: IProfileService) {
     suspend fun enqueueRequest(request: ProfileRequest) = withContext(Dispatchers.IO) {
         service.enqueueRequest(request)
     }
+
+    suspend fun setActiveProfile(id: Long) = withContext(Dispatchers.IO) {
+        service.setActiveProfile(id)
+    }
 }

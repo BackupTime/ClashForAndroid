@@ -53,7 +53,13 @@
     <string name="in_minutes">In minutes</string>
     <string name="invalid_interval">Invalid Interval</string>
     <string name="invalid_profile">Invalid Profile</string>
+    <string name="download_failure">Download Failure</string>
     <string name="detail">Detail</string>
+    <string name="update">Update</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="clear_cache">Clear Cache</string>
+    <string name="properties">Properties</string>
 
     <string name="exit_without_save">Exit without Save</string>
     <string name="exit_without_save_warning">All changed will *LOST*</string>

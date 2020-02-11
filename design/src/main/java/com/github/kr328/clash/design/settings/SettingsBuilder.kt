@@ -29,4 +29,25 @@ class SettingsBuilder(val screen: SettingsScreen) {
 
         screen.addElement(textInput)
     }
+
+    fun option(
+        title: String = "",
+        summary: String = "",
+        icon: Drawable? = null,
+        id: String? = null,
+        dependOn: String? = null,
+        setup: Option.() -> Unit = {}
+    ) {
+        val option = Option(screen)
+
+        option.title = title
+        option.summary = summary
+        option.icon = icon
+        option.id = id
+        option.dependOn = dependOn?.run { screen.requireElement(this) }
+
+        setup(option)
+
+        screen.addElement(option)
+    }
 }

@@ -2,12 +2,17 @@ package bridge
 
 import (
 	"github.com/Dreamacro/clash/component/mmdb"
+	C "github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/tunnel"
 	"github.com/kr328/cfa/profile"
 )
 
 func LoadMMDB(data []byte) {
 	mmdb.LoadFromBytes(data)
+}
+
+func SetHome(homeDir string) {
+	C.SetHomeDir(homeDir)
 }
 
 func Reset() {

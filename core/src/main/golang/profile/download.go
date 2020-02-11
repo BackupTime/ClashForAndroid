@@ -71,11 +71,7 @@ func ReadAndCheck(fd int, output, baseDir string) error {
 }
 
 func SaveAndCheck(data []byte, output, baseDir string) error {
-	original := constant.Path.HomeDir()
-	constant.SetHomeDir(baseDir)
-	defer constant.SetHomeDir(original)
-
-	_, err := parseConfig(data)
+	_, err := parseConfig(data, baseDir)
 	if err != nil {
 		return err
 	}
@@ -84,16 +80,12 @@ func SaveAndCheck(data []byte, output, baseDir string) error {
 }
 
 func MoveAndCheck(source, target, baseDir string) error {
-	original := constant.Path.HomeDir()
-	constant.SetHomeDir(baseDir)
-	defer constant.SetHomeDir(original)
-
 	buf, err := ioutil.ReadFile(source)
 	if err != nil {
 		return err
 	}
 
-	_, err = parseConfig(buf)
+	_, err = parseConfig(buf, baseDir)
 	if err != nil {
 		return err
 	}
@@ -107,7 +99,7 @@ func MoveAndCheck(source, target, baseDir string) error {
 	return nil
 }
 
-func parseConfig(data []byte) (*config.Config, error) {
+func parseConfig(data []byte, baseDir string) (*config.Config, error) {
 	raw, err := config.UnmarshalRawConfig(data)
 	if err != nil {
 		return nil, err
@@ -116,5 +108,5 @@ func parseConfig(data []byte) (*config.Config, error) {
 	raw.ExternalUI = ""
 	raw.ExternalController = ""
 
-	return config.ParseRawConfig(raw)
+	return config.ParseRawConfig(raw, baseDir)
 }

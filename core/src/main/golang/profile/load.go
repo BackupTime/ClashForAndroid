@@ -6,7 +6,6 @@ import (
 
 	"github.com/Dreamacro/clash/component/fakeip"
 	"github.com/Dreamacro/clash/config"
-	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/dns"
 	"github.com/Dreamacro/clash/hub/executor"
 	"github.com/kr328/cfa/tun"
@@ -48,20 +47,8 @@ func LoadFromFile(path, baseDir string) error {
 		return err
 	}
 
-	rawCfg, err := config.UnmarshalRawConfig(data)
+	cfg, err := parseConfig(data, baseDir)
 	if err != nil {
-		return err
-	}
-
-	rawCfg.ExternalController = ""
-	rawCfg.ExternalUI = ""
-
-	fallbackBaseDir := constant.Path.HomeDir()
-	constant.SetHomeDir(baseDir)
-
-	cfg, err := config.ParseRawConfig(rawCfg)
-	if err != nil {
-		constant.SetHomeDir(fallbackBaseDir)
 		return err
 	}
 

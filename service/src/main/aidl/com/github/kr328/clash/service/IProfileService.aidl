@@ -10,4 +10,7 @@ interface IProfileService {
     // query
     ClashProfileEntity[] queryProfiles();
     ClashProfileEntity queryActiveProfile();
+
+    // set
+    void setActiveProfile(long id);
 }

@@ -11,7 +11,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.github.kr328.clash.ApkBrokenActivity
 import com.github.kr328.clash.Constants
-import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager
 import com.github.kr328.clash.service.IProfileService
@@ -46,7 +45,6 @@ object Remote {
                 while (isActive) {
                     val client = instance ?: return@launch
                     clash.send(client)
-                    Log.d("Clash Client sent")
                 }
             }
         }
@@ -70,7 +68,6 @@ object Remote {
                 while (isActive) {
                     val client = instance ?: return@launch
                     profile.send(client)
-                    Log.d("Profile Client sent")
                 }
             }
         }
@@ -104,8 +101,14 @@ object Remote {
             }
 
             override fun onStop(owner: LifecycleOwner) {
-                clashConnection?.also(application::unbindService)
-                profileConnection?.also(application::unbindService)
+                clashConnection?.also {
+                    application.unbindService(it)
+                    it.onServiceDisconnected(null)
+                }
+                profileConnection?.also {
+                    application.unbindService(it)
+                    it.onServiceDisconnected(null)
+                }
 
                 clashConnection = null
                 profileConnection = null

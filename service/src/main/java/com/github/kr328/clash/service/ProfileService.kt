@@ -3,28 +3,24 @@ package com.github.kr328.clash.service
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
-import android.net.Uri
 import android.os.IBinder
-import com.github.kr328.clash.core.Clash
+import com.github.kr328.clash.core.Global
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.data.ClashDatabase
-import com.github.kr328.clash.service.data.ClashProfileDao
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import java.io.File
-import java.io.FileNotFoundException
 import java.util.*
 
 class ProfileService : BaseService() {
     private val service = this
     private val queue: MutableMap<Long, Channel<ProfileRequest>> = Hashtable()
+    private val pending = mutableListOf<ProfileRequest>()
 
-    private val profiles: ClashProfileDao by lazy {
-        ClashDatabase.getInstance(service).openClashProfileDao()
-    }
+    private val profiles = ClashDatabase.getInstance(Global.application).openClashProfileDao()
+    private val processor = ProfileProcessor(this)
 
     override fun onBind(intent: Intent?): IBinder? {
         return object : IProfileService.Stub() {
@@ -39,16 +35,38 @@ class ProfileService : BaseService() {
             override fun queryProfiles(): Array<ClashProfileEntity> {
                 return profiles.queryProfiles()
             }
+
+            override fun setActiveProfile(id: Long) {
+                profiles.setActiveProfile(id)
+
+                broadcastProfileChanged(service)
+            }
         }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        Log.d("ProfileService.onCreate")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        pending.forEach {
+            it.callback?.completeExceptionally("Canceled")
+        }
+
+        Log.d("ProfileService.onDestroy")
     }
 
     private fun createChannelForRequests(id: Long): Channel<ProfileRequest> {
         return Channel<ProfileRequest>(Channel.UNLIMITED).also {
             launch {
                 try {
-                    while (isActive) {
-                        Log.d("Coroutine for $id launched")
+                    Log.d("Coroutine for $id launched")
 
+                    while (isActive) {
                         val request = withTimeout(1000 * 30) {
                             it.receive()
                         }
@@ -56,8 +74,7 @@ class ProfileService : BaseService() {
                         Log.d("Handling $id")
                         handleRequest(request)
                     }
-                }
-                finally {
+                } finally {
                     Log.d("Coroutine for $id exited")
 
                     queue.remove(id)
@@ -68,6 +85,10 @@ class ProfileService : BaseService() {
 
     private fun enqueueRequest(request: ProfileRequest) {
         launch {
+            Log.d("Request $request enqueue")
+
+            pending.add(request)
+
             queue.computeIfAbsent(request.id) {
                 createChannelForRequests(it)
             }.send(request)
@@ -83,6 +104,8 @@ class ProfileService : BaseService() {
                     handleUpdateOrCreate(request)
                 ProfileRequest.Action.REMOVE ->
                     removeProfile(request)
+                ProfileRequest.Action.CLEAR ->
+                    clearProfile(request)
             }
 
             request.callback?.complete()
@@ -90,6 +113,8 @@ class ProfileService : BaseService() {
             broadcastProfileChanged(this)
         } catch (e: Exception) {
             request.callback?.completeExceptionally(e.message)
+        } finally {
+            pending.remove(request)
         }
     }
 
@@ -120,21 +145,7 @@ class ProfileService : BaseService() {
                     )
                 }
 
-            val url = Uri.parse(entity.uri)
-
-            if (url == null || url == Uri.EMPTY)
-                throw IllegalArgumentException("Invalid url $url")
-
-            Log.d("Profile ${entity.name} downloading")
-
-            downloadProfile(url, profileDir.resolve(entity.file), clashDir.resolve(entity.base))
-
-            val newEntity = entity.copy(lastUpdate = System.currentTimeMillis())
-
-            val newId = if (entity.id == 0L)
-                profiles.getId(profiles.addProfile(newEntity))
-            else
-                profiles.updateProfile(newEntity).run { entity.id }
+            val newId = processor.createOrUpdate(entity)
 
             if (entity.updateInterval > 0) {
                 val nextRequest =
@@ -156,32 +167,10 @@ class ProfileService : BaseService() {
         }
 
     private suspend fun removeProfile(request: ProfileRequest) = withContext(Dispatchers.IO) {
-        val entity = profiles.queryProfileById(request.id) ?: return@withContext
-
-        clashDir.resolve(entity.base).deleteRecursively()
-        profileDir.resolve(entity.file).delete()
-
-        profiles.removeProfile(entity.id)
+        processor.remove(request.id)
     }
 
-    private suspend fun downloadProfile(source: Uri, target: File, baseDir: File) {
-        try {
-            target.parentFile?.mkdirs()
-            baseDir.mkdirs()
-
-            if (source.scheme == "content" || source.scheme == "file") {
-                val fd = contentResolver.openFileDescriptor(source, "r")
-                    ?: throw FileNotFoundException("Unable to open file $source")
-
-                Clash.downloadProfile(fd.fd, target, baseDir).await()
-            } else {
-                Clash.downloadProfile(source.toString(), target, baseDir).await()
-            }
-        } catch (e: Exception) {
-            target.delete()
-            baseDir.deleteRecursively()
-
-            throw e
-        }
+    private suspend fun clearProfile(request: ProfileRequest) = withContext(Dispatchers.IO) {
+        processor.clear(request.id)
     }
 }

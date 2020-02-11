@@ -30,6 +30,7 @@ object Clash {
             .use(InputStream::readBytes)
 
         Bridge.loadMMDB(bytes)
+        Bridge.setHome(context.cacheDir.absolutePath)
     }
 
     fun start() {
