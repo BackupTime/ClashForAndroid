@@ -1,9 +1,9 @@
-package com.github.kr328.clash.design.settings
+package com.github.kr328.clash.design.common
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 
-class SettingsBuilder(val screen: SettingsScreen) {
+class CommonUiBuilder(val screen: CommonUiScreen) {
     val context: Context
         get() = screen.layout.context
 

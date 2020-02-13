@@ -126,9 +126,9 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         recreate()
     }
 
-    protected fun makeSnackbarException(title: String, detail: String) {
+    protected fun makeSnackbarException(title: String, detail: String?) {
         Snackbar.make(rootView, title, Snackbar.LENGTH_LONG).setAction(R.string.detail) {
-            AlertDialog.Builder(this).setTitle(R.string.detail).setMessage(detail).show()
+            AlertDialog.Builder(this).setTitle(R.string.detail).setMessage(detail ?: "Unknown").show()
         }.show()
     }
 

@@ -4,13 +4,12 @@ import com.github.kr328.clash.service.transact.ProfileRequest;
 import com.github.kr328.clash.service.data.ClashProfileEntity;
 
 interface IProfileService {
-    // process
     void enqueueRequest(in ProfileRequest request);
+    String requestProfileEditUri(long id);
+    void commitProfileEditUri(String uri);
 
-    // query
     ClashProfileEntity[] queryProfiles();
     ClashProfileEntity queryActiveProfile();
 
-    // set
     void setActiveProfile(long id);
 }

@@ -2,16 +2,17 @@ package com.github.kr328.clash.service
 
 import android.content.Context
 import android.net.Uri
+import androidx.core.content.FileProvider
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.data.ClashProfileEntity
-import com.github.kr328.clash.service.util.clashDir
-import com.github.kr328.clash.service.util.profileDir
+import com.github.kr328.clash.service.util.resolveBase
+import com.github.kr328.clash.service.util.resolveProfile
 import java.io.File
 import java.io.FileNotFoundException
 
 class ProfileProcessor(private val context: Context) {
-    suspend fun createOrUpdate(entity: ClashProfileEntity): Long {
+    suspend fun createOrUpdate(entity: ClashProfileEntity, newRecord: Boolean) {
         val database = ClashDatabase.getInstance(context).openClashProfileDao()
 
         val uri = Uri.parse(entity.uri)
@@ -20,33 +21,39 @@ class ProfileProcessor(private val context: Context) {
 
         downloadProfile(
             uri,
-            context.clashDir.resolve(entity.file),
-            context.profileDir.resolve(entity.base)
+            resolveProfile(entity.id),
+            resolveBase(entity.id)
         )
 
-        val newEntity = entity.copy(lastUpdate = System.currentTimeMillis())
-
-        return if ( newEntity.id == 0L )
-            database.addProfile(newEntity).let { database.getId(it) }
+        val newEntity = if (entity.type == ClashProfileEntity.TYPE_FILE)
+            entity.copy(
+                lastUpdate = System.currentTimeMillis(),
+                uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}${Constants.PROFILE_PROVIDER_SUFFIX}",
+                    resolveProfile(entity.id)
+                ).toString()
+            )
         else
-            database.updateProfile(newEntity).let { newEntity.id }
+            entity.copy(lastUpdate = System.currentTimeMillis())
+
+        if (newRecord)
+            database.addProfile(newEntity)
+        else
+            database.updateProfile(newEntity)
     }
 
-    fun remove(id: Long) {
+    suspend fun remove(id: Long) {
         val database = ClashDatabase.getInstance(context).openClashProfileDao()
-        val entity = database.queryProfileById(id) ?: return
 
-        context.profileDir.resolve(entity.file).delete()
-        context.clashDir.resolve(entity.base).deleteRecursively()
+        resolveProfile(id).delete()
+        resolveBase(id).deleteRecursively()
 
         database.removeProfile(id)
     }
 
     fun clear(id: Long) {
-        val database = ClashDatabase.getInstance(context).openClashProfileDao()
-        val entity = database.queryProfileById(id) ?: return
-
-        context.profileDir.resolve(entity.base).listFiles()?.forEach {
+        resolveBase(id).listFiles()?.forEach {
             it.deleteRecursively()
         }
     }
@@ -67,7 +74,6 @@ class ProfileProcessor(private val context: Context) {
         } catch (e: Exception) {
             target.delete()
             baseDir.deleteRecursively()
-
             throw e
         }
     }

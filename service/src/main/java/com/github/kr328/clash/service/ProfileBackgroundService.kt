@@ -85,7 +85,9 @@ class ProfileBackgroundService : BaseService() {
                     channel.offer(request)
             }
             Intents.INTENT_ACTION_PROFILE_SETUP -> {
-                resetProfileUpdateAlarm()
+                launch {
+                    resetProfileUpdateAlarm()
+                }
             }
         }
 
@@ -108,16 +110,22 @@ class ProfileBackgroundService : BaseService() {
                         it.withCallback(object : IStreamCallback.Stub() {
                             override fun complete() {
                                 deferred.complete(it)
-                                updateUpdateComplete(it.id)
+                                launch {
+                                    updateUpdateComplete(it.id)
+                                }
                             }
 
                             override fun completeExceptionally(reason: String?) {
                                 deferred.complete(it)
-                                updateUpdateFailure(it.id)
+                                launch {
+                                    updateUpdateFailure(it.id)
+                                }
                             }
 
                             override fun send(data: ParcelableContainer?) {
-                                updateUpdating(it.id)
+                                launch {
+                                    updateUpdating(it.id)
+                                }
                             }
                         })
 
@@ -144,7 +152,7 @@ class ProfileBackgroundService : BaseService() {
         }
     }
 
-    private fun resetProfileUpdateAlarm() {
+    private suspend fun resetProfileUpdateAlarm() {
         for (entity in profiles.queryProfiles()) {
             if (entity.updateInterval <= 0) continue
 
@@ -197,7 +205,7 @@ class ProfileBackgroundService : BaseService() {
         startForeground(SERVICE_NOTIFICATION_ID_BASE, notification)
     }
 
-    private fun updateUpdating(id: Long) {
+    private suspend fun updateUpdating(id: Long) {
         val notificationId = (id % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
         val entity = database.queryProfileById(id) ?: return
 
@@ -212,7 +220,7 @@ class ProfileBackgroundService : BaseService() {
             .notify(SERVICE_NOTIFICATION_ID_BASE + notificationId, notification)
     }
 
-    private fun updateUpdateComplete(id: Long) {
+    private suspend fun updateUpdateComplete(id: Long) {
         val notificationId = (id % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
         val entity = database.queryProfileById(id)
 
@@ -231,7 +239,7 @@ class ProfileBackgroundService : BaseService() {
             .notify(SERVICE_NOTIFICATION_ID_BASE + notificationId, notification)
     }
 
-    private fun updateUpdateFailure(id: Long) {
+    private suspend fun updateUpdateFailure(id: Long) {
         val notificationId = (id % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
         val entity = database.queryProfileById(id)
 

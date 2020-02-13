@@ -31,6 +31,7 @@ object Clash {
 
         Bridge.loadMMDB(bytes)
         Bridge.setHome(context.cacheDir.absolutePath)
+        Bridge.reset()
     }
 
     fun start() {

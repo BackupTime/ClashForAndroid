@@ -25,6 +25,9 @@ object Broadcasts {
     private val receivers = mutableListOf<Receiver>()
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            if ( intent?.`package` != context?.packageName )
+                return
+
             when (intent?.action) {
                 Intents.INTENT_ACTION_CLASH_STARTED ->
                     receivers.forEach {

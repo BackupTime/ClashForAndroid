@@ -1,7 +1,8 @@
-package com.github.kr328.clash.design.settings
+package com.github.kr328.clash.design.common
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -9,7 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.github.kr328.clash.design.R
 
-class TextInput(screen: SettingsScreen) : Base(screen) {
+class TextInput(screen: CommonUiScreen) : Base(screen) {
     override val view: View = LayoutInflater.from(context).inflate(
         R.layout.view_setting_text_input,
         screen.layout,
@@ -75,7 +76,7 @@ class TextInput(screen: SettingsScreen) : Base(screen) {
 
     override fun applyAttribute(enabled: Boolean, hidden: Boolean) {
         view.isEnabled = enabled
-        view.visibility = if (hidden) View.GONE else View.INVISIBLE
+        view.visibility = if (hidden) View.GONE else View.VISIBLE
     }
 
     override fun saveState(bundle: Bundle) {

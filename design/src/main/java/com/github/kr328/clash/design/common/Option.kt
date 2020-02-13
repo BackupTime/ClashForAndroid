@@ -1,4 +1,4 @@
-package com.github.kr328.clash.design.settings
+package com.github.kr328.clash.design.common
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.TextView
 import com.github.kr328.clash.design.R
 
-class Option(screen: SettingsScreen): Base(screen) {
+class Option(screen: CommonUiScreen): Base(screen) {
     override val view: View = LayoutInflater.from(context).inflate(R.layout.view_setting_option, screen.layout, false)
 
     private val vIcon: View = view.findViewById(android.R.id.icon)

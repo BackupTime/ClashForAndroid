@@ -1,5 +1,6 @@
 package com.github.kr328.clash
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -19,6 +20,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CreateProfileActivity : BaseActivity() {
+    companion object {
+        const val REQUEST_CODE = 20000
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,10 +41,11 @@ class CreateProfileActivity : BaseActivity() {
             mainList.setOnItemClickListener { _, _, position, _ ->
                 val item = providers[position]
 
-                startActivity(
+                startActivityForResult(
                     ProfileEditActivity::class.intent
                         .putExtra("type", item.type)
-                        .putExtra("intent", item.intent)
+                        .putExtra("intent", item.intent),
+                    REQUEST_CODE
                 )
             }
             mainList.setOnItemLongClickListener { _, _, position, _ ->
@@ -58,6 +64,13 @@ class CreateProfileActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if ( requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK )
+            return finish()
+
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private suspend fun queryUrlProviders(): List<UrlProvider> =

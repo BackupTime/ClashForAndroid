@@ -84,8 +84,8 @@ class ClashService : BaseService() {
 
         try {
             Clash.loadProfile(
-                profileDir.resolve(active.file),
-                clashDir.resolve(active.base)
+                resolveProfile(active.id),
+                resolveBase(active.id)
             ).await()
 
             notification.setProfile(active.name)

@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AlertDialog
-import com.github.kr328.clash.design.settings.TextInput
+import com.github.kr328.clash.design.common.TextInput
 import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.ipc.IStreamCallback
@@ -16,6 +16,7 @@ import com.github.kr328.clash.service.transact.ProfileRequest
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_profile_edit.*
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.lang.IllegalArgumentException
 
 class ProfileEditActivity : BaseActivity() {
@@ -73,6 +74,7 @@ class ProfileEditActivity : BaseActivity() {
                 title = getString(R.string.name),
                 icon = getDrawable(R.drawable.ic_label_outline),
                 hint = getString(R.string.profile_name),
+                content = intent.getStringExtra("name") ?: "",
                 id = KEY_NAME
             ) {
                 onTextChanged {
@@ -83,6 +85,7 @@ class ProfileEditActivity : BaseActivity() {
                 title = getString(R.string.url),
                 icon = getDrawable(R.drawable.ic_content),
                 hint = getString(R.string.profile_url),
+                content = intent.getStringExtra("url") ?: "",
                 id = KEY_URL
             ) {
                 onOpenInput {
@@ -100,7 +103,8 @@ class ProfileEditActivity : BaseActivity() {
                 title = getString(R.string.auto_update),
                 icon = getDrawable(R.drawable.ic_update),
                 hint = getString(R.string.in_minutes),
-                id = KEY_AUTO_UPDATE
+                id = KEY_AUTO_UPDATE,
+                content = intent.getStringExtra("interval") ?: ""
             ) {
                 onDisplayContent {
                     val interval = it.toString().toIntOrNull() ?: 0
@@ -121,6 +125,9 @@ class ProfileEditActivity : BaseActivity() {
                         modified = true
                     }
                 }
+
+                if ( intent.getStringExtra("type") == Constants.URL_PROVIDER_TYPE_FILE )
+                    isHidden = true
             }
         }
 
@@ -150,7 +157,18 @@ class ProfileEditActivity : BaseActivity() {
             }
         }
 
-        openUrlProvider()
+        when (intent.extras?.getLong("id", -1L)) {
+            -1L -> {
+                openUrlProvider()
+                setTitle(R.string.new_profile)
+            }
+            0L -> {
+                setTitle(R.string.new_profile)
+            }
+            else -> {
+                setTitle(R.string.edit_profile)
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -200,18 +218,23 @@ class ProfileEditActivity : BaseActivity() {
         val type = intent.getStringExtra("type")
         val externalIntent = intent.getParcelableExtra<Intent>("intent")
 
-        when (type) {
-            Constants.URL_PROVIDER_TYPE_FILE ->
-                startActivityForResult(
-                    Intent(Intent.ACTION_GET_CONTENT).setType(TYPE_YAML),
-                    REQUEST_CODE
-                )
-            Constants.URL_PROVIDER_TYPE_EXTERNAL ->
-                startActivityForResult(
-                    externalIntent ?: throw NullPointerException(),
-                    REQUEST_CODE
-                )
-            else -> return false
+        try {
+            when (type) {
+                Constants.URL_PROVIDER_TYPE_FILE ->
+                    startActivityForResult(
+                        Intent(Intent.ACTION_GET_CONTENT).setType(TYPE_YAML),
+                        REQUEST_CODE
+                    )
+                Constants.URL_PROVIDER_TYPE_EXTERNAL ->
+                    startActivityForResult(
+                        externalIntent ?: throw NullPointerException(),
+                        REQUEST_CODE
+                    )
+                else -> return false
+            }
+        }
+        catch (e: Exception) {
+            makeSnackbarException(getString(R.string.start_url_provider_failure), e.message)
         }
 
         return true
@@ -232,6 +255,7 @@ class ProfileEditActivity : BaseActivity() {
 
             val request = ProfileRequest()
                 .action(ProfileRequest.Action.UPDATE_OR_CREATE)
+                .withId(intent.getLongExtra("id", 0))
                 .withName(name)
                 .withURL(url)
                 .withUpdateInterval(interval)

@@ -1,10 +1,10 @@
-package com.github.kr328.clash.design.settings
+package com.github.kr328.clash.design.common
 
 import android.os.Bundle
 import android.os.Handler
-import com.github.kr328.clash.design.view.SettingsLayout
+import com.github.kr328.clash.design.view.CommonUiLayout
 
-class SettingsScreen(val layout: SettingsLayout) {
+class CommonUiScreen(val layout: CommonUiLayout) {
     private val handler = Handler()
     val elements = mutableListOf<Base>()
 

@@ -1,10 +1,13 @@
 package com.github.kr328.clash.service.util
 
-import android.content.Context
+import com.github.kr328.clash.core.Global
 import com.github.kr328.clash.service.Constants
 import java.io.File
 
-val Context.profileDir: File
-    get() = this.filesDir.resolve(Constants.PROFILES_DIR)
-val Context.clashDir: File
-    get() = this.filesDir.resolve(Constants.CLASH_DIR)
+fun resolveProfile(id: Long): File {
+    return Global.application.filesDir.resolve(Constants.PROFILES_DIR).resolve("$id.yaml")
+}
+
+fun resolveBase(id: Long): File {
+    return Global.application.filesDir.resolve(Constants.CLASH_DIR).resolve(id.toString())
+}

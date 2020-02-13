@@ -8,11 +8,11 @@ import androidx.room.Query
 @Dao
 interface ClashProfileProxyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun setSelectedForProfile(item: ClashProfileProxyEntity)
+    suspend fun setSelectedForProfile(item: ClashProfileProxyEntity)
 
     @Query("SELECT * FROM profile_select_proxies WHERE profile_id = :id")
-    fun querySelectedForProfile(id: Int): List<ClashProfileProxyEntity>
+    suspend fun querySelectedForProfile(id: Int): List<ClashProfileProxyEntity>
 
     @Query("DELETE FROM profile_select_proxies WHERE profile_id = :id AND proxy in (:selected)")
-    fun removeSelectedForProfile(id: Int, selected: List<String>)
+    suspend fun removeSelectedForProfile(id: Int, selected: List<String>)
 }

@@ -1,10 +1,10 @@
-package com.github.kr328.clash.design.settings
+package com.github.kr328.clash.design.common
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 
-abstract class Base(val screen: SettingsScreen) {
+abstract class Base(val screen: CommonUiScreen) {
     val context: Context
         get() = screen.layout.context
 

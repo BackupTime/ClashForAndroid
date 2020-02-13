@@ -30,13 +30,25 @@
             android:label="@string/clash_profile_service_label"
             android:exported="false"
             android:process=":background" />
-        <service android:name=".ProfileBackgroundService"
+        <service
+            android:name=".ProfileBackgroundService"
             android:label="@string/clash_profile_service_label"
             android:exported="false"
             android:process=":background" />
+
         <receiver
             android:name=".ProfileRequestReceiver"
             android:exported="false"
             android:process=":background" />
+
+        <provider
+            android:authorities="${applicationId}.profiles"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/profile_provider" />
+        </provider>
     </application>
 </manifest>

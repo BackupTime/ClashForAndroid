@@ -2,15 +2,15 @@ package com.github.kr328.clash
 
 import android.app.Application
 import android.content.Context
-import com.crashlytics.android.Crashlytics
 import com.github.kr328.clash.core.Global
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.remote.Remote
-import com.google.firebase.FirebaseApp
-import io.fabric.sdk.android.Fabric
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 
 @Suppress("unused")
-class MainApplication : Application() {
+class MainApplication: Application() {
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
 
@@ -20,11 +20,13 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        runCatching {
-            FirebaseApp.initializeApp(this)
-        }
-        runCatching {
-            Fabric.with(this, Crashlytics())
+        // Initialize AppCenter
+        if ( BuildConfig.APP_CENTER_KEY.isNotEmpty() && !BuildConfig.DEBUG ) {
+            AppCenter.start(
+                this,
+                BuildConfig.APP_CENTER_KEY,
+                Analytics::class.java, Crashes::class.java
+            )
         }
 
         Remote.init(this)

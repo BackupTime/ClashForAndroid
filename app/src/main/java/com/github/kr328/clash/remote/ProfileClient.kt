@@ -22,4 +22,12 @@ class ProfileClient(private val service: IProfileService) {
     suspend fun setActiveProfile(id: Long) = withContext(Dispatchers.IO) {
         service.setActiveProfile(id)
     }
+
+    suspend fun requestProfileEditUri(id: Long): String? = withContext(Dispatchers.IO) {
+        service.requestProfileEditUri(id)
+    }
+
+    suspend fun commitProfileEditUri(uri: String) = withContext(Dispatchers.IO) {
+        service.commitProfileEditUri(uri)
+    }
 }
