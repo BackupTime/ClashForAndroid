@@ -67,7 +67,7 @@ class CreateProfileActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if ( requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK )
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK)
             return finish()
 
         super.onActivityResult(requestCode, resultCode, data)

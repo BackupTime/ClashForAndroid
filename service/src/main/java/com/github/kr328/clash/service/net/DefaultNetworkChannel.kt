@@ -13,7 +13,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DefaultNetworkChannel(val context: Context, scope: CoroutineScope):
+class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
     CoroutineScope by scope, Channel<Network?> by Channel(Channel.CONFLATED) {
     private val connectivity = context.getSystemService(ConnectivityManager::class.java)!!
     private val callback = object : ConnectivityManager.NetworkCallback() {
@@ -22,11 +22,13 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope):
                 send(rebuildNetworkList())
             }
         }
+
         override fun onLost(network: Network) {
             launch {
                 send(rebuildNetworkList())
             }
         }
+
         override fun onCapabilitiesChanged(
             network: Network,
             networkCapabilities: NetworkCapabilities

@@ -8,6 +8,7 @@ import (
 	"github.com/Dreamacro/clash/config"
 	"github.com/Dreamacro/clash/dns"
 	"github.com/Dreamacro/clash/hub/executor"
+	"github.com/Dreamacro/clash/log"
 	"github.com/kr328/cfa/tun"
 )
 
@@ -97,6 +98,8 @@ func LoadFromFile(path, baseDir string) error {
 	}
 
 	tun.ResetDnsRedirect()
+
+	log.Infoln("Profile " + path + " loaded")
 
 	return nil
 }

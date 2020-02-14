@@ -10,7 +10,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
 
 @Suppress("unused")
-class MainApplication: Application() {
+class MainApplication : Application() {
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
 
@@ -21,7 +21,7 @@ class MainApplication: Application() {
         super.onCreate()
 
         // Initialize AppCenter
-        if ( BuildConfig.APP_CENTER_KEY.isNotEmpty() && !BuildConfig.DEBUG ) {
+        if (BuildConfig.APP_CENTER_KEY.isNotEmpty() && !BuildConfig.DEBUG) {
             AppCenter.start(
                 this,
                 BuildConfig.APP_CENTER_KEY,

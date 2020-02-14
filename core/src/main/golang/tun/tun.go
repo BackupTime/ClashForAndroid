@@ -2,6 +2,7 @@ package tun
 
 import (
 	"strconv"
+	"sync"
 
 	"github.com/Dreamacro/clash/dns"
 	"github.com/Dreamacro/clash/log"
@@ -10,8 +11,12 @@ import (
 
 var tunInstance *tun.TunAdapter
 var dnsAddress string
+var mutex sync.Mutex
 
 func StartTunDevice(fd, mtu int, dns string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	if tunInstance != nil {
 		return nil
 	}
@@ -22,7 +27,7 @@ func StartTunDevice(fd, mtu int, dns string) error {
 	}
 
 	tunInstance = &t
-	dnsAddress = dns + ":53"
+	dnsAddress = dns
 
 	ResetDnsRedirect()
 
@@ -32,12 +37,18 @@ func StartTunDevice(fd, mtu int, dns string) error {
 }
 
 func StopTunDevice() {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	t := tunInstance
 	if t == nil {
 		return
 	}
 
 	(*t).Close()
+	tunInstance = nil
+
+	log.Infoln("Android tun stopped")
 }
 
 func ResetDnsRedirect() {

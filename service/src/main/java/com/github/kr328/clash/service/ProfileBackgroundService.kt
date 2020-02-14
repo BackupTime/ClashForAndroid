@@ -36,7 +36,6 @@ class ProfileBackgroundService : BaseService() {
         private const val SERVICE_NOTIFICATION_ID_BASE = 10000
     }
 
-    private val database by lazy { ClashDatabase.getInstance(this).openClashProfileDao() }
     private val channel = Channel<ProfileRequest>(2)
     private val queue = mutableListOf<CompletableDeferred<ProfileRequest>>()
     private val profiles: ClashProfileDao by lazy {
@@ -81,8 +80,7 @@ class ProfileBackgroundService : BaseService() {
                 val request =
                     intent.getParcelableExtra<ProfileRequest>(Intents.INTENT_EXTRA_PROFILE_REQUEST)
                         ?: return START_NOT_STICKY
-                if (request.id != 0L)
-                    channel.offer(request)
+                channel.offer(request)
             }
             Intents.INTENT_ACTION_PROFILE_SETUP -> {
                 launch {
@@ -98,57 +96,62 @@ class ProfileBackgroundService : BaseService() {
         return Binder()
     }
 
-    private fun startProfileProcessor(service: IProfileService) {
-        launch {
-            while (isActive) {
-                val timeout = timeout(1000 * 60L)
+    private fun startProfileProcessor(service: IProfileService) = launch {
+        while (isActive) {
+            val timeout = timeout(1000 * 30L)
 
-                select<Unit> {
-                    channel.onReceive {
-                        val deferred = CompletableDeferred<ProfileRequest>()
+            select<Unit> {
+                channel.onReceive {
+                    val deferred = CompletableDeferred<ProfileRequest>()
+                    val originalCallback = it.callback
 
-                        it.withCallback(object : IStreamCallback.Stub() {
-                            override fun complete() {
-                                deferred.complete(it)
-                                launch {
-                                    updateUpdateComplete(it.id)
-                                }
+                    it.withCallback(object : IStreamCallback.Stub() {
+                        override fun complete() {
+                            originalCallback?.complete()
+                            deferred.complete(it)
+
+                            launch {
+                                updateUpdateComplete(it.id)
                             }
+                        }
 
-                            override fun completeExceptionally(reason: String?) {
-                                deferred.complete(it)
-                                launch {
-                                    updateUpdateFailure(it.id)
-                                }
+                        override fun completeExceptionally(reason: String?) {
+                            originalCallback?.completeExceptionally(reason)
+                            deferred.complete(it)
+
+                            launch {
+                                updateUpdateFailure(it.id, reason ?: "Unknown")
                             }
+                        }
 
-                            override fun send(data: ParcelableContainer?) {
-                                launch {
-                                    updateUpdating(it.id)
-                                }
+                        override fun send(data: ParcelableContainer?) {
+                            originalCallback?.send(data)
+
+                            launch {
+                                updateUpdating(it.id)
                             }
-                        })
+                        }
+                    })
 
-                        service.enqueueRequest(it)
+                    service.enqueueRequest(it)
 
-                        queue.add(deferred)
+                    queue.add(deferred)
+                }
+                if (queue.isNotEmpty()) {
+                    for (task in queue) {
+                        task.onAwait {
+                            queue.remove(task)
+                        }
                     }
-                    if (queue.isNotEmpty()) {
-                        for (task in queue) {
-                            task.onAwait {
-                                queue.remove(task)
-                            }
-                        }
-                    } else {
-                        timeout.onJoin {
-                            stopSelf()
-                            cancel()
-                        }
+                } else {
+                    timeout.onJoin {
+                        stopSelf()
+                        cancel()
                     }
                 }
-
-                timeout.cancel()
             }
+
+            timeout.cancel()
         }
     }
 
@@ -206,13 +209,14 @@ class ProfileBackgroundService : BaseService() {
     }
 
     private suspend fun updateUpdating(id: Long) {
-        val notificationId = (id % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
-        val entity = database.queryProfileById(id) ?: return
+        val notificationId = ((id + 1) % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
+        val entity = profiles.queryProfileById(id) ?: return
 
         val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
             .setContentTitle(getText(R.string.profile_status_title))
             .setContentText(getString(R.string.profile_status_updating, entity.name))
             .setSmallIcon(R.drawable.ic_update_normal)
+            .setOnlyAlertOnce(true)
             .setOngoing(true)
             .build()
 
@@ -221,8 +225,8 @@ class ProfileBackgroundService : BaseService() {
     }
 
     private suspend fun updateUpdateComplete(id: Long) {
-        val notificationId = (id % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
-        val entity = database.queryProfileById(id)
+        val notificationId = ((id + 1) % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
+        val entity = profiles.queryProfileById(id)
 
         if (entity == null) {
             NotificationManagerCompat.from(this).cancel(notificationId)
@@ -233,15 +237,16 @@ class ProfileBackgroundService : BaseService() {
             .setContentTitle(getText(R.string.profile_status_title))
             .setContentText(getString(R.string.profile_status_update_completed, entity.name))
             .setSmallIcon(R.drawable.ic_update_normal)
+            .setOnlyAlertOnce(true)
             .build()
 
         NotificationManagerCompat.from(this)
             .notify(SERVICE_NOTIFICATION_ID_BASE + notificationId, notification)
     }
 
-    private suspend fun updateUpdateFailure(id: Long) {
-        val notificationId = (id % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
-        val entity = database.queryProfileById(id)
+    private suspend fun updateUpdateFailure(id: Long, reason: String) {
+        val notificationId = ((id + 1) % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
+        val entity = profiles.queryProfileById(id)
 
         if (entity == null) {
             NotificationManagerCompat.from(this).cancel(notificationId)
@@ -249,10 +254,10 @@ class ProfileBackgroundService : BaseService() {
         }
 
         val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
-            .setContentTitle(getText(R.string.profile_status_title))
-            .setContentText(getString(R.string.profile_status_update_failure, entity.name))
+            .setContentTitle(getString(R.string.profile_status_update_failure, entity.name))
+            .setContentText(reason)
             .setSmallIcon(R.drawable.ic_update_normal)
-            .setOngoing(true)
+            .setOnlyAlertOnce(true)
             .build()
 
         NotificationManagerCompat.from(this)

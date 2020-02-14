@@ -41,6 +41,10 @@ object Remote {
             if (service != null)
                 instance = ClashClient(IClashManager.Stub.asInterface(service))
 
+            service?.linkToDeath({
+                onServiceDisconnected(null)
+            }, 0)
+
             sender = GlobalScope.launch {
                 while (isActive) {
                     val client = instance ?: return@launch
@@ -63,6 +67,10 @@ object Remote {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service != null)
                 instance = ProfileClient(IProfileService.Stub.asInterface(service))
+
+            service?.linkToDeath({
+                onServiceDisconnected(null)
+            }, 0)
 
             sender = GlobalScope.launch {
                 while (isActive) {

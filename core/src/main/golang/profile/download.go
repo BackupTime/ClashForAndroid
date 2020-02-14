@@ -79,26 +79,6 @@ func SaveAndCheck(data []byte, output, baseDir string) error {
 	return ioutil.WriteFile(output, data, defaultFileMode)
 }
 
-func MoveAndCheck(source, target, baseDir string) error {
-	buf, err := ioutil.ReadFile(source)
-	if err != nil {
-		return err
-	}
-
-	_, err = parseConfig(buf, baseDir)
-	if err != nil {
-		return err
-	}
-
-	if err := ioutil.WriteFile(target, buf, defaultFileMode); err != nil {
-		return err
-	}
-
-	os.Remove(source)
-
-	return nil
-}
-
 func parseConfig(data []byte, baseDir string) (*config.Config, error) {
 	raw, err := config.UnmarshalRawConfig(data)
 	if err != nil {

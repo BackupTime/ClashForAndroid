@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:scrollbars="none"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,7 +49,7 @@
             android:theme="@style/AppTheme.ThemeOverlay.ForceDarkSurface"
             app:cardElevation="4dp"
             app:cardCornerRadius="8dp"
-            app:cardBackgroundColor="@color/primaryCardColor"
+            app:cardBackgroundColor="@color/primaryCardColorStopped"
             app:icon="@drawable/ic_stopped"
             app:title="@string/stopped"
             app:summary="@string/tap_to_start" />

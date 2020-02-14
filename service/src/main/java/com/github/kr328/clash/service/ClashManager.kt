@@ -5,16 +5,16 @@ import androidx.core.content.edit
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroup
-import com.github.kr328.clash.service.data.ClashDatabase
-import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.core.model.ProxyGroupList
+import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
 
-class ClashManager(private val context: Context) : IClashManager.Stub() {
+class ClashManager(context: Context) : IClashManager.Stub() {
     private val settings = context.getSharedPreferences("service", Context.MODE_PRIVATE)
 
-    override fun queryAllProxies(): Array<ProxyGroup> {
-        return Clash.queryProxyGroups().toTypedArray()
+    override fun queryAllProxies(): ProxyGroupList {
+        return ProxyGroupList(Clash.queryProxyGroups())
     }
 
     override fun queryGeneral(): General {
@@ -65,7 +65,7 @@ class ClashManager(private val context: Context) : IClashManager.Stub() {
         }
     }
 
-    override fun getSetting(key: String?): String {
-        return settings.getString(key, "")!!
+    override fun getSetting(key: String?): String? {
+        return settings.getString(key, null)
     }
 }

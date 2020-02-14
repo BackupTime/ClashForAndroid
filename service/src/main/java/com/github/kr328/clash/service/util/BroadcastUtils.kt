@@ -5,8 +5,6 @@ import android.content.Intent
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.Intents
 import com.github.kr328.clash.service.data.ClashDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 fun Context.sendBroadcastSelf(intent: Intent) {
     this.sendBroadcast(intent.setPackage(this.packageName))

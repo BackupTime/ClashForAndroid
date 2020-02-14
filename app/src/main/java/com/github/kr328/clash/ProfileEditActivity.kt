@@ -16,8 +16,6 @@ import com.github.kr328.clash.service.transact.ProfileRequest
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_profile_edit.*
 import kotlinx.coroutines.launch
-import java.lang.Exception
-import java.lang.IllegalArgumentException
 
 class ProfileEditActivity : BaseActivity() {
     companion object {
@@ -36,11 +34,10 @@ class ProfileEditActivity : BaseActivity() {
         set(value) {
             field = value
 
-            if ( value ) {
+            if (value) {
                 saving.visibility = View.VISIBLE
                 save.visibility = View.INVISIBLE
-            }
-            else {
+            } else {
                 saving.visibility = View.INVISIBLE
                 save.visibility = View.VISIBLE
             }
@@ -126,7 +123,7 @@ class ProfileEditActivity : BaseActivity() {
                     }
                 }
 
-                if ( intent.getStringExtra("type") == Constants.URL_PROVIDER_TYPE_FILE )
+                if (intent.getStringExtra("type") == Constants.URL_PROVIDER_TYPE_FILE)
                     isHidden = true
             }
         }
@@ -140,13 +137,14 @@ class ProfileEditActivity : BaseActivity() {
                 val interval = requireElement<TextInput>(KEY_AUTO_UPDATE).content.toString()
                     .toLongOrNull()?.minus(60) ?: 0
 
-                if ( name.isBlank() ) {
+                if (name.isBlank()) {
                     Snackbar.make(rootView, R.string.empty_name, Snackbar.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
 
-                if ( url == null || url == Uri.EMPTY ||
-                    (url.scheme != "http" && url.scheme != "https" && url.scheme != "content" )) {
+                if (url == null || url == Uri.EMPTY ||
+                    (url.scheme != "http" && url.scheme != "https" && url.scheme != "content")
+                ) {
                     Snackbar.make(rootView, R.string.invalid_url, Snackbar.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
@@ -157,12 +155,12 @@ class ProfileEditActivity : BaseActivity() {
             }
         }
 
-        when (intent.extras?.getLong("id", -1L)) {
-            -1L -> {
+        when (intent.extras?.getLong("id", Long.MIN_VALUE)) {
+            Long.MIN_VALUE -> {
                 openUrlProvider()
                 setTitle(R.string.new_profile)
             }
-            0L -> {
+            -1L -> {
                 setTitle(R.string.new_profile)
             }
             else -> {
@@ -232,8 +230,7 @@ class ProfileEditActivity : BaseActivity() {
                     )
                 else -> return false
             }
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             makeSnackbarException(getString(R.string.start_url_provider_failure), e.message)
         }
 
@@ -243,7 +240,7 @@ class ProfileEditActivity : BaseActivity() {
     private fun sendProfileRequest(name: String, url: Uri, interval: Long) {
         launch {
             val source = intent?.getParcelableExtra<Intent>("intent")?.toUri(0)?.run(Uri::parse)
-            val type = when( intent?.getStringExtra("type") ) {
+            val type = when (intent?.getStringExtra("type")) {
                 Constants.URL_PROVIDER_TYPE_FILE ->
                     ClashProfileEntity.TYPE_FILE
                 Constants.URL_PROVIDER_TYPE_URL ->
@@ -255,7 +252,7 @@ class ProfileEditActivity : BaseActivity() {
 
             val request = ProfileRequest()
                 .action(ProfileRequest.Action.UPDATE_OR_CREATE)
-                .withId(intent.getLongExtra("id", 0))
+                .withId(intent.getLongExtra("id", -1L))
                 .withName(name)
                 .withURL(url)
                 .withUpdateInterval(interval)

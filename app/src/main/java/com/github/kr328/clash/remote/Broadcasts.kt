@@ -8,10 +8,10 @@ import android.content.IntentFilter
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.github.kr328.clash.service.ClashService
+import com.github.kr328.clash.service.Constants
 import com.github.kr328.clash.service.Intents
+import com.github.kr328.clash.service.ServiceStatusProvider
 import com.github.kr328.clash.service.data.ClashProfileEntity
-import com.github.kr328.clash.service.util.componentName
 
 object Broadcasts {
     interface Receiver {
@@ -25,18 +25,24 @@ object Broadcasts {
     private val receivers = mutableListOf<Receiver>()
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if ( intent?.`package` != context?.packageName )
+            if (intent?.`package` != context?.packageName)
                 return
 
             when (intent?.action) {
-                Intents.INTENT_ACTION_CLASH_STARTED ->
+                Intents.INTENT_ACTION_CLASH_STARTED -> {
+                    clashRunning = true
+
                     receivers.forEach {
                         it.onStarted()
                     }
-                Intents.INTENT_ACTION_CLASH_STOPPED ->
+                }
+                Intents.INTENT_ACTION_CLASH_STOPPED -> {
+                    clashRunning = false
+
                     receivers.forEach {
                         it.onStopped(intent.getStringExtra(Intents.INTENT_EXTRA_CLASH_STOP_REASON))
                     }
+                }
                 Intents.INTENT_ACTION_PROFILE_CHANGED ->
                     receivers.forEach {
                         it.onProfileChanged(intent.getParcelableExtra(Intents.INTENT_EXTRA_PROFILE_ACTIVE))
@@ -62,10 +68,14 @@ object Broadcasts {
                     addAction(Intents.INTENT_ACTION_CLASH_STARTED)
                 })
 
-                clashRunning = broadcastReceiver.peekService(
-                    application,
-                    Intent().setComponent(ClashService::class.componentName)
-                ) != null
+                val pong = application.contentResolver.call(
+                    "${application.packageName}${Constants.STATUS_PROVIDER_SUFFIX}",
+                    ServiceStatusProvider.METHOD_PING_CLASH_SERVICE,
+                    null,
+                    null
+                )
+
+                clashRunning = pong != null
             }
 
             override fun onStop(owner: LifecycleOwner) {

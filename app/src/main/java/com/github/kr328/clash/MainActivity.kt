@@ -1,9 +1,15 @@
 package com.github.kr328.clash
 
+import android.app.Activity
 import android.content.Intent
+import android.net.VpnService
 import android.os.Bundle
+import android.view.View
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.remote.withClash
+import com.github.kr328.clash.service.ClashService
+import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.service.util.startForegroundServiceCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -11,6 +17,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
+    companion object {
+        private const val REQUEST_CODE = 40000
+    }
+
     private var bandwidthJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,26 +28,31 @@ class MainActivity : BaseActivity() {
 
         setContentView(R.layout.activity_main)
 
+        status.setOnClickListener {
+            if (clashRunning) {
+                stopService(ClashService::class.intent)
+            } else {
+                val vpnRequest = VpnService.prepare(this)
+                if (vpnRequest == null)
+                    startForegroundServiceCompat(ClashService::class.intent)
+                else
+                    startActivityForResult(vpnRequest, REQUEST_CODE)
+            }
+        }
+
+        proxies.setOnClickListener {
+            startActivity(ProxiesActivity::class.intent)
+        }
+
         profiles.setOnClickListener {
-            startActivity(Intent(this, ProfilesActivity::class.java))
+            startActivity(ProfilesActivity::class.intent)
         }
     }
 
     override fun onStart() {
         super.onStart()
 
-        launch {
-            if (clashRunning) {
-                status.icon = getDrawable(R.drawable.ic_started)
-                status.title = getText(R.string.running)
-                status.summary = getString(
-                    R.string.format_traffic_forwarded,
-                    0L.asBytesString()
-                )
-
-                startBandwidthPolling()
-            }
-        }
+        updateClashStatus()
     }
 
     override fun onStop() {
@@ -46,12 +61,25 @@ class MainActivity : BaseActivity() {
         stopBandwidthPolling()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK)
+                startForegroundServiceCompat(ClashService::class.intent)
+            return
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     override suspend fun onClashStarted() {
-        startBandwidthPolling()
+        updateClashStatus()
     }
 
     override suspend fun onClashStopped(reason: String?) {
-        stopBandwidthPolling()
+        updateClashStatus()
+
+        if (reason != null)
+            makeSnackbarException(getString(R.string.clash_start_failure), reason)
     }
 
     private fun startBandwidthPolling() {
@@ -60,20 +88,44 @@ class MainActivity : BaseActivity() {
 
         bandwidthJob = launch {
             withClash {
-                while (clashRunning && isActive) {
-                    val bandwidth = queryBandwidth()
-                    status.summary = getString(
-                        R.string.format_traffic_forwarded,
-                        bandwidth.asBytesString()
-                    )
-                    delay(1000)
+                try {
+                    while (clashRunning && isActive) {
+                        val bandwidth = queryBandwidth()
+                        status.summary = getString(
+                            R.string.format_traffic_forwarded,
+                            bandwidth.asBytesString()
+                        )
+                        delay(1000)
+                    }
+                } finally {
+                    bandwidthJob = null
                 }
-                bandwidthJob = null
             }
         }
     }
 
     private fun stopBandwidthPolling() {
         bandwidthJob?.cancel()
+    }
+
+    private fun updateClashStatus() {
+        if (clashRunning) {
+            startBandwidthPolling()
+
+            status.setCardBackgroundColor(getColor(R.color.primaryCardColorStarted))
+            status.icon = getDrawable(R.drawable.ic_started)
+            status.title = getText(R.string.running)
+
+            proxies.visibility = View.VISIBLE
+        } else {
+            stopBandwidthPolling()
+
+            status.setCardBackgroundColor(getColor(R.color.primaryCardColorStopped))
+            status.icon = getDrawable(R.drawable.ic_stopped)
+            status.title = getText(R.string.stopped)
+            status.summary = getText(R.string.tap_to_start)
+
+            proxies.visibility = View.GONE
+        }
     }
 }

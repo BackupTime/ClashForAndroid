@@ -10,7 +10,7 @@ interface IClashManager {
     void startHealthCheck(String group, IStreamCallback callback);
 
     // Query
-    ProxyGroup[] queryAllProxies();
+    ProxyGroupList queryAllProxies();
     General queryGeneral();
     long queryBandwidth();
 

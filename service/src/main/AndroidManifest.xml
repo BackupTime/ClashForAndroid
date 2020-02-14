@@ -50,5 +50,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/profile_provider" />
         </provider>
+        <provider
+            android:authorities="${applicationId}.status"
+            android:name=".ServiceStatusProvider"
+            android:exported="false"
+            android:process=":background"/>
     </application>
 </manifest>

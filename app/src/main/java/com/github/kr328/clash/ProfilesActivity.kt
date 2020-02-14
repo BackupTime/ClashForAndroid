@@ -7,11 +7,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.ProfileAdapter
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.remote.withProfile
+import com.github.kr328.clash.service.Intents
+import com.github.kr328.clash.service.ProfileBackgroundService
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.transact.ProfileRequest
+import com.github.kr328.clash.service.util.componentName
 import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.service.util.startForegroundServiceCompat
 import com.github.kr328.clash.weight.ProfilesMenu
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.activity_profiles.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -146,7 +149,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         val interval = entity.updateInterval.toString()
 
         val editor = ProfileEditActivity::class.intent
-            .putExtra("id", if (duplicate) 0 else entity.id)
+            .putExtra("id", if (duplicate) -1L else entity.id)
             .putExtra("type", type)
             .putExtra("intent", intent)
             .putExtra("name", name)
@@ -171,12 +174,24 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         )
     }
 
+    private fun startUpdate(entity: ClashProfileEntity) {
+        val request = ProfileRequest()
+            .action(ProfileRequest.Action.UPDATE_OR_CREATE)
+            .withId(entity.id)
+
+        val intent = Intent(Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST)
+            .setComponent(ProfileBackgroundService::class.componentName)
+            .putExtra(Intents.INTENT_EXTRA_PROFILE_REQUEST, request)
+
+        startForegroundServiceCompat(intent)
+    }
+
     override fun onOpenEditor(entity: ClashProfileEntity) {
         openEditor(entity)
     }
 
     override fun onUpdate(entity: ClashProfileEntity) {
-
+        startUpdate(entity)
     }
 
     override fun onOpenProperties(entity: ClashProfileEntity) {

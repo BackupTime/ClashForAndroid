@@ -13,7 +13,6 @@ import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.utils.IntervalUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
 
 class ProfileAdapter(private val context: Context, private val callback: Callback) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {

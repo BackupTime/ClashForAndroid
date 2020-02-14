@@ -5,4 +5,5 @@ object Constants {
     const val PROFILES_DIR = "profiles"
 
     const val PROFILE_PROVIDER_SUFFIX = ".profiles"
+    const val STATUS_PROVIDER_SUFFIX = ".status"
 }

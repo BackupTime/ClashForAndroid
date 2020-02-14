@@ -22,18 +22,6 @@ func ReadProfileAndCheck(fd int, output, baseDir string, callback DoneCallback) 
 	}()
 }
 
-func SaveProfileAndCheck(data []byte, output, baseDir string, callback DoneCallback) {
-	go func() {
-		call(profile.SaveAndCheck(data, output, baseDir), callback)
-	}()
-}
-
-func MoveProfileAndCheck(source, target, baseDir string, callback DoneCallback) {
-	go func() {
-		call(profile.MoveAndCheck(source, target, baseDir), callback)
-	}()
-}
-
 func call(err error, callback DoneCallback) {
 	if err != nil {
 		callback.DoneWithError(err)

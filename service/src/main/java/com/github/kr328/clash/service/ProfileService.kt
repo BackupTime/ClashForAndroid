@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.IBinder
 import androidx.core.content.FileProvider
 import com.github.kr328.clash.core.Global
@@ -17,7 +16,6 @@ import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import java.io.File
 import java.util.*
 
 class ProfileService : BaseService() {
@@ -70,8 +68,6 @@ class ProfileService : BaseService() {
                         file
                     ).toString()
 
-                    Log.d("Generated template file $file")
-
                     "$url?id=${entity.id}&fileName=$fileName"
                 }
             }
@@ -85,7 +81,9 @@ class ProfileService : BaseService() {
                 val id = u.getQueryParameter("id")?.toLongOrNull() ?: return
                 val fileName = u.getQueryParameter("fileName") ?: return
 
-                val request = ProfileRequest().withId(id).withURL(u)
+                val request = ProfileRequest().action(ProfileRequest.Action.UPDATE_OR_CREATE)
+                    .withId(id)
+                    .withURL(u)
                     .withCallback(object : IStreamCallback.Stub() {
                         override fun complete() {
                             cacheDir.resolve("profiles/$fileName").delete()
@@ -100,12 +98,10 @@ class ProfileService : BaseService() {
                         }
                     })
                 val i = ProfileBackgroundService::class.intent
+                    .setAction(Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST)
                     .putExtra(Intents.INTENT_EXTRA_PROFILE_REQUEST, request)
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    startForegroundService(i)
-                else
-                    startService(i)
+                startForegroundServiceCompat(i)
             }
         }
     }
@@ -188,7 +184,7 @@ class ProfileService : BaseService() {
             val id = request.id
 
             val entity: ClashProfileEntity =
-                if (id == 0L) {
+                if (id == -1L) {
                     ClashProfileEntity(
                         requireNotNull(request.name),
                         requireNotNull(request.type),
@@ -209,11 +205,12 @@ class ProfileService : BaseService() {
                     )
                 }
 
-            processor.createOrUpdate(entity, id == 0L)
+            processor.createOrUpdate(entity, id == -1L)
 
             if (entity.updateInterval > 0) {
                 val nextRequest =
-                    ProfileRequest().action(ProfileRequest.Action.UPDATE_OR_CREATE).withId(entity.id)
+                    ProfileRequest().action(ProfileRequest.Action.UPDATE_OR_CREATE)
+                        .withId(entity.id)
 
                 requireNotNull(getSystemService(AlarmManager::class.java)).set(
                     AlarmManager.RTC,

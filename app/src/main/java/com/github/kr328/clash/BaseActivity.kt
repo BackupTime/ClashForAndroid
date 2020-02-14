@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -128,7 +127,8 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
 
     protected fun makeSnackbarException(title: String, detail: String?) {
         Snackbar.make(rootView, title, Snackbar.LENGTH_LONG).setAction(R.string.detail) {
-            AlertDialog.Builder(this).setTitle(R.string.detail).setMessage(detail ?: "Unknown").show()
+            AlertDialog.Builder(this).setTitle(R.string.detail).setMessage(detail ?: "Unknown")
+                .show()
         }.show()
     }
 

@@ -10,17 +10,18 @@
         android:layout_marginStart="2dp"
         android:textColor="?attr/colorPrimary"
         android:text="@string/launch_name"
-        android:id="@+id/adapter_proxy_header_name"
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <View
-        android:id="@+id/adapter_proxy_header_url_test"
+        android:id="@+id/urlTest"
         android:focusable="true"
         android:clickable="true"
         android:layout_width="22dp"
         android:layout_height="22dp"
         android:layout_marginEnd="5dp"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/ic_url_test" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:foreground="@drawable/ic_flash"/>
 </RelativeLayout>

@@ -10,6 +10,7 @@ class Settings(private val clashManager: IClashManager) {
         val ACCESS_CONTROL_MODE = StringSetting("access_control_mode", ACCESS_CONTROL_MODE_ALL)
         val ACCESS_CONTROL_PACKAGES = PackageListSetting("access_control_packages", emptyList())
         val DNS_HIJACKING = BooleanSetting("dns_hijacking", true)
+        val NOTIFICATION_REFRESH = BooleanSetting("notification_refresh", true)
     }
 
     fun put(key: String, value: String) {
@@ -56,7 +57,7 @@ class Settings(private val clashManager: IClashManager) {
         }
     }
 
-    class StringSetting(override val key: String, val def: String) : Setting<String> {
+    class StringSetting(override val key: String, private val def: String) : Setting<String> {
         override fun parseValue(value: String?): String {
             return value ?: def
         }

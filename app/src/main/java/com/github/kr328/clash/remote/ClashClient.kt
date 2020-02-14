@@ -28,8 +28,8 @@ class ClashClient(private val service: IClashManager) {
         }
     }.await()
 
-    suspend fun queryAllProxyGroups(): Array<ProxyGroup> = withContext(Dispatchers.IO) {
-        service.queryAllProxies()
+    suspend fun queryAllProxyGroups(): List<ProxyGroup> = withContext(Dispatchers.IO) {
+        service.queryAllProxies().list
     }
 
     suspend fun queryGeneral(): General = withContext(Dispatchers.IO) {

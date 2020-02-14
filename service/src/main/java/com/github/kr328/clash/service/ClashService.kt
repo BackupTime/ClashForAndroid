@@ -16,20 +16,27 @@ class ClashService : BaseService() {
     companion object {
         const val INTENT_EXTRA_START_TUN =
             "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.start.tun"
+
+        var isServiceRunning = false
     }
 
     private val service = this
-    private val notification by lazy { ClashNotification(service) }
+    private lateinit var notification: ClashNotification
     private var stopReason: String? = null
     private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
+    private val settings: Settings by lazy { Settings(ClashManager(this)) }
     private val profileObserver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.`package` != packageName)
+                return
             reloadChannel.offer(Unit)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
+
+        notification = ClashNotification(service, settings.get(Settings.NOTIFICATION_REFRESH))
 
         launch {
             while (isActive) {
@@ -42,6 +49,11 @@ class ClashService : BaseService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+
+        if (isServiceRunning)
+            return START_NOT_STICKY
+
+        isServiceRunning = true
 
         Clash.start()
 
@@ -74,6 +86,8 @@ class ClashService : BaseService() {
         broadcastClashStopped(this, stopReason)
 
         unregisterReceiver(profileObserver)
+
+        isServiceRunning = false
 
         super.onDestroy()
     }

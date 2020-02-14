@@ -1,6 +1,9 @@
 package com.github.kr328.clash.service
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,14 +15,11 @@ import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.core.utils.asSpeedString
-import com.github.kr328.clash.service.util.ticker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.selects.select
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
-class ClashNotification(private val context: Service) : CoroutineScope {
+class ClashNotification(private val context: ClashService, enableRefresh: Boolean) :
+    CoroutineScope by context {
     companion object {
         private const val CLASH_STATUS_NOTIFICATION_CHANNEL = "clash_status_channel"
         private const val CLASH_STATUS_NOTIFICATION_ID = 413
@@ -45,6 +45,7 @@ class ClashNotification(private val context: Service) : CoroutineScope {
             )
         )
     private val screenChannel: Channel<Boolean> = Channel(Channel.CONFLATED)
+    private val tickerChannel: Channel<Unit> = Channel()
 
     private var profile = "None"
     private val observer = object : BroadcastReceiver() {
@@ -59,65 +60,71 @@ class ClashNotification(private val context: Service) : CoroutineScope {
     }
 
     init {
+        createNotificationChannel()
+
         runBlocking {
             update()
         }
 
-        launch {
-            withContext(Dispatchers.IO) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationManagerCompat.from(context)
-                        .createNotificationChannel(
-                            NotificationChannel(
-                                CLASH_STATUS_NOTIFICATION_CHANNEL,
-                                context.getString(R.string.clash_service_status_channel),
-                                NotificationManager.IMPORTANCE_LOW
-                            )
-                        )
-                }
-            }
-
-            while (isActive) {
+        if (enableRefresh) {
+            launch {
                 val powerManager =
                     requireNotNull(context.getSystemService(PowerManager::class.java))
-                val tickerChannel = Channel<Int>(Channel.CONFLATED)
-                var tickerJob = if (powerManager.isInteractive)
-                    ticker(1000, tickerChannel)
-                else
-                    EmptyCoroutineContext
 
-                select<Unit> {
-                    screenChannel.onReceive {
-                        tickerJob.cancel()
+                screenChannel.send(powerManager.isInteractive)
 
-                        if (it) {
-                            tickerJob = ticker(1000, tickerChannel)
+                var tickerJob: Job? = null
+
+                launch {
+                    while (isActive) {
+                        tickerJob = if (screenChannel.receive()) {
+                            tickerJob?.cancel()
+                            startTicker()
+                        } else {
+                            tickerJob?.cancel()
+                            null
                         }
                     }
-                    tickerChannel.onReceive {
+                }
+
+                launch {
+                    while (isActive) {
+                        tickerChannel.receive()
+
                         update()
                     }
                 }
+
+                context.registerReceiver(observer, IntentFilter().apply {
+                    addAction(Intent.ACTION_SCREEN_ON)
+                    addAction(Intent.ACTION_SCREEN_OFF)
+                })
             }
         }
+    }
 
-        context.registerReceiver(observer, IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-        })
+    private fun startTicker(): Job {
+        return launch {
+            while (isActive) {
+                tickerChannel.send(Unit)
+
+                delay(1000)
+            }
+        }
     }
 
     fun destroy() {
-        cancel()
-
         context.unregisterReceiver(observer)
         context.stopForeground(true)
     }
 
     fun setProfile(profile: String) {
-        this.profile = profile
-    }
+        launch {
+            this@ClashNotification.profile = profile
 
+            update()
+        }
+    }
 
     private suspend fun update() {
         val notification = withContext(Dispatchers.Default) {
@@ -144,12 +151,21 @@ class ClashNotification(private val context: Service) : CoroutineScope {
                 context.getString(
                     R.string.clash_notification_content,
                     bandwidth.upload.asBytesString(),
-                    traffic.download.asBytesString()
+                    bandwidth.download.asBytesString()
                 )
             )
             .build()
     }
 
-    override val coroutineContext: CoroutineContext
-        get() = SupervisorJob()
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            return
+        NotificationManagerCompat.from(context).createNotificationChannel(
+            NotificationChannel(
+                CLASH_STATUS_NOTIFICATION_CHANNEL,
+                context.getText(R.string.clash_service_status_channel),
+                NotificationManager.IMPORTANCE_LOW
+            )
+        )
+    }
 }

@@ -17,11 +17,11 @@ func StartTunDevice(fd, mtu int, dns string, cb TunCallback) error {
 }
 
 func StopTunDevice() {
+	tun.StopTunDevice()
+
 	if c := callback; c != nil {
 		c.OnStop()
 	}
 
 	callback = nil
-
-	tun.StopTunDevice()
 }

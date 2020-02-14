@@ -1,6 +1,7 @@
 package com.github.kr328.clash.core.serialization
 
 import android.os.Parcel
+import com.github.kr328.clash.core.utils.Log
 import kotlinx.serialization.*
 import kotlinx.serialization.modules.EmptyModule
 import kotlinx.serialization.modules.SerialModule
@@ -17,6 +18,8 @@ object MergedParcels : AbstractSerialFormat(EmptyModule) {
 
             parcel.writeStringList(encoder.getStringList())
             parcel.appendFrom(data, 0, data.dataSize())
+
+            Log.i("Send ${parcel.dataSize()} bytes")
         } finally {
             data.recycle()
         }
@@ -24,6 +27,7 @@ object MergedParcels : AbstractSerialFormat(EmptyModule) {
 
     fun <T> load(deserializer: DeserializationStrategy<T>, parcel: Parcel): T {
         val strings = mutableListOf<String>().apply { parcel.readStringList(this) }
+
         return deserializer.deserialize(ParcelsDecoder(strings, parcel))
     }
 
@@ -142,6 +146,7 @@ object MergedParcels : AbstractSerialFormat(EmptyModule) {
             val index = strings.computeIfAbsent(value) {
                 stringIndex++
             }
+
             parcel.writeInt(index)
         }
     }
@@ -254,8 +259,12 @@ object MergedParcels : AbstractSerialFormat(EmptyModule) {
             parcel.readInt().toShort()
 
         override fun decodeUnit() {}
-        override fun decodeString() =
-            strings[parcel.readInt()]
+        override fun decodeString(): String {
+            val index = parcel.readInt()
+
+            return strings[index]
+        }
+
     }
 }
 

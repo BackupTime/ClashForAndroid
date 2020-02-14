@@ -38,9 +38,13 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             else
                 "$PRIVATE_VLAN_DNS:53"
 
+        Log.i("TunService.startTun ${fd.fd}")
+
         Clash.startTunDevice(fd.fd, VPN_MTU, dnsAddress) {
             stopSelf()
         }
+
+        fd.close()
     }
 
     override fun onCreate() {
@@ -67,6 +71,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         cancel()
 
         defaultNetworkChannel.unregister()
+
+        Log.i("TunService.onDestroy")
 
         super.onDestroy()
     }
@@ -102,7 +108,6 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 addDisallowedApplication(packageName)
             }
             Settings.ACCESS_CONTROL_MODE_WHITELIST -> {
-                addAllowedApplication(packageName)
                 for (app in settings.get(Settings.ACCESS_CONTROL_PACKAGES).toSet() -
                         resources.getStringArray(R.array.default_disallow_application) -
                         setOf(packageName)) {
@@ -124,6 +129,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 }
                 addDisallowedApplication(packageName)
             }
+            else -> throw IllegalArgumentException("Invalid mode")
         }
 
         return this

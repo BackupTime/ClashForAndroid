@@ -22,7 +22,7 @@ class ProfileRequest private constructor(private val bundle: Bundle) : Parcelabl
     val type: Int
         get() = bundle.getInt(KEY_TYPE, -1)
     val id: Long
-        get() = bundle.getLong(KEY_ID, 0)
+        get() = bundle.getLong(KEY_ID, -1)
     val name: String?
         get() = bundle.getString(KEY_NAME)
     val url: Uri?

@@ -46,5 +46,10 @@
             android:label="@string/profile"
             android:exported="false"
             android:configChanges="uiMode" />
+        <activity
+            android:name=".ProxiesActivity"
+            android:label="@string/proxy"
+            android:exported="false"
+            android:configChanges="uiMode" />
     </application>
 </manifest>
