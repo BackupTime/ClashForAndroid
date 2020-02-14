@@ -2,7 +2,6 @@ package com.github.kr328.clash.core
 
 import android.content.Context
 import bridge.Bridge
-import bridge.EventPoll
 import com.github.kr328.clash.core.event.EventStream
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.model.General
@@ -15,7 +14,6 @@ import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
 import kotlinx.coroutines.CompletableDeferred
 import java.io.File
 import java.io.InputStream
-import java.util.concurrent.CompletableFuture
 
 object Clash {
     private var initialized = false

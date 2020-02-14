@@ -7,5 +7,6 @@ interface AbstractProxyAdapter {
     var onSelectProxyListener: suspend (String, String) -> Unit
 
     suspend fun applyChange()
-    suspend fun scrollToGroup(name: String)
+    suspend fun getGroupPosition(name: String): Int?
+    suspend fun getCurrentGroup(): String
 }

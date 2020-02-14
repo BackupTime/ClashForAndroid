@@ -1,16 +1,19 @@
 package com.github.kr328.clash
 
 import android.os.Bundle
-import androidx.core.view.isEmpty
+import android.util.DisplayMetrics
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.adapter.AbstractProxyAdapter
 import com.github.kr328.clash.adapter.GridProxyAdapter
-import com.github.kr328.clash.core.model.ProxyGroup
-import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.adapter.ProxyChipAdapter
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.utils.ProxySorter
-import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.activity_proxies.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -18,6 +21,7 @@ class ProxiesActivity : BaseActivity() {
     private val activity: ProxiesActivity
         get() = this
     private var maskedGroup: MutableSet<String> = mutableSetOf()
+    private val updateChipChannel = Channel<Unit>(Channel.CONFLATED)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +35,58 @@ class ProxiesActivity : BaseActivity() {
             onSelectProxyListener = { group, name ->
                 withClash {
                     setSelectProxy(group, name)
+                }
+            }
+        }
+
+        mainList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                updateChipChannel.offer(Unit)
+            }
+        })
+
+        chipList.adapter = ProxyChipAdapter(this) {
+            launch {
+                (mainList.adapter!! as AbstractProxyAdapter).getGroupPosition(it)?.also {
+                    val scroller = (object : LinearSmoothScroller(activity) {
+                        override fun getVerticalSnapPreference(): Int {
+                            return SNAP_TO_START
+                        }
+
+                        override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics?): Float {
+                            return 40f / displayMetrics!!.densityDpi
+                        }
+
+                        init {
+                            targetPosition = it
+                        }
+                    })
+
+                    mainList.layoutManager?.startSmoothScroll(scroller)
+                }
+            }
+        }
+        chipList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        chipList.itemAnimator?.changeDuration = 80
+
+        launch {
+            var currentChecked = ""
+
+            while (isActive) {
+                updateChipChannel.receive()
+
+                val currentGroup = (mainList.adapter!! as AbstractProxyAdapter).getCurrentGroup()
+
+                if (currentChecked == currentGroup)
+                    continue
+
+                currentChecked = currentGroup
+
+                (chipList.adapter!! as ProxyChipAdapter).apply {
+                    selected = currentChecked
+
+                    (chipList.layoutManager!! as LinearLayoutManager)
+                        .scrollToPositionWithOffset(chips.indexOf(currentChecked), 0)
                 }
             }
         }
@@ -58,45 +114,13 @@ class ProxiesActivity : BaseActivity() {
                 sorter.sort(proxies.toList())
             }
 
-            if (chipGroup.isEmpty()) {
-                filtered.map(ProxyGroup::name).forEach {
-                    val chip = Chip(activity).apply {
-                        text = it
-
-                        chipBackgroundColor = getColorStateList(R.color.proxies_chip_colors)
-                        rippleColor = getColorStateList(R.color.proxies_chip_colors)
-                        setTextColor(getColorStateList(R.color.proxies_chip_text_colors))
-                        checkedIcon = null
-
-                        isCheckable = true
-                        isClickable = true
-                        isFocusable = true
-                        isChecked = !maskedGroup.contains(it)
-
-                        setOnCheckedChangeListener { _, isChecked ->
-                            if (isChecked) {
-                                maskedGroup.remove(it)
-                            } else {
-                                maskedGroup.add(it)
-                            }
-
-                            refreshList(it)
-                        }
-                    }
-
-                    chipGroup.addView(chip)
-                }
-            }
-
             (mainList.adapter!! as AbstractProxyAdapter).apply {
                 root = filtered.filter { !maskedGroup.contains(it.name) }
 
                 applyChange()
-
-                if (scrollTo != null) {
-                    scrollToGroup(scrollTo)
-                }
             }
+
+            (chipList.adapter!! as ProxyChipAdapter).chips = filtered.map { it.name }
         }
     }
 }

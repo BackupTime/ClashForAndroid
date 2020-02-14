@@ -14,7 +14,6 @@ import com.github.kr328.clash.ProxiesActivity
 import com.github.kr328.clash.R
 import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.core.model.ProxyGroup
-import com.github.kr328.clash.core.utils.Log
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,13 +24,18 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), AbstractProxyAdapter {
     private interface RenderInfo {
         val name: String
+        val group: String
     }
 
-    private data class ProxyGroupInfo(override val name: String) : RenderInfo
+    private data class ProxyGroupInfo(override val name: String) : RenderInfo {
+        override val group: String
+            get() = name
+    }
+
     private data class ProxyInfo(
         override val name: String,
         val type: Proxy.Type,
-        val group: String,
+        override val group: String,
         val selectable: Boolean,
         val delay: Short,
         val active: Boolean
@@ -115,17 +119,24 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
         }
     }
 
-    override suspend fun scrollToGroup(name: String) {
-        val position = withContext(Dispatchers.Default) {
+    override suspend fun getGroupPosition(name: String): Int? {
+        return withContext(Dispatchers.Default) {
             renderList.mapIndexed { index, p ->
-                if ( p is ProxyGroupInfo && p.name == name )
+                if (p is ProxyGroupInfo && p.name == name)
                     index
                 else
                     -1
             }.singleOrNull { it >= 0 }
-        } ?: return
+        }
+    }
 
-        layoutManager.scrollToPositionWithOffset(position, 0)
+    override suspend fun getCurrentGroup(): String {
+        val position = layoutManager.findFirstCompletelyVisibleItemPosition()
+
+        if (position < 0)
+            return ""
+
+        return renderList[position].group
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

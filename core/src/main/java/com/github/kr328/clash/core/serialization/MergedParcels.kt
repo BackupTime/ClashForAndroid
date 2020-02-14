@@ -1,7 +1,6 @@
 package com.github.kr328.clash.core.serialization
 
 import android.os.Parcel
-import com.github.kr328.clash.core.utils.Log
 import kotlinx.serialization.*
 import kotlinx.serialization.modules.EmptyModule
 import kotlinx.serialization.modules.SerialModule
@@ -18,8 +17,6 @@ object MergedParcels : AbstractSerialFormat(EmptyModule) {
 
             parcel.writeStringList(encoder.getStringList())
             parcel.appendFrom(data, 0, data.dataSize())
-
-            Log.i("Send ${parcel.dataSize()} bytes")
         } finally {
             data.recycle()
         }
