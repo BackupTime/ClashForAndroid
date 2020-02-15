@@ -1,5 +1,6 @@
 package com.github.kr328.clash.adapter
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
 import android.util.TypedValue
@@ -44,6 +45,51 @@ class ProxyChipAdapter(
     class Holder(root: View) : RecyclerView.ViewHolder(root) {
         val card: MaterialCardView = root.findViewById(R.id.root)
         val title: TextView = root.findViewById(android.R.id.title)
+
+        private var cardAnimator: ValueAnimator? = null
+        private var cardColor: Int = card.cardBackgroundColor.defaultColor
+        private var titleAnimator: ValueAnimator? = null
+        private var titleColor: Int = title.textColors.defaultColor
+
+        fun setCardColorAnimation(color: Int) {
+            if (cardColor == color)
+                return
+
+            cardAnimator?.cancel()
+
+            cardAnimator = ValueAnimator.ofArgb(cardColor, color).apply {
+                addUpdateListener {
+                    val v = animatedValue as Int
+
+                    card.setCardBackgroundColor(v)
+
+                    cardColor = v
+                }
+
+                duration = 200
+                start()
+            }
+        }
+
+        fun setTitleColorAnimation(color: Int) {
+            if (color == titleColor)
+                return
+
+            titleAnimator?.cancel()
+
+            titleAnimator = ValueAnimator.ofArgb(titleColor, color).apply {
+                addUpdateListener {
+                    val v = animatedValue as Int
+
+                    title.setTextColor(v)
+
+                    titleColor = v
+                }
+
+                duration = 200
+                start()
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -65,11 +111,11 @@ class ProxyChipAdapter(
         }
 
         if (selected == current) {
-            holder.title.setTextColor(Color.WHITE)
-            holder.card.setCardBackgroundColor(context.getColor(R.color.primaryCardColorStarted))
+            holder.setTitleColorAnimation(Color.WHITE)
+            holder.setCardColorAnimation(context.getColor(R.color.primaryCardColorStarted))
         } else {
-            holder.title.setTextColor(colorOnSurface)
-            holder.card.setCardBackgroundColor(context.getColor(R.color.chipBackgroundColor))
+            holder.setTitleColorAnimation(colorOnSurface)
+            holder.setCardColorAnimation(context.getColor(R.color.chipBackgroundColor))
         }
     }
 }

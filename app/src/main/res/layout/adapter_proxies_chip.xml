@@ -9,7 +9,8 @@
     android:layout_marginTop="10dp"
     app:cardCornerRadius="12dp"
     android:focusable="true"
-    android:clickable="true">
+    android:clickable="true"
+    app:cardBackgroundColor="@color/chipBackgroundColor">
 
     <TextView
         android:id="@android:id/title"
