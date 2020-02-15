@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/refresh" android:id="@+id/menuRefresh" />
+    <item android:title="@string/mode">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item android:id="@+id/modeRule" android:title="@string/rule" />
+                <item android:id="@+id/modeDirect" android:title="@string/direct" />
+                <item android:id="@+id/modeGlobal" android:title="@string/global" />
+            </group>
+        </menu>
+    </item>
+    <item android:title="@string/sort_group">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item android:id="@+id/groupDefault" android:title="@string/default_" />
+                <item android:id="@+id/groupName" android:title="@string/name" />
+                <item android:id="@+id/groupDelay" android:title="@string/delay" />
+            </group>
+        </menu>
+    </item>
+    <item android:title="@string/sort_proxy">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item android:id="@+id/proxyDefault" android:title="@string/default_" />
+                <item android:id="@+id/proxyName" android:title="@string/name" />
+                <item android:id="@+id/proxyDelay" android:title="@string/delay" />
+            </group>
+        </menu>
+    </item>
+</menu>

@@ -6,14 +6,14 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.preference.UiPreferences
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.google.android.material.snackbar.Snackbar
@@ -53,6 +53,9 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         get() = Broadcasts.clashRunning
     val rootView: View
         get() = overrideRootView ?: window.decorView
+    var menu: Menu? = null
+    lateinit var uiPreference: UiPreferences
+        private set
 
     open suspend fun onClashStarted() {}
     open suspend fun onClashStopped(reason: String?) {}
@@ -82,6 +85,8 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        uiPreference = UiPreferences(this)
+
         resetLightNavigationBar()
     }
 
@@ -97,9 +102,27 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         Broadcasts.unregister(receiver)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        this.menu = menu
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if ( super.onOptionsItemSelected(item) )
+            return true
+
+        if ( item.itemId == android.R.id.home ) {
+            onSupportNavigateUp()
+            return true
+        }
+
+        return false
+    }
+
     override fun setSupportActionBar(toolbar: Toolbar?) {
         super.setSupportActionBar(toolbar)
 
+        supportActionBar?.setDisplayShowHomeEnabled(shouldDisplayHomeAsUpEnabled())
         supportActionBar?.setDisplayHomeAsUpEnabled(shouldDisplayHomeAsUpEnabled())
     }
 

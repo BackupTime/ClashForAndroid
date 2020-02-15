@@ -1,12 +1,15 @@
 package com.github.kr328.clash.view
 
 import android.util.DisplayMetrics
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.ProxiesActivity
 import com.github.kr328.clash.adapter.AbstractProxyAdapter
 import com.github.kr328.clash.adapter.ProxyChipAdapter
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 
 class ProxiesTabMediator(
     private val context: ProxiesActivity,
@@ -38,13 +41,33 @@ class ProxiesTabMediator(
 
                 currentChecked = currentGroup
 
-                (chipView.adapter!! as ProxyChipAdapter).apply {
-                    selected = currentChecked
+                val adapter = chipView.adapter!! as ProxyChipAdapter
 
-                    if (!preventChipScroll)
-                        chipView.smoothScrollToPosition(chips.indexOf(currentChecked))
+                adapter.selected = currentChecked
+
+                if (!preventChipScroll) {
+                    val index = adapter.chips.indexOf(currentChecked)
+
+                    if (index < 0)
+                        continue
+
+                    chipView.smoothScrollToPosition(index)
                 }
+
+                delay(200)
             }
+
+        }
+    }
+
+    suspend fun scrollToDirect(group: String) {
+        val position = (proxiesView.adapter!! as AbstractProxyAdapter).getGroupPosition(group) ?: return
+
+        when ( val m = proxiesView.layoutManager ) {
+            is GridLayoutManager ->
+                m.scrollToPositionWithOffset(position, 0)
+            is LinearLayoutManager ->
+                m.scrollToPositionWithOffset(position, 0)
         }
     }
 

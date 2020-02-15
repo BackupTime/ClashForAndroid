@@ -24,7 +24,7 @@ class ClashService : BaseService() {
     private lateinit var notification: ClashNotification
     private var stopReason: String? = null
     private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
-    private val settings: Settings by lazy { Settings(ClashManager(this)) }
+    private val settings: Settings by lazy { Settings(ClashManager(this, this)) }
     private val profileObserver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.`package` != packageName)
@@ -93,14 +93,19 @@ class ClashService : BaseService() {
     }
 
     private suspend fun reloadProfile() = withContext(Dispatchers.IO) {
-        val active = ClashDatabase.getInstance(service).openClashProfileDao().queryActiveProfile()
-            ?: return@withContext stopSelf("Empty active profile")
+        val active = ClashDatabase.getInstance(service).openClashProfileDao()
+            .queryActiveProfile() ?: return@withContext stopSelf("Empty active profile")
 
         try {
             Clash.loadProfile(
                 resolveProfile(active.id),
                 resolveBase(active.id)
             ).await()
+
+            ClashDatabase.getInstance(service).openClashProfileProxyDao()
+                .querySelectedForProfile(active.id).forEach {
+                    Clash.setSelectedProxy(it.proxy, it.selected)
+                }
 
             notification.setProfile(active.name)
         } catch (e: Exception) {

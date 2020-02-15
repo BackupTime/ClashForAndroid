@@ -8,6 +8,7 @@ interface IClashManager {
     // Control
     boolean setSelectProxy(String proxy, String selected);
     void startHealthCheck(String group, IStreamCallback callback);
+    void setProxyMode(String mode);
 
     // Query
     ProxyGroupList queryAllProxies();

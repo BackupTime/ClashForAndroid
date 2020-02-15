@@ -8,7 +8,10 @@ import (
 )
 
 func LoadMMDB(data []byte) {
-	mmdb.LoadFromBytes(data)
+	dataClone := make([]byte, len(data))
+	copy(dataClone, data)
+
+	mmdb.LoadFromBytes(dataClone)
 }
 
 func SetHome(homeDir string) {

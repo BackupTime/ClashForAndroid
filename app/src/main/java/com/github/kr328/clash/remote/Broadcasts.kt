@@ -75,13 +75,24 @@ object Broadcasts {
                     null
                 )
 
-                clashRunning = pong != null
+                val current = pong != null
+                if (current != clashRunning) {
+                    clashRunning = current
+
+                    if (current) {
+                        receivers.forEach {
+                            it.onStarted()
+                        }
+                    } else {
+                        receivers.forEach {
+                            it.onStopped(null)
+                        }
+                    }
+                }
             }
 
             override fun onStop(owner: LifecycleOwner) {
                 application.unregisterReceiver(broadcastReceiver)
-
-                clashRunning = false
             }
         })
     }

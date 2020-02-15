@@ -10,7 +10,6 @@ import (
 
 	"github.com/Dreamacro/clash/adapters/inbound"
 	"github.com/Dreamacro/clash/component/socks5"
-	"github.com/Dreamacro/clash/config"
 	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/tunnel"
 )
@@ -77,16 +76,4 @@ func SaveAndCheck(data []byte, output, baseDir string) error {
 	}
 
 	return ioutil.WriteFile(output, data, defaultFileMode)
-}
-
-func parseConfig(data []byte, baseDir string) (*config.Config, error) {
-	raw, err := config.UnmarshalRawConfig(data)
-	if err != nil {
-		return nil, err
-	}
-
-	raw.ExternalUI = ""
-	raw.ExternalController = ""
-
-	return config.ParseRawConfig(raw, baseDir)
 }

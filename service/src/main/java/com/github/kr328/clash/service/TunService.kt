@@ -50,7 +50,9 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     override fun onCreate() {
         super.onCreate()
 
-        settings = Settings(ClashManager(this))
+        Clash.initialize(this)
+
+        settings = Settings(ClashManager(this, this))
 
         defaultNetworkChannel = DefaultNetworkChannel(this, this)
 

@@ -15,7 +15,7 @@ import com.google.android.material.card.MaterialCardView
 
 class ProxyChipAdapter(
     private val context: Context,
-    private val onClick: (String) -> Unit
+    val onClick: (String) -> Unit
 ) :
     RecyclerView.Adapter<ProxyChipAdapter.Holder>() {
     var chips = listOf<String>()

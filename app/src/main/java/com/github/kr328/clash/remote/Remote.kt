@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
+import android.os.Handler
 import android.os.IBinder
 import androidx.core.content.edit
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -82,8 +83,12 @@ object Remote {
     }
 
     fun init(application: Application) {
+        val handler = Handler()
+
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
+                handler.removeMessages(0)
+
                 GlobalScope.launch {
                     if (!verifyApk(application)) {
                         application.startActivity(ApkBrokenActivity::class.intent)
@@ -109,17 +114,19 @@ object Remote {
             }
 
             override fun onStop(owner: LifecycleOwner) {
-                clashConnection?.also {
-                    application.unbindService(it)
-                    it.onServiceDisconnected(null)
-                }
-                profileConnection?.also {
-                    application.unbindService(it)
-                    it.onServiceDisconnected(null)
-                }
+                handler.postDelayed({
+                    clashConnection?.also {
+                        application.unbindService(it)
+                        it.onServiceDisconnected(null)
+                    }
+                    profileConnection?.also {
+                        application.unbindService(it)
+                        it.onServiceDisconnected(null)
+                    }
 
-                clashConnection = null
-                profileConnection = null
+                    clashConnection = null
+                    profileConnection = null
+                }, 5000)
             }
         })
     }

@@ -49,7 +49,7 @@ dependencies {
 afterEvaluate {
     def ds = tasks.register("downloadMMDB", MMDBDowloadTask.class) {
         onlyIf {
-            System.currentTimeMillis() - file("$buildDir/intermediates/dynamic_assets/Country.mmdb").lastModified() > 24 * 3600 * 1000L
+            System.currentTimeMillis() - file("$buildDir/intermediates/dynamic_assets/Country.mmdb").lastModified() > 7 * 24 * 3600 * 1000L
         }
 
         output = "$buildDir/intermediates/dynamic_assets/Country.mmdb"

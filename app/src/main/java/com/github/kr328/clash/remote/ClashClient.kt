@@ -40,4 +40,8 @@ class ClashClient(private val service: IClashManager) {
         withContext(Dispatchers.IO) {
             service.queryBandwidth()
         }
+
+    suspend fun setProxyMode(mode: General.Mode) = withContext(Dispatchers.IO) {
+        service.setProxyMode(mode.toString())
+    }
 }

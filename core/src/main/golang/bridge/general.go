@@ -25,3 +25,14 @@ func QueryGeneral() *TunnelGeneral {
 
 	return result
 }
+
+func SetProxyMode(mode string) {
+	switch mode {
+	case "Direct":
+		tunnel.Instance().SetMode(tunnel.Direct)
+	case "Global":
+		tunnel.Instance().SetMode(tunnel.Global)
+	case "Rule":
+		tunnel.Instance().SetMode(tunnel.Rule)
+	}
+}

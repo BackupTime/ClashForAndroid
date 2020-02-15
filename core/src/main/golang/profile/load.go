@@ -1,27 +1,29 @@
 package profile
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net"
 
 	"github.com/Dreamacro/clash/component/fakeip"
 	"github.com/Dreamacro/clash/config"
+	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/dns"
 	"github.com/Dreamacro/clash/hub/executor"
 	"github.com/Dreamacro/clash/log"
 	"github.com/kr328/cfa/tun"
 )
 
+const tunAddress = "172.31.255.253/30"
+
 const defaultConfig = `
+log: debug
 mode: Direct
 Proxy:
-- name: "ss1"
-  type: ss
-  server: server
-  port: 443
-  cipher: chacha20-ietf-poly1305
-  password: "password"
-  # udp: true
+- name: "broadcast"
+  type: socks5
+  server: 255.255.255.255
+  port: 1080
 
 Proxy Group:
 - name: "select"
@@ -34,11 +36,15 @@ Rule:
 
 // LoadDefault - load default configure
 func LoadDefault() {
-	defaultC, _ := config.Parse([]byte(defaultConfig))
-
-	tun.ResetDnsRedirect()
+	defaultC, err := parseConfig([]byte(defaultConfig), constant.Path.HomeDir())
+	if err != nil {
+		log.Warnln("Load Default Failure " + err.Error())
+		return
+	}
 
 	executor.ApplyConfig(defaultC, true)
+
+	tun.ResetDnsRedirect()
 }
 
 // LoadFromFile - load file
@@ -102,4 +108,17 @@ func LoadFromFile(path, baseDir string) error {
 	log.Infoln("Profile " + path + " loaded")
 
 	return nil
+}
+
+func parseConfig(data []byte, baseDir string) (*config.Config, error) {
+	raw, err := config.UnmarshalRawConfig(data)
+	if err != nil {
+		return nil, err
+	}
+
+	raw.ExternalUI = ""
+	raw.ExternalController = ""
+	raw.Rule = append([]string{fmt.Sprintf("IP-CIDR,%s,REJECT", tunAddress)}, raw.Rule...)
+
+	return config.ParseRawConfig(raw, baseDir)
 }

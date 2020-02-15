@@ -75,13 +75,15 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="clash_start_failure">Clash Start Failure</string>
     <string name="refresh">Refresh</string>
-    <string name="group_order">Group Order</string>
-    <string name="proxy_order">Proxy Order</string>
-    <string name="default_">Default</string>
+
     <string name="delay">Delay</string>
     <string name="direct">Direct</string>
     <string name="global">Global</string>
     <string name="rule">Rule</string>
+    <string name="mode">Mode</string>
+    <string name="sort_group">Sort Group</string>
+    <string name="sort_proxy">Sort Proxy</string>
+    <string name="default_">Default</string>
 
     <string name="start_url_provider_failure">Start URL Provider Failure</string>
 

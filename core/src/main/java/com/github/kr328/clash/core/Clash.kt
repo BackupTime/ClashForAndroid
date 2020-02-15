@@ -11,6 +11,7 @@ import com.github.kr328.clash.core.model.Traffic
 import com.github.kr328.clash.core.transact.DoneCallbackImpl
 import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
+import com.github.kr328.clash.core.utils.Log
 import kotlinx.coroutines.CompletableDeferred
 import java.io.File
 import java.io.InputStream
@@ -30,6 +31,8 @@ object Clash {
         Bridge.loadMMDB(bytes)
         Bridge.setHome(context.cacheDir.absolutePath)
         Bridge.reset()
+
+        Log.d("MMDB loaded ${bytes.size}")
     }
 
     fun start() {
@@ -95,6 +98,10 @@ object Clash {
         return DoneCallbackImpl().apply {
             Bridge.startUrlTest(name, this)
         }
+    }
+
+    fun setProxyMode(mode: String) {
+        Bridge.setProxyMode(mode)
     }
 
     fun queryGeneral(): General {
