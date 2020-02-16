@@ -2,8 +2,6 @@ package com.github.kr328.clash.preference
 
 import android.content.Context
 import android.content.SharedPreferences
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class UiPreferences(context: Context) {
     companion object {
@@ -35,8 +33,8 @@ class UiPreferences(context: Context) {
         }
     }
 
-    class BooleanEntry(private val key: String, private val defaultValue: Boolean = false):
-            Entry<Boolean> {
+    class BooleanEntry(private val key: String, private val defaultValue: Boolean = false) :
+        Entry<Boolean> {
         override fun get(sharedPreferences: SharedPreferences): Boolean {
             return sharedPreferences.getBoolean(key, defaultValue)
         }

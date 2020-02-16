@@ -201,7 +201,8 @@ class ProfileBackgroundService : BaseService() {
     private fun startForeground() {
         val notification = NotificationCompat.Builder(this, SERVICE_STATUS_CHANNEL)
             .setContentTitle(getText(R.string.profile_service_status_title))
-            .setSmallIcon(R.drawable.ic_updating)
+            .setColor(getColor(R.color.colorAccentService))
+            .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
             .build()
 
@@ -215,7 +216,8 @@ class ProfileBackgroundService : BaseService() {
         val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
             .setContentTitle(getText(R.string.profile_status_title))
             .setContentText(getString(R.string.profile_status_updating, entity.name))
-            .setSmallIcon(R.drawable.ic_update_normal)
+            .setColor(getColor(R.color.colorAccentService))
+            .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
             .setOngoing(true)
             .build()
@@ -236,7 +238,8 @@ class ProfileBackgroundService : BaseService() {
         val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
             .setContentTitle(getText(R.string.profile_status_title))
             .setContentText(getString(R.string.profile_status_update_completed, entity.name))
-            .setSmallIcon(R.drawable.ic_update_normal)
+            .setColor(getColor(R.color.colorAccentService))
+            .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
             .build()
 
@@ -256,7 +259,8 @@ class ProfileBackgroundService : BaseService() {
         val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
             .setContentTitle(getString(R.string.profile_status_update_failure, entity.name))
             .setContentText(reason)
-            .setSmallIcon(R.drawable.ic_update_normal)
+            .setColor(getColor(R.color.colorAccentService))
+            .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
             .build()
 

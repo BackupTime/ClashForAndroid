@@ -8,12 +8,9 @@
     <string name="format_traffic_forwarded">%s Forwarded</string>
 
     <string name="proxy">Proxy</string>
-    <string name="rule_mode">Rule Mode</string>
     <string name="direct_mode">Direct Mode</string>
-    <string name="global_mode">Global Mode</string>
 
     <string name="profiles">Profiles</string>
-    <string name="format_profile_activated">%s Activated</string>
     <string name="not_selected">Not selected</string>
 
     <string name="logs">Logs</string>
@@ -21,8 +18,6 @@
     <string name="feedback">Feedback</string>
     <string name="about">About</string>
 
-    <string name="local">Local</string>
-    <string name="remote">Remote</string>
     <string name="unknown">Unknown</string>
 
     <string name="recently">Recently</string>
@@ -38,27 +33,22 @@
     <string name="url">URL</string>
     <string name="import_from_url">Import from URL</string>
     <string name="external">External</string>
-    <string name="format_import_from_external">Import from %s</string>
-    
+
     <string name="application_broken">Application Broken</string>
 
     <string name="profile">Profile</string>
     <string name="name">Name</string>
-    <string name="source">Source</string>
     <string name="profile_name">Profile Name</string>
     <string name="profile_url">Profile URL</string>
 
     <string name="auto_update">Auto Update</string>
-    <string name="auto_update_interval">Auto Update Interval</string>
     <string name="in_minutes">In minutes</string>
     <string name="invalid_interval">Invalid Interval</string>
-    <string name="invalid_profile">Invalid Profile</string>
     <string name="download_failure">Download Failure</string>
     <string name="detail">Detail</string>
     <string name="update">Update</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
-    <string name="clear_cache">Clear Cache</string>
     <string name="properties">Properties</string>
     <string name="duplicate">Duplicate</string>
     <string name="reset_provider">Reset Providers</string>
@@ -89,96 +79,9 @@
 
     <string name="start_url_provider_failure">Start URL Provider Failure</string>
 
-    <string name="clash_profile_item_summary_file">%s (File)</string>
-    <string name="clash_profile_item_summary_url">%s (URL)</string>
-    <string name="clash_profile_remove">Remove</string>
-    <string name="clash_profile_updating">Profile Updating</string>
-
     <string name="clash_new_profile">New Profile</string>
-    <string name="clash_new_profile_file_title">File</string>
-    <string name="clash_new_profile_file_summary">From Local Storage</string>
-
-    <string name="clash_new_profile_url_title">URL</string>
-    <string name="clash_new_profile_url_summary">From Internet</string>
-
-    <string name="clash_import_from_file">Import From File</string>
-    <string name="clash_import_from_url">Import From URL</string>
-
-    <string name="clash_profile_name">Name</string>
-    <string name="clash_profile_name_hint">Unlabeled</string>
-
-    <string name="clash_profile_file">File</string>
-    <string name="clash_profile_file_hint">content://</string>
-
-    <string name="clash_profile_url">URL</string>
-    <string name="clash_profile_url_hint">https://</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
-    <string name="clash_import_file_empty_name">Empty Name</string>
-    <string name="clash_import_file_empty_path">Empty Path</string>
-    <string name="clash_profile_invalid">Invalid Config: %s</string>
-
-    <string name="clash_proxy_group_title">%s - %s</string>
-
-    <string name="application_setting_title">Setting</string>
-    <string name="application_setting_application">Application</string>
-    <string name="application_setting_proxy">Proxy</string>
-
-    <string name="proxy_setting_vpn_mode">VPN Mode</string>
-    <string name="proxy_setting_vpn_mode_summary">Handle all system traffic</string>
-    <string name="proxy_setting_proxy_mode">Proxy Only Mode</string>
-    <string name="proxy_setting_proxy_mode_summary">Start clash core only</string>
-    <string name="proxy_setting_vpn_setting">VPN Settings</string>
-    <string name="proxy_setting_vpn_setting_access_control">Access Control</string>
-    <string name="proxy_setting_vpn_setting_access_control_summary">Configure access permission for apps</string>
-    <string name="proxy_setting_vpn_setting_bypass_private_network">Bypass Private Network</string>
-    <string name="proxy_setting_vpn_setting_bypass_private_network_summary">Bypass private network subnet</string>
-    <string name="proxy_setting_vpn_setting_ipv6">IPv6 Support</string>
-    <string name="proxy_setting_vpn_setting_ipv6_summary">Routing IPv6 traffic</string>
-    <string name="proxy_setting_vpn_setting_dns_hijacking">DNS Hijacking</string>
-    <string name="proxy_setting_vpn_setting_dns_hijacking_summary">Redirect ALL dns traffic to clash</string>
-
-    <string name="access_setting_allow_all">Global</string>
-    <string name="access_setting_allow_all_summary">Allow all apps</string>
-    <string name="access_setting_allow">Whitelist</string>
-    <string name="access_setting_allow_summary">Only allowing selected apps</string>
-    <string name="access_setting_disallow">Blacklist</string>
-    <string name="access_setting_disallow_summary">Disallow selected apps</string>
-    <string name="access_setting_loading">Loading</string>
-    <string name="access_setting_show_header">Show Mode</string>
-    <string name="access_setting_hide_header">Hide Mode</string>
-    <string name="access_setting_select_all">Select All</string>
-    <string name="access_setting_select_invert">Select Invert</string>
-    <string name="access_setting_clean_selection">Clear Selection</string>
-
-    <string name="application_setting_behavior">Behavior</string>
-    <string name="application_setting_start_on_boot">Start on Boot</string>
-    <string name="application_setting_start_on_boot_summary">Start clash on system boot</string>
-
-    <string name="clash_start_service_notification_channel">Clash Start Service</string>
-    <string name="clash_start_service_notification">Starting Clash</string>
-    
-    <string name="not_implemented">Not Implemented</string>
-
-    <string name="feedback_id">ID</string>
-    <string name="feedback_feedback_id">Feedback ID</string>
-    <string name="feedback_feedback_id_summary">Unknown</string>
-    <string name="feedback_feedback_id_copied">Copied</string>
-
-    <string name="feedback_source">Source &amp; Issues</string>
-    <string name="feedback_upstream">Upstream</string>
-    <string name="feedback_github_repo">Github</string>
-
-    <string name="feedback_group">Groups</string>
-    <string name="feedback_telegram_channel">Telegram Channel</string>
-    <string name="feedback_telegram_group">Telegram Group</string>
-
-    <string name="feedback_upstream_url" translatable="false">https://github.com/Dreamacro/clash</string>
-    <string name="feedback_github_repo_url" translatable="false">https://github.com/Kr328/ClashForAndroid</string>
-    <string name="feedback_telegram_group_url" translatable="false">https://t.me/clash_for_android</string>
-    <string name="feedback_telegram_channel_url" translatable="false">https://t.me/clash_for_android_channel</string>
-
-    <string name="about_power_by_clash">Power by Clash</string>
 </resources>

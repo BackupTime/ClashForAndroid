@@ -1,6 +1,5 @@
 package com.github.kr328.clash.utils
 
-import com.github.kr328.clash.core.utils.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -34,7 +33,7 @@ object PrefixMerger {
                 }
             }
 
-            if ( mergingGroup.isNotEmpty() )
+            if (mergingGroup.isNotEmpty())
                 groups.add(mergingGroup)
 
             for (group in groups) {

@@ -1,5 +1,4 @@
 <resources>
-    <string name="demo_string">Demo String</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 </resources>

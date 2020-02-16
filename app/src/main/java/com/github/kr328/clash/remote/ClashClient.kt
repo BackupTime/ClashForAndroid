@@ -5,6 +5,7 @@ import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroup
 import com.github.kr328.clash.service.IClashManager
 import com.github.kr328.clash.service.ipc.IStreamCallback
+import com.github.kr328.clash.service.ipc.ParcelableContainer
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,7 +17,7 @@ class ClashClient(private val service: IClashManager) {
 
     suspend fun startHealthCheck(group: String) = withContext(Dispatchers.IO) {
         CompletableDeferred<Unit>().apply {
-            service.startHealthCheck(group, object : IStreamCallback.Default() {
+            service.startHealthCheck(group, object: IStreamCallback.Stub() {
                 override fun complete() {
                     this@apply.complete(Unit)
                 }
@@ -24,6 +25,8 @@ class ClashClient(private val service: IClashManager) {
                 override fun completeExceptionally(reason: String?) {
                     this@apply.completeExceptionally(RemoteException(reason))
                 }
+
+                override fun send(data: ParcelableContainer?) {}
             })
         }
     }.await()

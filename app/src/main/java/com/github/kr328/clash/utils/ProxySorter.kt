@@ -2,37 +2,40 @@ package com.github.kr328.clash.utils
 
 import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.core.model.ProxyGroup
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class ProxySorter(val groupOrder: Order, val proxyOrder: Order) {
     enum class Order {
         DEFAULT, DELAY_INCREASE, DELAY_DECREASE, NAME_INCREASE, NAME_DECREASE
     }
 
-    fun sort(proxyGroup: List<ProxyGroup>): List<ProxyGroup> {
-        val global = proxyGroup.singleOrNull {
-            it.name == "GLOBAL"
-        }
-
-        val sortedGroup = when (groupOrder) {
-            Order.DEFAULT -> groupSortWithDefault(global, proxyGroup)
-            Order.DELAY_INCREASE -> groupSortWithDelay(true, proxyGroup)
-            Order.DELAY_DECREASE -> groupSortWithDelay(false, proxyGroup)
-            Order.NAME_INCREASE -> groupSortWithName(true, proxyGroup)
-            Order.NAME_DECREASE -> groupSortWithName(false, proxyGroup)
-        }
-
-        return sortedGroup.map {
-            val sortedProxy = when (proxyOrder) {
-                Order.DEFAULT -> it.proxies
-                Order.DELAY_INCREASE -> proxySortWithDelay(true, it.proxies)
-                Order.DELAY_DECREASE -> proxySortWithDelay(false, it.proxies)
-                Order.NAME_INCREASE -> proxySortWithName(true, it.proxies)
-                Order.NAME_DECREASE -> proxySortWithName(false, it.proxies)
+    suspend fun sort(proxyGroup: List<ProxyGroup>): List<ProxyGroup> =
+        withContext(Dispatchers.Default) {
+            val global = proxyGroup.singleOrNull {
+                it.name == "GLOBAL"
             }
 
-            it.copy(proxies = sortedProxy)
+            val sortedGroup = when (groupOrder) {
+                Order.DEFAULT -> groupSortWithDefault(global, proxyGroup)
+                Order.DELAY_INCREASE -> groupSortWithDelay(true, proxyGroup)
+                Order.DELAY_DECREASE -> groupSortWithDelay(false, proxyGroup)
+                Order.NAME_INCREASE -> groupSortWithName(true, proxyGroup)
+                Order.NAME_DECREASE -> groupSortWithName(false, proxyGroup)
+            }
+
+            sortedGroup.map {
+                val sortedProxy = when (proxyOrder) {
+                    Order.DEFAULT -> it.proxies
+                    Order.DELAY_INCREASE -> proxySortWithDelay(true, it.proxies)
+                    Order.DELAY_DECREASE -> proxySortWithDelay(false, it.proxies)
+                    Order.NAME_INCREASE -> proxySortWithName(true, it.proxies)
+                    Order.NAME_DECREASE -> proxySortWithName(false, it.proxies)
+                }
+
+                it.copy(proxies = sortedProxy)
+            }
         }
-    }
 
     private fun groupSortWithDefault(
         global: ProxyGroup?,

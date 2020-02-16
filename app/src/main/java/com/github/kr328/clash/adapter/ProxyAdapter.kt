@@ -1,5 +1,6 @@
 package com.github.kr328.clash.adapter
 
+import android.content.Context
 import android.graphics.Color
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -10,24 +11,43 @@ import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.kr328.clash.ProxiesActivity
 import com.github.kr328.clash.R
-import com.github.kr328.clash.core.utils.Log
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 
 
-class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>(), AbstractProxyAdapter {
-    private interface RenderInfo {
+class ProxyAdapter(
+    private val context: Context,
+    val onSelect: (String, String) -> Unit,
+    val onUrlTest: (String) -> Unit
+): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    companion object {
+        const val DEFAULT_SPAN_COUNT = 2
+    }
+
+    data class ProxyGroupInfo(
+        val name: String,
+        val proxies: List<ProxyInfo>
+    )
+
+    data class ProxyInfo(
+        val name: String,
+        val group: String,
+        val prefix: String,
+        val content: String,
+        val delay: Short,
+        val selectable: Boolean,
+        val active: Boolean
+    )
+
+    interface RenderInfo {
         val name: String
         val group: String
     }
 
-    private data class ProxyGroupRenderInfo(val info: AbstractProxyAdapter.ProxyGroupInfo) :
+    private data class ProxyGroupRenderInfo(val info: ProxyGroupInfo) :
         RenderInfo {
         override val name: String
             get() = info.name
@@ -35,15 +55,18 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
             get() = info.name
     }
 
-    private data class ProxyRenderInfo(val info: AbstractProxyAdapter.ProxyInfo) : RenderInfo {
+    private data class ProxyRenderInfo(val info: ProxyInfo) : RenderInfo {
         override val name: String
             get() = info.name
         override val group: String
             get() = info.group
     }
 
+
     private var rootMutex = Mutex()
-    private var renderList = emptyList<RenderInfo>()
+    private var urlTesting: Set<String> = emptySet()
+    private var renderList = mutableListOf<RenderInfo>()
+    private val activeList: MutableMap<String, Int> = mutableMapOf()
     @ColorInt
     private val colorSurface: Int
     @ColorInt
@@ -59,7 +82,7 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
         colorOnSurface = typedValue.data
     }
 
-    val layoutManager = GridLayoutManager(context, spanCount).apply {
+    val layoutManager = GridLayoutManager(context, DEFAULT_SPAN_COUNT).apply {
         spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (renderList[position]) {
@@ -71,12 +94,12 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
         }
     }
 
-    private var root = listOf<AbstractProxyAdapter.ProxyGroupInfo>()
-    override var onSelectProxyListener: suspend (String, String) -> Unit = { _, _ -> }
+    private var root = listOf<ProxyGroupInfo>()
 
     private class ProxyGroupHeader(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name)
         val urlTest: View = view.findViewById(R.id.urlTest)
+        val urlTestProgress: View = view.findViewById(R.id.urlTestProgress)
     }
 
     private class ProxyItem(view: View) : RecyclerView.ViewHolder(view) {
@@ -86,7 +109,7 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
         val delay: TextView = view.findViewById(R.id.delay)
     }
 
-    override suspend fun applyChange(newList: List<AbstractProxyAdapter.ProxyGroupInfo>) =
+    suspend fun applyChange(newList: List<ProxyGroupInfo>, testing: Set<String>) =
         withContext(Dispatchers.Default) {
             rootMutex.lock()
 
@@ -111,25 +134,26 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
 
             withContext(Dispatchers.Main) {
                 root = newList
-                renderList = newRenderList
-                result.dispatchUpdatesTo(this@GridProxyAdapter)
+                renderList = newRenderList.toMutableList()
+                urlTesting = testing
+                result.dispatchUpdatesTo(this@ProxyAdapter)
             }
 
             rootMutex.unlock()
         }
 
-    override suspend fun getGroupPosition(name: String): Int? {
+    suspend fun getGroupPosition(name: String): Int {
         return withContext(Dispatchers.Default) {
             renderList.mapIndexed { index, p ->
                 if (p is ProxyGroupRenderInfo && p.name == name)
                     index
                 else
                     -1
-            }.singleOrNull { it >= 0 }
+            }.singleOrNull() ?: -1
         }
     }
 
-    override suspend fun getCurrentGroup(): String {
+    fun getCurrentGroup(): String {
         val position = layoutManager.findFirstCompletelyVisibleItemPosition()
 
         if (position < 0)
@@ -161,7 +185,19 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
 
                 holder.name.text = current.info.name
                 holder.urlTest.setOnClickListener {
+                    holder.urlTest.visibility = View.GONE
+                    holder.urlTestProgress.visibility = View.VISIBLE
 
+                    onUrlTest(current.name)
+                }
+
+                if ( urlTesting.contains(current.name) ) {
+                    holder.urlTest.visibility = View.GONE
+                    holder.urlTestProgress.visibility = View.VISIBLE
+                }
+                else {
+                    holder.urlTest.visibility = View.VISIBLE
+                    holder.urlTestProgress.visibility = View.GONE
                 }
             }
             is ProxyItem -> {
@@ -170,13 +206,14 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
                 holder.prefix.text = current.info.prefix
                 holder.content.text = current.info.content
 
-
                 if (current.info.delay > 0)
                     holder.delay.text = current.info.delay.toString()
                 else
                     holder.delay.text = ""
 
                 if (current.info.active) {
+                    activeList[current.group] = position
+
                     holder.prefix.setTextColor(Color.WHITE)
                     holder.content.setTextColor(Color.WHITE)
                     holder.delay.setTextColor(Color.WHITE)
@@ -190,25 +227,17 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
 
                 if (current.info.selectable) {
                     holder.root.setOnClickListener {
-                        context.launch {
-                            rootMutex.lock()
-                            val n = withContext(Dispatchers.Default) {
-                                root.map {
-                                    if (it.name == current.group) {
-                                        it.copy(proxies = it.proxies.map { p ->
-                                            p.copy(active = p.name == current.name)
-                                        })
-                                    } else {
-                                        it
-                                    }
-                                }
-                            }
-                            rootMutex.unlock()
+                        val oldPosition = activeList[current.group] ?: return@setOnClickListener
+                        val old = renderList[oldPosition] as ProxyRenderInfo
+                        val new = renderList[position] as ProxyRenderInfo
 
-                            applyChange(n)
+                        renderList[oldPosition] = old.copy(info = old.info.copy(active = false))
+                        renderList[position] = new.copy(info = new.info.copy(active = true))
 
-                            onSelectProxyListener(current.group, current.name)
-                        }
+                        notifyItemChanged(oldPosition)
+                        notifyItemChanged(position)
+
+                        onSelect(current.group, current.name)
                     }
                     holder.root.isClickable = true
                     holder.root.isFocusable = true

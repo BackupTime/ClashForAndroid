@@ -89,7 +89,6 @@
             app:summary="@string/not_selected" />
 
         <LinearLayout
-            android:id="@+id/logs"
             android:padding="15dp"
             android:layout_marginStart="35dp"
             android:layout_marginEnd="30dp"
@@ -143,7 +142,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/feedback"
             android:padding="15dp"
             android:layout_marginStart="35dp"
             android:layout_marginEnd="30dp"
@@ -170,7 +168,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/about"
             android:padding="15dp"
             android:layout_marginStart="35dp"
             android:layout_marginEnd="30dp"

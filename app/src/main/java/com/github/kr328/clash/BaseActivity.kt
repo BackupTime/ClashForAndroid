@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.preference.UiPreferences
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.data.ClashProfileEntity
@@ -108,10 +107,10 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if ( super.onOptionsItemSelected(item) )
+        if (super.onOptionsItemSelected(item))
             return true
 
-        if ( item.itemId == android.R.id.home ) {
+        if (item.itemId == android.R.id.home) {
             onSupportNavigateUp()
             return true
         }
