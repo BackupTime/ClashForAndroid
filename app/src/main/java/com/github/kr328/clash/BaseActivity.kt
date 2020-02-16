@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.util.*
 
 abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     class EmptyBroadcastReceiver : BroadcastReceiver() {
@@ -55,6 +56,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     var menu: Menu? = null
     lateinit var uiPreference: UiPreferences
         private set
+    lateinit var language: String
 
     open suspend fun onClashStarted() {}
     open suspend fun onClashStopped(reason: String?) {}
@@ -81,16 +83,39 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         super.setContentView(base)
     }
 
+    override fun attachBaseContext(newBase: Context?) {
+        val base = newBase ?: return super.attachBaseContext(newBase)
+
+        uiPreference = UiPreferences(base)
+
+        language = uiPreference.get(UiPreferences.LANGUAGE)
+
+        val languageOverride = language.split("-")
+        if ( language.isEmpty() )
+            return super.attachBaseContext(base)
+
+        val configuration = base.resources.configuration
+        val localeOverride = if ( languageOverride.size == 2 )
+            Locale(languageOverride[0], languageOverride[1])
+        else
+            Locale(languageOverride[0])
+
+        configuration.setLocale(localeOverride)
+
+        super.attachBaseContext(base.createConfigurationContext(configuration))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        uiPreference = UiPreferences(this)
 
         resetLightNavigationBar()
     }
 
     override fun onStart() {
         super.onStart()
+
+        if ( language != uiPreference.get(UiPreferences.LANGUAGE) )
+            recreate()
 
         Broadcasts.register(receiver)
     }

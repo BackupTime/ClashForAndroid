@@ -11,10 +11,15 @@ class UiPreferences(context: Context) {
         const val PROXY_SORT_NAME = "name"
         const val PROXY_SORT_DELAY = "delay"
 
+        const val LANGUAGE_DEFAULT = ""
+        const val LANGUAGE_EN = "en"
+        const val LANGUAGE_ZH_CN = "zh-CN"
+
         val PROXY_GROUP_SORT = StringEntry("proxy_group_sort", PROXY_SORT_DEFAULT)
         val PROXY_PROXY_SORT = StringEntry("proxy_proxy_sort", PROXY_SORT_DEFAULT)
         val PROXY_LAST_SELECT_GROUP = StringEntry("proxy_last_select_group", "")
         val PROXY_MERGE_PREFIX = BooleanEntry("proxy_merge_prefix", true)
+        val LANGUAGE = StringEntry("language", "")
     }
 
     interface Entry<T> {
@@ -22,7 +27,7 @@ class UiPreferences(context: Context) {
         fun put(editor: SharedPreferences.Editor, value: T)
     }
 
-    class StringEntry(private val key: String, private val defaultValue: String? = null) :
+    class StringEntry(private val key: String, private val defaultValue: String) :
         Entry<String> {
         override fun get(sharedPreferences: SharedPreferences): String {
             return sharedPreferences.getString(key, defaultValue)!!
