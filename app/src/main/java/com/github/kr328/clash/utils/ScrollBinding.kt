@@ -1,7 +1,9 @@
 package com.github.kr328.clash.utils
 
 import android.content.Context
+import android.util.DisplayMetrics
 import androidx.recyclerview.widget.LinearSmoothScroller
+import com.github.kr328.clash.core.utils.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 
@@ -10,10 +12,10 @@ class ScrollBinding(
     private val callback: Callback
 ) {
     interface Callback {
-        suspend fun getCurrentMasterToken(): String
-        suspend fun onMasterTokenChanged(token: String)
-        suspend fun getMasterTokenPosition(token: String): Int
-        suspend fun doMasterScroll(scroller: LinearSmoothScroller)
+        fun getCurrentMasterToken(): String
+        fun onMasterTokenChanged(token: String)
+        fun getMasterTokenPosition(token: String): Int
+        fun doMasterScroll(scroller: LinearSmoothScroller)
     }
 
     private val updateChannel = Channel<Unit>(Channel.CONFLATED)
@@ -23,7 +25,7 @@ class ScrollBinding(
         updateChannel.offer(Unit)
     }
 
-    suspend fun scrollMaster(token: String) {
+    fun scrollMaster(token: String) {
         val position = callback.getMasterTokenPosition(token)
 
         if (position < 0)
@@ -46,6 +48,10 @@ class ScrollBinding(
                 preventSlaveScroll = true
             }
 
+            override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics?): Float {
+                return super.calculateSpeedPerPixel(displayMetrics) * 0.8f
+            }
+
             init {
                 targetPosition = position
             }
@@ -61,7 +67,7 @@ class ScrollBinding(
             updateChannel.receive()
 
             val currentToken = callback.getCurrentMasterToken()
-            if (lastToken == currentToken)
+            if (preventSlaveScroll || lastToken == currentToken)
                 continue
 
             lastToken = currentToken

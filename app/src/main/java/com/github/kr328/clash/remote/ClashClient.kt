@@ -17,7 +17,7 @@ class ClashClient(private val service: IClashManager) {
 
     suspend fun startHealthCheck(group: String) = withContext(Dispatchers.IO) {
         CompletableDeferred<Unit>().apply {
-            service.startHealthCheck(group, object: IStreamCallback.Stub() {
+            service.startHealthCheck(group, object : IStreamCallback.Stub() {
                 override fun complete() {
                     this@apply.complete(Unit)
                 }

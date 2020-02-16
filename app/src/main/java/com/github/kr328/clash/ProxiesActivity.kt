@@ -10,6 +10,7 @@ import com.github.kr328.clash.adapter.ProxyAdapter
 import com.github.kr328.clash.adapter.ProxyChipAdapter
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
+import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.preference.UiPreferences
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.utils.PrefixMerger
@@ -75,7 +76,7 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
         chipList.itemAnimator?.changeDuration = 0
 
         launch {
-            mainList.addOnScrollListener(object: RecyclerView.OnScrollListener(){
+            mainList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     scrollBinding.sendMasterScrolled()
                 }
@@ -318,24 +319,25 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
         }
     }
 
-    override suspend fun getCurrentMasterToken(): String {
+    override fun getCurrentMasterToken(): String {
         return mainListAdapter.getCurrentGroup()
     }
 
-    override suspend fun onMasterTokenChanged(token: String) {
+    override fun onMasterTokenChanged(token: String) {
+        chipListAdapter.selected = token
         val position = chipListAdapter.chips.indexOf(token)
 
         if (position < 0)
             return
 
-        chipList.scrollToPosition(position)
+        chipList.smoothScrollToPosition(position)
     }
 
-    override suspend fun getMasterTokenPosition(token: String): Int {
+    override fun getMasterTokenPosition(token: String): Int {
         return mainListAdapter.getGroupPosition(token)
     }
 
-    override suspend fun doMasterScroll(scroller: LinearSmoothScroller) {
+    override fun doMasterScroll(scroller: LinearSmoothScroller) {
         mainListAdapter.layoutManager.startSmoothScroll(scroller)
     }
 }

@@ -22,7 +22,7 @@ class ProxyAdapter(
     private val context: Context,
     val onSelect: (String, String) -> Unit,
     val onUrlTest: (String) -> Unit
-): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         const val DEFAULT_SPAN_COUNT = 2
     }
@@ -66,7 +66,8 @@ class ProxyAdapter(
     private var rootMutex = Mutex()
     private var urlTesting: Set<String> = emptySet()
     private var renderList = mutableListOf<RenderInfo>()
-    private val activeList: MutableMap<String, Int> = mutableMapOf()
+    private var activeList: MutableMap<String, Int> = mutableMapOf()
+    private var groupPosition: MutableMap<String, Int> = mutableMapOf()
     @ColorInt
     private val colorSurface: Int
     @ColorInt
@@ -132,25 +133,34 @@ class ProxyAdapter(
                 override fun getNewListSize(): Int = newRenderList.size
             })
 
+            val groupCache: MutableMap<String, Int> = mutableMapOf()
+            val activeCache: MutableMap<String, Int> = mutableMapOf()
+
+            newRenderList.forEachIndexed { index, it ->
+                when ( it ) {
+                    is ProxyGroupRenderInfo ->
+                        groupCache[it.name] = index
+                    is ProxyRenderInfo -> {
+                        if ( it.info.active )
+                            activeCache[it.name] = index
+                    }
+                }
+            }
+
             withContext(Dispatchers.Main) {
                 root = newList
                 renderList = newRenderList.toMutableList()
                 urlTesting = testing
+                groupPosition = groupCache
+                activeList = activeCache
                 result.dispatchUpdatesTo(this@ProxyAdapter)
             }
 
             rootMutex.unlock()
         }
 
-    suspend fun getGroupPosition(name: String): Int {
-        return withContext(Dispatchers.Default) {
-            renderList.mapIndexed { index, p ->
-                if (p is ProxyGroupRenderInfo && p.name == name)
-                    index
-                else
-                    -1
-            }.singleOrNull() ?: -1
-        }
+    fun getGroupPosition(name: String): Int {
+        return groupPosition[name] ?: -1
     }
 
     fun getCurrentGroup(): String {
@@ -183,6 +193,8 @@ class ProxyAdapter(
             is ProxyGroupHeader -> {
                 val current = renderList[position] as ProxyGroupRenderInfo
 
+                groupPosition[current.name] = position
+
                 holder.name.text = current.info.name
                 holder.urlTest.setOnClickListener {
                     holder.urlTest.visibility = View.GONE
@@ -191,11 +203,10 @@ class ProxyAdapter(
                     onUrlTest(current.name)
                 }
 
-                if ( urlTesting.contains(current.name) ) {
+                if (urlTesting.contains(current.name)) {
                     holder.urlTest.visibility = View.GONE
                     holder.urlTestProgress.visibility = View.VISIBLE
-                }
-                else {
+                } else {
                     holder.urlTest.visibility = View.VISIBLE
                     holder.urlTestProgress.visibility = View.GONE
                 }
@@ -209,7 +220,7 @@ class ProxyAdapter(
                 if (current.info.delay > 0)
                     holder.delay.text = current.info.delay.toString()
                 else
-                    holder.delay.text = ""
+                    holder.delay.text = if (current.info.selectable) "" else "N/A"
 
                 if (current.info.active) {
                     activeList[current.group] = position
