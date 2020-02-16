@@ -15,7 +15,8 @@ class UiPreferences(context: Context) {
 
         val PROXY_GROUP_SORT = StringEntry("proxy_group_sort", PROXY_SORT_DEFAULT)
         val PROXY_PROXY_SORT = StringEntry("proxy_proxy_sort", PROXY_SORT_DEFAULT)
-        val LAST_SELECT_GROUP = StringEntry("last_select_group", "")
+        val PROXY_LAST_SELECT_GROUP = StringEntry("proxy_last_select_group", "")
+        val PROXY_MERGE_PREFIX = BooleanEntry("proxy_merge_prefix", true)
     }
 
     interface Entry<T> {
@@ -31,6 +32,17 @@ class UiPreferences(context: Context) {
 
         override fun put(editor: SharedPreferences.Editor, value: String) {
             editor.putString(key, value)
+        }
+    }
+
+    class BooleanEntry(private val key: String, private val defaultValue: Boolean = false):
+            Entry<Boolean> {
+        override fun get(sharedPreferences: SharedPreferences): Boolean {
+            return sharedPreferences.getBoolean(key, defaultValue)
+        }
+
+        override fun put(editor: SharedPreferences.Editor, value: Boolean) {
+            editor.putBoolean(key, value)
         }
     }
 

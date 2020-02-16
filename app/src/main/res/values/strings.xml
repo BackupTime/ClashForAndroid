@@ -84,6 +84,8 @@
     <string name="sort_group">Sort Group</string>
     <string name="sort_proxy">Sort Proxy</string>
     <string name="default_">Default</string>
+    <string name="utils">Utils</string>
+    <string name="merge_prefix">Merge Prefix</string>
 
     <string name="start_url_provider_failure">Start URL Provider Failure</string>
 

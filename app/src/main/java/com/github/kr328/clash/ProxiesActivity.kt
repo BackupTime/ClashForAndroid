@@ -8,20 +8,22 @@ import com.github.kr328.clash.adapter.AbstractProxyAdapter
 import com.github.kr328.clash.adapter.GridProxyAdapter
 import com.github.kr328.clash.adapter.ProxyChipAdapter
 import com.github.kr328.clash.core.model.General
-import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.preference.UiPreferences
 import com.github.kr328.clash.remote.withClash
+import com.github.kr328.clash.utils.PrefixMerger
 import com.github.kr328.clash.utils.ProxySorter
 import com.github.kr328.clash.view.ProxiesTabMediator
 import kotlinx.android.synthetic.main.activity_proxies.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ProxiesActivity : BaseActivity() {
     private lateinit var mediator: ProxiesTabMediator
     private val doScrollToLastProxy by lazy {
-        val selected = uiPreference.get(UiPreferences.LAST_SELECT_GROUP)
+        val selected = uiPreference.get(UiPreferences.PROXY_LAST_SELECT_GROUP)
 
         launch {
             mediator.scrollToDirect(selected)
@@ -63,7 +65,10 @@ class ProxiesActivity : BaseActivity() {
 
     override fun onStop() {
         uiPreference.edit {
-            put(UiPreferences.LAST_SELECT_GROUP, (chipList.adapter!! as ProxyChipAdapter).selected)
+            put(
+                UiPreferences.PROXY_LAST_SELECT_GROUP,
+                (chipList.adapter!! as ProxyChipAdapter).selected
+            )
         }
 
         super.onStop()
@@ -136,6 +141,17 @@ class ProxiesActivity : BaseActivity() {
                         put(UiPreferences.PROXY_PROXY_SORT, UiPreferences.PROXY_SORT_DELAY)
                     }
                 }
+                R.id.utilsMergePrefix -> {
+                    item.isChecked = !item.isChecked
+
+                    uiPreference.edit {
+                        put(UiPreferences.PROXY_MERGE_PREFIX, item.isChecked)
+                    }
+
+                    refreshList()
+
+                    return@launch
+                }
                 else -> return@launch
             }
 
@@ -182,6 +198,9 @@ class ProxiesActivity : BaseActivity() {
                     UiPreferences.PROXY_SORT_DELAY ->
                         findItem(R.id.proxyDelay).isChecked = true
                 }
+
+                findItem(R.id.utilsMergePrefix).isChecked =
+                    uiPreference.get(UiPreferences.PROXY_MERGE_PREFIX)
             }
         }
     }
@@ -194,6 +213,16 @@ class ProxiesActivity : BaseActivity() {
             val proxies = withClash {
                 queryAllProxyGroups()
             }
+
+            val prefix = if (uiPreference.get(UiPreferences.PROXY_MERGE_PREFIX)) {
+                proxies.map {
+                    async { PrefixMerger.merge(it.proxies.map { p -> it.name to p.name }) { it.second } }
+                }.flatMap {
+                    it.await()
+                }.map {
+                    it.value to it
+                }.toMap()
+            } else emptyMap()
 
             val groupSort = when (uiPreference.get(UiPreferences.PROXY_GROUP_SORT)) {
                 UiPreferences.PROXY_SORT_DEFAULT ->
@@ -218,7 +247,7 @@ class ProxiesActivity : BaseActivity() {
             val sorter = ProxySorter(groupSort, proxySort)
 
             val sorted = withContext(Dispatchers.Default) {
-                sorter.sort(proxies.toList())
+                sorter.sort(proxies)
             }.run {
                 when (general.mode) {
                     General.Mode.GLOBAL -> this
@@ -227,11 +256,29 @@ class ProxiesActivity : BaseActivity() {
                 }
             }
 
-            (mainList.adapter!! as AbstractProxyAdapter).apply {
-                root = sorted
+            val newList = withContext(Dispatchers.Default) {
+                sorted.map {
+                    AbstractProxyAdapter.ProxyGroupInfo(it.name,
+                        it.proxies.map { p ->
+                            val r = prefix.getOrElse(it.name to p.name) {
+                                PrefixMerger.Result(p.name, "", p)
+                            }
 
-                applyChange()
+                            AbstractProxyAdapter.ProxyInfo(
+                                p.name,
+                                it.name,
+                                r.prefix,
+                                if (r.content.isEmpty()) p.type.toString() else r.content,
+                                p.delay.toShort(),
+                                it.type == Proxy.Type.SELECT,
+                                p.name == it.current
+                            )
+                        }
+                    )
+                }
             }
+
+            (mainList.adapter!! as AbstractProxyAdapter).applyChange(newList)
 
             (chipList.adapter!! as ProxyChipAdapter).apply {
                 chips = sorted.map { it.name }

@@ -12,11 +12,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.ProxiesActivity
 import com.github.kr328.clash.R
-import com.github.kr328.clash.core.model.Proxy
-import com.github.kr328.clash.core.model.ProxyGroup
+import com.github.kr328.clash.core.utils.Log
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 
 
@@ -27,20 +27,22 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
         val group: String
     }
 
-    private data class ProxyGroupInfo(override val name: String) : RenderInfo {
+    private data class ProxyGroupRenderInfo(val info: AbstractProxyAdapter.ProxyGroupInfo) :
+        RenderInfo {
+        override val name: String
+            get() = info.name
         override val group: String
-            get() = name
+            get() = info.name
     }
 
-    private data class ProxyInfo(
-        override val name: String,
-        val type: Proxy.Type,
-        override val group: String,
-        val selectable: Boolean,
-        val delay: Short,
-        val active: Boolean
-    ) : RenderInfo
+    private data class ProxyRenderInfo(val info: AbstractProxyAdapter.ProxyInfo) : RenderInfo {
+        override val name: String
+            get() = info.name
+        override val group: String
+            get() = info.group
+    }
 
+    private var rootMutex = Mutex()
     private var renderList = emptyList<RenderInfo>()
     @ColorInt
     private val colorSurface: Int
@@ -61,15 +63,15 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
         spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (renderList[position]) {
-                    is ProxyGroupInfo -> spanCount
-                    is ProxyInfo -> 1
+                    is ProxyGroupRenderInfo -> spanCount
+                    is ProxyRenderInfo -> 1
                     else -> throw IllegalArgumentException()
                 }
             }
         }
     }
 
-    override var root = listOf<ProxyGroup>()
+    private var root = listOf<AbstractProxyAdapter.ProxyGroupInfo>()
     override var onSelectProxyListener: suspend (String, String) -> Unit = { _, _ -> }
 
     private class ProxyGroupHeader(view: View) : RecyclerView.ViewHolder(view) {
@@ -79,50 +81,47 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
 
     private class ProxyItem(view: View) : RecyclerView.ViewHolder(view) {
         val root: MaterialCardView = view.findViewById(R.id.root)
-        val name: TextView = view.findViewById(R.id.name)
-        val type: TextView = view.findViewById(R.id.type)
+        val prefix: TextView = view.findViewById(R.id.prefix)
+        val content: TextView = view.findViewById(R.id.content)
         val delay: TextView = view.findViewById(R.id.delay)
     }
 
-    override suspend fun applyChange() = withContext(Dispatchers.Default) {
-        val newRenderList = root
-            .flatMap {
-                listOf(ProxyGroupInfo(it.name)) + it.proxies.map { p ->
-                    ProxyInfo(
-                        p.name,
-                        p.type,
-                        it.name,
-                        it.type == Proxy.Type.SELECT,
-                        p.delay.toShort(),
-                        it.current == p.name
-                    )
+    override suspend fun applyChange(newList: List<AbstractProxyAdapter.ProxyGroupInfo>) =
+        withContext(Dispatchers.Default) {
+            rootMutex.lock()
+
+            val newRenderList = newList
+                .flatMap {
+                    listOf(ProxyGroupRenderInfo(it)) + it.proxies.map { p -> ProxyRenderInfo(p) }
                 }
+
+            val oldRenderList = renderList
+
+            val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+                    oldRenderList[oldItemPosition]::class == newRenderList[newItemPosition]::class &&
+                            oldRenderList[oldItemPosition].name == newRenderList[newItemPosition].name
+
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+                    oldRenderList[oldItemPosition] == newRenderList[newItemPosition]
+
+                override fun getOldListSize(): Int = oldRenderList.size
+                override fun getNewListSize(): Int = newRenderList.size
+            })
+
+            withContext(Dispatchers.Main) {
+                root = newList
+                renderList = newRenderList
+                result.dispatchUpdatesTo(this@GridProxyAdapter)
             }
 
-        val oldRenderList = renderList
-
-        val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-                oldRenderList[oldItemPosition]::class == newRenderList[newItemPosition]::class &&
-                        oldRenderList[oldItemPosition].name == newRenderList[newItemPosition].name
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-                oldRenderList[oldItemPosition] == newRenderList[newItemPosition]
-
-            override fun getOldListSize(): Int = oldRenderList.size
-            override fun getNewListSize(): Int = newRenderList.size
-        })
-
-        withContext(Dispatchers.Main) {
-            renderList = newRenderList
-            result.dispatchUpdatesTo(this@GridProxyAdapter)
+            rootMutex.unlock()
         }
-    }
 
     override suspend fun getGroupPosition(name: String): Int? {
         return withContext(Dispatchers.Default) {
             renderList.mapIndexed { index, p ->
-                if (p is ProxyGroupInfo && p.name == name)
+                if (p is ProxyGroupRenderInfo && p.name == name)
                     index
                 else
                     -1
@@ -158,49 +157,55 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ProxyGroupHeader -> {
-                val current = renderList[position] as ProxyGroupInfo
+                val current = renderList[position] as ProxyGroupRenderInfo
 
-                holder.name.text = current.name
+                holder.name.text = current.info.name
                 holder.urlTest.setOnClickListener {
 
                 }
             }
             is ProxyItem -> {
-                val current = renderList[position] as ProxyInfo
+                val current = renderList[position] as ProxyRenderInfo
 
-                holder.name.text = current.name
-                holder.type.text = current.type.toString()
+                holder.prefix.text = current.info.prefix
+                holder.content.text = current.info.content
 
 
-                if (current.delay > 0)
-                    holder.delay.text = current.delay.toString()
+                if (current.info.delay > 0)
+                    holder.delay.text = current.info.delay.toString()
                 else
-                    holder.delay.text = "N/A"
+                    holder.delay.text = ""
 
-                if (current.active) {
-                    holder.name.setTextColor(Color.WHITE)
-                    holder.type.setTextColor(Color.WHITE)
+                if (current.info.active) {
+                    holder.prefix.setTextColor(Color.WHITE)
+                    holder.content.setTextColor(Color.WHITE)
                     holder.delay.setTextColor(Color.WHITE)
                     holder.root.setCardBackgroundColor(context.getColor(R.color.primaryCardColorStarted))
                 } else {
-                    holder.name.setTextColor(colorOnSurface)
-                    holder.type.setTextColor(colorOnSurface)
+                    holder.prefix.setTextColor(colorOnSurface)
+                    holder.content.setTextColor(colorOnSurface)
                     holder.delay.setTextColor(colorOnSurface)
                     holder.root.setCardBackgroundColor(colorSurface)
                 }
 
-                if (current.selectable) {
+                if (current.info.selectable) {
                     holder.root.setOnClickListener {
-                        root = root.map {
-                            if (it.name == current.group) {
-                                it.copy(current = current.name)
-                            } else {
-                                it
-                            }
-                        }
-
                         context.launch {
-                            applyChange()
+                            rootMutex.lock()
+                            val n = withContext(Dispatchers.Default) {
+                                root.map {
+                                    if (it.name == current.group) {
+                                        it.copy(proxies = it.proxies.map { p ->
+                                            p.copy(active = p.name == current.name)
+                                        })
+                                    } else {
+                                        it
+                                    }
+                                }
+                            }
+                            rootMutex.unlock()
+
+                            applyChange(n)
 
                             onSelectProxyListener(current.group, current.name)
                         }
@@ -219,8 +224,8 @@ class GridProxyAdapter(private val context: ProxiesActivity, spanCount: Int = 2)
     override fun getItemCount(): Int = renderList.size
     override fun getItemViewType(position: Int): Int {
         return when (renderList[position]) {
-            is ProxyGroupInfo -> 1
-            is ProxyInfo -> 2
+            is ProxyGroupRenderInfo -> 1
+            is ProxyRenderInfo -> 2
             else -> throw IllegalArgumentException()
         }
     }

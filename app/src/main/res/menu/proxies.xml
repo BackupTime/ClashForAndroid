@@ -28,4 +28,11 @@
             </group>
         </menu>
     </item>
+    <item android:title="@string/utils">
+        <menu>
+            <group android:checkableBehavior="all">
+                <item android:id="@+id/utilsMergePrefix" android:title="@string/merge_prefix"/>
+            </group>
+        </menu>
+    </item>
 </menu>

@@ -1,12 +1,23 @@
 package com.github.kr328.clash.adapter
 
-import com.github.kr328.clash.core.model.ProxyGroup
-
 interface AbstractProxyAdapter {
-    var root: List<ProxyGroup>
+    data class ProxyGroupInfo(
+        val name: String,
+        val proxies: List<ProxyInfo>
+    )
+    data class ProxyInfo(
+        val name: String,
+        val group: String,
+        val prefix: String,
+        val content: String,
+        val delay: Short,
+        val selectable: Boolean,
+        val active: Boolean
+    )
+
     var onSelectProxyListener: suspend (String, String) -> Unit
 
-    suspend fun applyChange()
+    suspend fun applyChange(newList: List<ProxyGroupInfo>)
     suspend fun getGroupPosition(name: String): Int?
     suspend fun getCurrentGroup(): String
 }
