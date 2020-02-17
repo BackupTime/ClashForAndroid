@@ -69,6 +69,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             while (isActive) {
                 val d = defaultNetworkChannel.receive()
 
+                Log.i("Network changed to ${d?.second}")
+
                 if ( d == null ) {
                     setUnderlyingNetworks(null)
                     continue

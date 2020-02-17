@@ -11,6 +11,7 @@ import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.sync.Mutex
 
 class ClashService : BaseService() {
     companion object {
@@ -20,6 +21,7 @@ class ClashService : BaseService() {
         var isServiceRunning = false
     }
 
+    private val loadLock = Mutex()
     private val service = this
     private lateinit var notification: ClashNotification
     private var stopReason: String? = null
@@ -96,10 +98,13 @@ class ClashService : BaseService() {
     }
 
     private suspend fun reloadProfile() {
-        val active = ClashDatabase.getInstance(service).openClashProfileDao()
-            .queryActiveProfile() ?: return stopSelf("Empty active profile")
+        if ( !loadLock.tryLock() )
+            return
 
         try {
+            val active = ClashDatabase.getInstance(service).openClashProfileDao()
+                .queryActiveProfile() ?: return stopSelf("Empty active profile")
+
             Clash.loadProfile(
                 resolveProfile(active.id),
                 resolveBase(active.id)
@@ -115,6 +120,8 @@ class ClashService : BaseService() {
             broadcastProfileLoaded(this, active)
         } catch (e: Exception) {
             stopSelf("Load profile failure")
+        } finally {
+            loadLock.unlock()
         }
     }
 
