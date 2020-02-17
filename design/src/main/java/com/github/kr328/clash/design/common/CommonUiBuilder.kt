@@ -2,6 +2,7 @@ package com.github.kr328.clash.design.common
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.view.View
 
 class CommonUiBuilder(val screen: CommonUiScreen) {
     val context: Context
@@ -49,5 +50,35 @@ class CommonUiBuilder(val screen: CommonUiScreen) {
         setup(option)
 
         screen.addElement(option)
+    }
+
+    fun category(
+        text: String = "",
+        showTopSeparator: Boolean = false,
+        showBottomSeparator: Boolean = false,
+        id: String? = null,
+        setup: Category.() -> Unit = {}
+    ) {
+        val category = Category(screen)
+
+        category.text = text
+        category.showTopSeparator = showTopSeparator
+        category.showBottomSeparator = showBottomSeparator
+        category.id = id
+
+        setup(category)
+
+        screen.addElement(category)
+    }
+
+    fun custom(
+        view: View,
+        setup: Custom.() -> Unit
+    ) {
+        val custom = Custom(screen, view)
+
+        setup(custom)
+
+        screen.addElement(custom)
     }
 }

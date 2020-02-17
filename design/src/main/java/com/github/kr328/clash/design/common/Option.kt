@@ -48,11 +48,6 @@ class Option(screen: CommonUiScreen): Base(screen) {
         this.click = block
     }
 
-    override fun applyAttribute(enabled: Boolean, hidden: Boolean) {
-        view.isEnabled = enabled
-        view.visibility = if ( hidden ) View.GONE else View.VISIBLE
-    }
-
     override fun saveState(bundle: Bundle) {}
     override fun restoreState(bundle: Bundle) {}
 }

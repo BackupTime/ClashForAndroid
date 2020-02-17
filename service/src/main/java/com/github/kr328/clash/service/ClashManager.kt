@@ -59,6 +59,10 @@ class ClashManager(context: Context, parent: CoroutineScope) :
         require(callback != null)
 
         Clash.openLogEvent().apply {
+            callback.asBinder()?.linkToDeath({
+                close()
+            }, 0)
+
             onEvent {
                 try {
                     callback.send(ParcelableContainer(it))

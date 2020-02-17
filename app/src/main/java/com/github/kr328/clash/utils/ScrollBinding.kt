@@ -3,7 +3,6 @@ package com.github.kr328.clash.utils
 import android.content.Context
 import android.util.DisplayMetrics
 import androidx.recyclerview.widget.LinearSmoothScroller
-import com.github.kr328.clash.core.utils.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 

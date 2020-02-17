@@ -16,8 +16,6 @@ suspend fun broadcastProfileChanged(context: Context) {
         .putExtra(Intents.INTENT_EXTRA_PROFILE_ACTIVE, active)
 
     context.sendBroadcastSelf(intent)
-
-    Log.d("Broadcasting $intent")
 }
 
 fun broadcastClashStarted(context: Context) {

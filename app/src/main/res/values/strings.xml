@@ -16,6 +16,7 @@
     <string name="logs">Logs</string>
     <string name="settings">Settings</string>
     <string name="feedback">Feedback</string>
+    <string name="support">Support</string>
     <string name="about">About</string>
 
     <string name="unknown">Unknown</string>
@@ -49,6 +50,8 @@
     <string name="update">Update</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="export">Export</string>
+    <string name="send">Send</string>
     <string name="properties">Properties</string>
     <string name="duplicate">Duplicate</string>
     <string name="reset_provider">Reset Providers</string>
@@ -84,4 +87,18 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
+    <string name="clash_logcat">Clash Logcat</string>
+    <string name="capturing_clash_log">Capturing clash core log</string>
+    <string name="history">History</string>
+    <string name="enabled">Enabled</string>
+    <string name="log_viewer">Log Viewer</string>
+    <string name="format_date_time">%s %s</string>
+    <string name="format_export_log_name">%s %s.log</string>
+
+    <string name="delete_all_logs">Delete All Logs</string>
+    <string name="delete_all_logs_warn">All historical logs will *LOST*</string>
+    <string name="delete_log">Delete Log</string>
+    <string name="delete_log_warn">%s will be deleted</string>
+    <string name="open_log_failure">Open Log File Failure</string>
+    <string name="file_exported">File Exported</string>
 </resources>

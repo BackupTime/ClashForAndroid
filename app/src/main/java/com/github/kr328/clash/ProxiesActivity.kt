@@ -10,7 +10,6 @@ import com.github.kr328.clash.adapter.ProxyAdapter
 import com.github.kr328.clash.adapter.ProxyChipAdapter
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
-import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.preference.UiPreferences
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.utils.PrefixMerger

@@ -32,5 +32,8 @@ abstract class Base(val screen: CommonUiScreen) {
     abstract val view: View
     abstract fun saveState(bundle: Bundle)
     abstract fun restoreState(bundle: Bundle)
-    protected abstract fun applyAttribute(enabled: Boolean, hidden: Boolean)
+    protected open fun applyAttribute(enabled: Boolean, hidden: Boolean) {
+        view.isEnabled = enabled
+        view.visibility = if ( hidden ) View.GONE else View.VISIBLE
+    }
 }

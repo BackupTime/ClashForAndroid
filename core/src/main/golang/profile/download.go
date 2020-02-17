@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"syscall"
 
 	"github.com/Dreamacro/clash/adapters/inbound"
 	"github.com/Dreamacro/clash/component/socks5"
@@ -59,7 +60,10 @@ func DownloadAndCheck(url, output, baseDir string) error {
 }
 
 func ReadAndCheck(fd int, output, baseDir string) error {
+	syscall.SetNonblock(fd, true)
+
 	file := os.NewFile(uintptr(fd), "/dev/null")
+	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {

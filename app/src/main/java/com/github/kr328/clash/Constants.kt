@@ -4,6 +4,10 @@ object Constants {
     const val PREFERENCE_NAME_APP = "app"
     const val PREFERENCE_KEY_LAST_INSTALL = "last_install"
 
+    const val LOG_DIR_NAME = "logs"
+
+    const val FILE_PROVIDER_AUTH = BuildConfig.APPLICATION_ID + ".files"
+
     const val URL_PROVIDER_TYPE_FILE = "file"
     const val URL_PROVIDER_TYPE_URL = "url"
     const val URL_PROVIDER_TYPE_EXTERNAL = "external"

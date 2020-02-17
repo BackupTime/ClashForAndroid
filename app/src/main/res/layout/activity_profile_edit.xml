@@ -17,25 +17,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
-                android:layout_gravity="end"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:focusable="true"
-                android:clickable="true">
+                android:layout_gravity="end">
 
                 <View
                     android:id="@+id/save"
                     android:padding="10dp"
-                    android:background="@drawable/ic_save"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center" />
+                    android:foreground="@drawable/ic_save"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:focusable="true"
+                    android:clickable="true"/>
 
                 <ProgressBar
                     android:id="@+id/saving"
                     android:visibility="invisible"
                     android:layout_gravity="center"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:indeterminate="true" />
             </FrameLayout>
         </androidx.appcompat.widget.Toolbar>

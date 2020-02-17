@@ -64,10 +64,12 @@ class ProfileProcessor(private val context: Context) {
             baseDir.mkdirs()
 
             if (source.scheme == "content" || source.scheme == "file") {
-                val fd = context.contentResolver.openFileDescriptor(source, "r")
+                val parcelFileDescriptor = context.contentResolver.openFileDescriptor(source, "r")
                     ?: throw FileNotFoundException("Unable to open file $source")
 
-                Clash.downloadProfile(fd.fd, target, baseDir).await()
+                val fd = parcelFileDescriptor.detachFd()
+
+                Clash.downloadProfile(fd, target, baseDir).await()
             } else {
                 Clash.downloadProfile(source.toString(), target, baseDir).await()
             }

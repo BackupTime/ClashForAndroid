@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.github.kr328.clash">
 
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".MainApplication"
@@ -19,7 +19,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/launch_name"
-            android:configChanges="uiMode">
+            android:configChanges="uiMode"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -51,5 +52,20 @@
             android:label="@string/proxy"
             android:exported="false"
             android:configChanges="uiMode" />
+        <activity
+            android:name=".LogsActivity"
+            android:label="@string/logs"
+            android:exported="false"
+            android:configChanges="uiMode" />
+        <activity
+            android:name=".LogViewerActivity"
+            android:label="@string/log_viewer"
+            android:exported="false"
+            android:configChanges="uiMode"
+            android:launchMode="singleTask"/>
+        <service
+            android:name=".LogcatService"
+            android:exported="false"
+            android:label="@string/clash_logcat" />
     </application>
 </manifest>

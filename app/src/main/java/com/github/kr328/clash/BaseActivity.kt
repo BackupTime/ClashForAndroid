@@ -91,11 +91,11 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         language = uiPreference.get(UiPreferences.LANGUAGE)
 
         val languageOverride = language.split("-")
-        if ( language.isEmpty() )
+        if (language.isEmpty())
             return super.attachBaseContext(base)
 
         val configuration = base.resources.configuration
-        val localeOverride = if ( languageOverride.size == 2 )
+        val localeOverride = if (languageOverride.size == 2)
             Locale(languageOverride[0], languageOverride[1])
         else
             Locale(languageOverride[0])
@@ -114,7 +114,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun onStart() {
         super.onStart()
 
-        if ( language != uiPreference.get(UiPreferences.LANGUAGE) )
+        if (language != uiPreference.get(UiPreferences.LANGUAGE))
             recreate()
 
         Broadcasts.register(receiver)
@@ -146,7 +146,6 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun setSupportActionBar(toolbar: Toolbar?) {
         super.setSupportActionBar(toolbar)
 
-        supportActionBar?.setDisplayShowHomeEnabled(shouldDisplayHomeAsUpEnabled())
         supportActionBar?.setDisplayHomeAsUpEnabled(shouldDisplayHomeAsUpEnabled())
     }
 

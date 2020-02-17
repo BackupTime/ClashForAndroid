@@ -137,11 +137,11 @@ class ProxyAdapter(
             val activeCache: MutableMap<String, Int> = mutableMapOf()
 
             newRenderList.forEachIndexed { index, it ->
-                when ( it ) {
+                when (it) {
                     is ProxyGroupRenderInfo ->
                         groupCache[it.name] = index
                     is ProxyRenderInfo -> {
-                        if ( it.info.active )
+                        if (it.info.active)
                             activeCache[it.name] = index
                     }
                 }
