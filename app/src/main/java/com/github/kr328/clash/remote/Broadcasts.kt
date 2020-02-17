@@ -17,7 +17,8 @@ object Broadcasts {
     interface Receiver {
         fun onStarted()
         fun onStopped(cause: String?)
-        fun onProfileChanged(active: ClashProfileEntity?)
+        fun onProfileChanged()
+        fun onProfileLoaded(profileEntity: ClashProfileEntity)
     }
 
     var clashRunning: Boolean = false
@@ -45,8 +46,16 @@ object Broadcasts {
                 }
                 Intents.INTENT_ACTION_PROFILE_CHANGED ->
                     receivers.forEach {
-                        it.onProfileChanged(intent.getParcelableExtra(Intents.INTENT_EXTRA_PROFILE_ACTIVE))
+                        it.onProfileChanged()
                     }
+                Intents.INTENT_ACTION_PROFILE_LOADED -> {
+                    val profile = intent
+                        .getParcelableExtra<ClashProfileEntity>(Intents.INTENT_EXTRA_PROFILE) ?: return
+
+                    receivers.forEach {
+                        it.onProfileLoaded(profile)
+                    }
+                }
             }
         }
     }
@@ -66,6 +75,7 @@ object Broadcasts {
                     addAction(Intents.INTENT_ACTION_PROFILE_CHANGED)
                     addAction(Intents.INTENT_ACTION_CLASH_STOPPED)
                     addAction(Intents.INTENT_ACTION_CLASH_STARTED)
+                    addAction(Intents.INTENT_ACTION_PROFILE_LOADED)
                 })
 
                 val pong = application.contentResolver.call(

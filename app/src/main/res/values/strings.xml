@@ -9,9 +9,12 @@
 
     <string name="proxy">Proxy</string>
     <string name="direct_mode">Direct Mode</string>
+    <string name="rule_mode">Rule Mode</string>
+    <string name="global_mode">Global Mode</string>
 
     <string name="profiles">Profiles</string>
     <string name="not_selected">Not selected</string>
+    <string name="format_profile_activated">%s Activated</string>
 
     <string name="logs">Logs</string>
     <string name="settings">Settings</string>

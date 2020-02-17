@@ -79,11 +79,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override suspend fun onClashProfileChanged(active: ClashProfileEntity?) {
-        super.onClashProfileChanged(active)
-
-        Log.d("Broadcast received")
-
+    override suspend fun onClashProfileChanged() {
         reloadProfiles()
     }
 

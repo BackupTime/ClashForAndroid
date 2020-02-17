@@ -92,9 +92,9 @@ class ClashService : BaseService() {
         super.onDestroy()
     }
 
-    private suspend fun reloadProfile() = withContext(Dispatchers.IO) {
+    private suspend fun reloadProfile() {
         val active = ClashDatabase.getInstance(service).openClashProfileDao()
-            .queryActiveProfile() ?: return@withContext stopSelf("Empty active profile")
+            .queryActiveProfile() ?: return stopSelf("Empty active profile")
 
         try {
             Clash.loadProfile(
@@ -108,6 +108,8 @@ class ClashService : BaseService() {
                 }
 
             notification.setProfile(active.name)
+
+            broadcastProfileLoaded(this, active)
         } catch (e: Exception) {
             stopSelf("Load profile failure")
         }

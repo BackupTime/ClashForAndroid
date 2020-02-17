@@ -40,9 +40,15 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
             }
         }
 
-        override fun onProfileChanged(active: ClashProfileEntity?) {
+        override fun onProfileChanged() {
             launch {
-                onClashProfileChanged(active)
+                onClashProfileChanged()
+            }
+        }
+
+        override fun onProfileLoaded(profileEntity: ClashProfileEntity) {
+            launch {
+                onClashProfileLoaded(profileEntity)
             }
         }
     }
@@ -60,7 +66,8 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
 
     open suspend fun onClashStarted() {}
     open suspend fun onClashStopped(reason: String?) {}
-    open suspend fun onClashProfileChanged(active: ClashProfileEntity?) {}
+    open suspend fun onClashProfileChanged() {}
+    open suspend fun onClashProfileLoaded(profile: ClashProfileEntity) {}
 
     override fun setContentView(layoutResID: Int) {
         val base = CoordinatorLayout(this).apply {

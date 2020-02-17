@@ -5,9 +5,12 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
 import android.view.View
+import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.remote.withClash
+import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.service.ClashService
+import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.service.util.startForegroundServiceCompat
 import kotlinx.android.synthetic.main.activity_main.*
@@ -86,6 +89,10 @@ class MainActivity : BaseActivity() {
             makeSnackbarException(getString(R.string.clash_start_failure), reason)
     }
 
+    override suspend fun onClashProfileLoaded(profile: ClashProfileEntity) {
+        updateClashStatus()
+    }
+
     private fun startBandwidthPolling() {
         if (bandwidthJob != null)
             return
@@ -130,6 +137,30 @@ class MainActivity : BaseActivity() {
             status.summary = getText(R.string.tap_to_start)
 
             proxies.visibility = View.GONE
+        }
+
+        launch {
+            val general = withClash {
+                queryGeneral()
+            }
+            val active = withProfile {
+                queryActiveProfile()
+            }
+
+            val modeResId = when ( general.mode ) {
+                General.Mode.DIRECT -> R.string.direct_mode
+                General.Mode.GLOBAL -> R.string.global_mode
+                General.Mode.RULE -> R.string.rule_mode
+            }
+
+            val profileString =
+                if ( active == null )
+                    getText(R.string.not_selected)
+                else
+                    getString(R.string.format_profile_activated, active.name)
+
+            proxies.summary = getText(modeResId)
+            profiles.summary = profileString
         }
     }
 }
