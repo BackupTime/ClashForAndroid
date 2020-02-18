@@ -91,7 +91,7 @@
     <string name="cancel">Cancel</string>
 
     <string name="clash_logcat">Clash Logcat</string>
-    <string name="capturing_clash_log">Capturing clash core log</string>
+    <string name="capturing_clash_log">Capturing logs</string>
     <string name="history">History</string>
     <string name="enabled">Enabled</string>
     <string name="log_viewer">Log Viewer</string>

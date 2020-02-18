@@ -11,6 +11,8 @@ class Settings(private val clashManager: IClashManager) {
         val ACCESS_CONTROL_PACKAGES = PackageListSetting("access_control_packages", emptyList())
         val DNS_HIJACKING = BooleanSetting("dns_hijacking", true)
         val NOTIFICATION_REFRESH = BooleanSetting("notification_refresh", true)
+        val AUTO_ADD_SYSTEM_DNS = BooleanSetting("auto_add_system_dns", true)
+        val OVERRIDE_DNS = BooleanSetting("override_dns", true)
     }
 
     fun put(key: String, value: String) {

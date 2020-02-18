@@ -5,7 +5,10 @@ import android.os.Build
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkChannel
+import com.github.kr328.clash.service.util.broadcastNetworkChanged
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.broadcast
+import java.net.InetAddress
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
@@ -40,9 +43,9 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
         Log.i("TunService.startTun ${fd.fd}")
 
-        Clash.startTunDevice(fd.fd, VPN_MTU, dnsAddress) {
-            stopSelf()
-        }
+        Clash.setDnsOverrideEnabled(settings.get(Settings.OVERRIDE_DNS))
+
+        Clash.startTunDevice(fd.fd, VPN_MTU, dnsAddress, this::protect, this::stopSelf)
 
         fd.close()
     }
@@ -64,7 +67,24 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             }
 
             while (isActive) {
-                setUnderlyingNetworks(defaultNetworkChannel.receive()?.let { arrayOf(it) })
+                val d = defaultNetworkChannel.receive()
+
+                if ( d == null ) {
+                    setUnderlyingNetworks(null)
+                    continue
+                }
+
+                setUnderlyingNetworks(arrayOf(d.first))
+
+                if ( settings.get(Settings.AUTO_ADD_SYSTEM_DNS) ) {
+                    withContext(Dispatchers.Default) {
+                        Clash.appendDns(d.second.dnsServers
+                            .map(InetAddress::getHostName)
+                            .filter(String::isNotBlank))
+                    }
+                }
+
+                broadcastNetworkChanged(this@TunService)
             }
         }
     }
@@ -107,12 +127,10 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                         addDisallowedApplication(app)
                     }
                 }
-                addDisallowedApplication(packageName)
             }
             Settings.ACCESS_CONTROL_MODE_WHITELIST -> {
                 for (app in settings.get(Settings.ACCESS_CONTROL_PACKAGES).toSet() -
-                        resources.getStringArray(R.array.default_disallow_application) -
-                        setOf(packageName)) {
+                        resources.getStringArray(R.array.default_disallow_application)) {
                     runCatching {
                         addAllowedApplication(app)
                     }.onFailure {
@@ -129,7 +147,6 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                         Log.w("Package $app not found")
                     }
                 }
-                addDisallowedApplication(packageName)
             }
             else -> throw IllegalArgumentException("Invalid mode")
         }

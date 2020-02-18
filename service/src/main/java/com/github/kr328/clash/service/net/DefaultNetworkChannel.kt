@@ -2,40 +2,37 @@
 package com.github.kr328.clash.service.net
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import com.github.kr328.clash.core.utils.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import android.net.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
 
 class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
-    CoroutineScope by scope, Channel<Network?> by Channel(Channel.CONFLATED) {
+    CoroutineScope by scope, Channel<Pair<Network, LinkProperties>?> by Channel(Channel.CONFLATED) {
+    private var currentNetwork: Network? = null
+    private val detectDelayLock = Mutex()
     private val connectivity = context.getSystemService(ConnectivityManager::class.java)!!
     private val callback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
-            launch {
-                send(rebuildNetworkList())
-            }
+            sendDefaultNetwork(true)
         }
 
         override fun onLost(network: Network) {
-            launch {
-                send(rebuildNetworkList())
-            }
+            sendDefaultNetwork(true)
         }
 
         override fun onCapabilitiesChanged(
             network: Network,
             networkCapabilities: NetworkCapabilities
         ) {
-            launch {
-                send(rebuildNetworkList())
-            }
+            if ( network == currentNetwork &&
+                !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) )
+                sendDefaultNetwork(true)
+        }
+
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+            if ( network == currentNetwork )
+                sendDefaultNetwork(false)
         }
     }
 
@@ -47,7 +44,30 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
         connectivity.unregisterNetworkCallback(callback)
     }
 
-    private suspend fun rebuildNetworkList(): Network? = withContext(Dispatchers.Default) {
+    private fun sendDefaultNetwork(ignoreSameNetwork: Boolean) {
+        if (detectDelayLock.tryLock()) {
+            launch {
+                delay(1000)
+
+                val network = detectDefaultNetwork()
+                if ( ignoreSameNetwork && network == currentNetwork )
+                    return@launch
+
+                currentNetwork = network
+
+                val linkProperties = network?.let { connectivity.getLinkProperties(it) }
+
+                if ( network != null && linkProperties != null )
+                    send(network to linkProperties)
+                else
+                    send(null)
+
+                detectDelayLock.unlock()
+            }
+        }
+    }
+
+    private suspend fun detectDefaultNetwork(): Network? = withContext(Dispatchers.Default) {
         return@withContext try {
             connectivity.allNetworks
                 .asSequence()
@@ -70,10 +90,6 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
                         -1000
                     else
                         0
-                }
-                .map {
-                    Log.i("Network ${it.first}")
-                    it
                 }
                 .map {
                     it.second

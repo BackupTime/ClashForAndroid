@@ -2,6 +2,7 @@ package com.github.kr328.clash.core
 
 import android.content.Context
 import bridge.Bridge
+import bridge.TunCallback
 import com.github.kr328.clash.core.event.EventStream
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.model.General
@@ -47,13 +48,29 @@ object Clash {
         fd: Int,
         mtu: Int,
         dns: String,
-        onStop: () -> Unit
+        onNewSocket: (Int) -> Boolean,
+        onTunStop: () -> Unit
     ) {
-        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns, onStop)
+        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns, object: TunCallback {
+            override fun onCreateSocket(fd: Long) {
+                onNewSocket(fd.toInt())
+            }
+            override fun onStop() {
+                onTunStop()
+            }
+        })
     }
 
     fun stopTunDevice() {
         Bridge.stopTunDevice()
+    }
+
+    fun appendDns(dns: List<String>) {
+        Bridge.resetDnsAppend(dns.joinToString(","))
+    }
+
+    fun setDnsOverrideEnabled(enabled: Boolean) {
+        Bridge.setDnsOverrideEnabled(enabled)
     }
 
     fun loadProfile(path: File, baseDir: File): CompletableDeferred<Unit> {

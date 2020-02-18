@@ -16,9 +16,9 @@ func QueryGeneral() *TunnelGeneral {
 	result := &TunnelGeneral{}
 
 	g := executor.GetGeneral()
-	t := tunnel.Instance()
+	m := tunnel.Mode()
 
-	result.Mode = t.Mode().String()
+	result.Mode = m.String()
 	result.HTTPPort = g.Port
 	result.SocksPort = g.SocksPort
 	result.RedirectPort = g.RedirPort
@@ -29,10 +29,10 @@ func QueryGeneral() *TunnelGeneral {
 func SetProxyMode(mode string) {
 	switch mode {
 	case "Direct":
-		tunnel.Instance().SetMode(tunnel.Direct)
+		tunnel.SetMode(tunnel.Direct)
 	case "Global":
-		tunnel.Instance().SetMode(tunnel.Global)
+		tunnel.SetMode(tunnel.Global)
 	case "Rule":
-		tunnel.Instance().SetMode(tunnel.Rule)
+		tunnel.SetMode(tunnel.Rule)
 	}
 }

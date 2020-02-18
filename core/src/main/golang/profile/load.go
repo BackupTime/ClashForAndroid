@@ -3,9 +3,7 @@ package profile
 import (
 	"fmt"
 	"io/ioutil"
-	"net"
 
-	"github.com/Dreamacro/clash/component/fakeip"
 	"github.com/Dreamacro/clash/config"
 	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/dns"
@@ -34,6 +32,31 @@ Rule:
 - 'MATCH,DIRECT'
 `
 
+func init() {
+	defaultNameServers := []string{
+		"223.5.5.5",
+		"119.29.29.29",
+		"1.1.1.1",
+		"208.67.222.222",
+	}
+
+	OptionalDnsPatch = &config.RawDNS{
+		Enable:     true,
+		IPv6:       true,
+		NameServer: defaultNameServers,
+		Fallback:   []string{},
+		FallbackFilter: config.RawFallbackFilter{
+			GeoIP:  false,
+			IPCIDR: []string{},
+		},
+		Listen:            ":0",
+		EnhancedMode:      dns.FAKEIP,
+		FakeIPRange:       "198.18.0.0/16",
+		FakeIPFilter:      []string{},
+		DefaultNameserver: defaultNameServers,
+	}
+}
+
 // LoadDefault - load default configure
 func LoadDefault() {
 	defaultC, err := parseConfig([]byte(defaultConfig), constant.Path.HomeDir())
@@ -41,6 +64,9 @@ func LoadDefault() {
 		log.Warnln("Load Default Failure " + err.Error())
 		return
 	}
+
+	DnsPatch = nil
+	NameServersAppend = make([]string, 0)
 
 	executor.ApplyConfig(defaultC, true)
 
@@ -59,49 +85,11 @@ func LoadFromFile(path, baseDir string) error {
 		return err
 	}
 
+	for _, ns := range cfg.DNS.NameServer {
+		log.Infoln("DNS: %s", ns.Addr)
+	}
+
 	executor.ApplyConfig(cfg, true)
-
-	if dns.DefaultResolver == nil && cfg.DNS.Enable {
-		c := cfg.DNS
-
-		r := dns.New(dns.Config{
-			Main:         c.NameServer,
-			Fallback:     c.Fallback,
-			IPv6:         c.IPv6,
-			EnhancedMode: c.EnhancedMode,
-			Pool:         c.FakeIPRange,
-			FallbackFilter: dns.FallbackFilter{
-				GeoIP:  c.FallbackFilter.GeoIP,
-				IPCIDR: c.FallbackFilter.IPCIDR,
-			},
-		})
-
-		dns.DefaultResolver = r
-	}
-
-	if dns.DefaultResolver == nil {
-		_, ipnet, _ := net.ParseCIDR("198.18.0.1/16")
-		pool, _ := fakeip.New(ipnet, 1000, nil)
-
-		var defaultDNSResolver = dns.New(dns.Config{
-			Main: []dns.NameServer{
-				dns.NameServer{Net: "tcp", Addr: "1.1.1.1:53"},
-				dns.NameServer{Net: "tcp", Addr: "208.67.222.222:53"},
-				dns.NameServer{Net: "", Addr: "119.29.29.29:53"},
-				dns.NameServer{Net: "", Addr: "223.5.5.5:53"},
-			},
-			Fallback:     make([]dns.NameServer, 0),
-			IPv6:         false,
-			EnhancedMode: dns.FAKEIP,
-			Pool:         pool,
-			FallbackFilter: dns.FallbackFilter{
-				GeoIP:  false,
-				IPCIDR: make([]*net.IPNet, 0),
-			},
-		})
-
-		dns.DefaultResolver = defaultDNSResolver
-	}
 
 	tun.ResetDnsRedirect()
 
@@ -120,5 +108,14 @@ func parseConfig(data []byte, baseDir string) (*config.Config, error) {
 	raw.ExternalController = ""
 	raw.Rule = append([]string{fmt.Sprintf("IP-CIDR,%s,REJECT", tunAddress)}, raw.Rule...)
 
-	return config.ParseRawConfig(raw, baseDir)
+	patchRawConfig(raw)
+
+	cfg, err := config.ParseRawConfig(raw, baseDir)
+	if err != nil {
+		return nil, err
+	}
+
+	patchConfig(cfg)
+
+	return cfg, nil
 }

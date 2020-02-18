@@ -51,7 +51,7 @@ func StartUrlTest(group string, callback DoneCallback) {
 	go func() {
 		defer callback.Done()
 
-		p := tunnel.Instance().Proxies()[group]
+		p := tunnel.Proxies()[group]
 
 		pa, ok := p.(*outbound.Proxy)
 		if !ok {
@@ -88,7 +88,7 @@ func StartUrlTest(group string, callback DoneCallback) {
 }
 
 func QueryAllProxyGroups(collection ProxyGroupCollection) {
-	ps := tunnel.Instance().Proxies()
+	ps := tunnel.Proxies()
 
 	for _, p := range ps {
 		pa, ok := p.(*outbound.Proxy)
@@ -144,7 +144,7 @@ func QueryAllProxyGroups(collection ProxyGroupCollection) {
 }
 
 func SetSelectedProxy(name, proxy string) bool {
-	p := tunnel.Instance().Proxies()[name]
+	p := tunnel.Proxies()[name]
 	if p == nil {
 		return false
 	}

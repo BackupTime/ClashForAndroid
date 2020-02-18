@@ -26,7 +26,7 @@ var client = &http.Client{
 
 			client, server := net.Pipe()
 
-			tunnel.Instance().Add(inbound.NewSocket(socks5.ParseAddr(address), server, constant.HTTP, constant.TCP))
+			tunnel.Add(inbound.NewSocket(socks5.ParseAddr(address), server, constant.HTTP, constant.TCP))
 
 			go func() {
 				if ctx == nil || ctx.Done() == nil {

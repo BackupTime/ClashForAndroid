@@ -95,6 +95,8 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
     }
 
     override fun onDestroy() {
+        logChannel.close()
+
         cancel()
 
         stopForeground(true)
@@ -231,7 +233,7 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
             .setSmallIcon(R.drawable.ic_notification)
             .setColor(getColor(R.color.colorAccentService))
             .setContentTitle(getString(R.string.clash_logcat))
-            .setContentText(getString(R.string.capturing_clash_log))
+            .setContentText(getString(R.string.running))
             .setContentIntent(
                 PendingIntent.getActivity(
                     this,

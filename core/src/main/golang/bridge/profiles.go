@@ -1,8 +1,26 @@
 package bridge
 
 import (
+	"strings"
+
 	"github.com/kr328/cfa/profile"
 )
+
+func ResetDnsAppend(dns string) {
+	if len(dns) == 0 {
+		profile.NameServersAppend = make([]string, 0)
+	} else {
+		profile.NameServersAppend = strings.Split(dns, ",")
+	}
+}
+
+func SetDnsOverrideEnabled(enabled bool) {
+	if enabled {
+		profile.DnsPatch = profile.OptionalDnsPatch
+	} else {
+		profile.DnsPatch = nil
+	}
+}
 
 func LoadProfileFile(path, baseDir string, callback DoneCallback) {
 	go func() {

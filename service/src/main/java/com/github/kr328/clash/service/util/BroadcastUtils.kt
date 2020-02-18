@@ -24,6 +24,10 @@ fun broadcastProfileLoaded(context: Context, profileEntity: ClashProfileEntity) 
     context.sendBroadcastSelf(intent)
 }
 
+fun broadcastNetworkChanged(context: Context) {
+    context.sendBroadcastSelf(Intent(Intents.INTENT_ACTION_NETWORK_CHANGED))
+}
+
 fun broadcastClashStarted(context: Context) {
     context.sendBroadcastSelf(Intent(Intents.INTENT_ACTION_CLASH_STARTED))
 }

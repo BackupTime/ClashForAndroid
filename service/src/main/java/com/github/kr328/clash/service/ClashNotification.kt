@@ -13,6 +13,7 @@ import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.core.Clash
+import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.core.utils.asSpeedString
 import kotlinx.coroutines.*
@@ -105,10 +106,17 @@ class ClashNotification(private val context: ClashService, enableRefresh: Boolea
 
     private fun startTicker(): Job {
         return launch {
-            while (isActive) {
-                tickerChannel.send(Unit)
+            Log.d("Clash Notification Started")
 
-                delay(1000)
+            try {
+                while (isActive) {
+                    tickerChannel.send(Unit)
+
+                    delay(1000)
+                }
+            }
+            finally {
+                Log.d("Clash Notification Stopped")
             }
         }
     }

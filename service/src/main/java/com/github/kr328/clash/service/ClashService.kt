@@ -25,7 +25,7 @@ class ClashService : BaseService() {
     private var stopReason: String? = null
     private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
     private val settings: Settings by lazy { Settings(ClashManager(this, this)) }
-    private val profileObserver = object : BroadcastReceiver() {
+    private val reloadReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.`package` != packageName)
                 return
@@ -64,7 +64,10 @@ class ClashService : BaseService() {
         if (startVpn)
             startService(TunService::class.intent)
 
-        registerReceiver(profileObserver, IntentFilter(Intents.INTENT_ACTION_PROFILE_CHANGED))
+        registerReceiver(reloadReceiver, IntentFilter().apply {
+            addAction(Intents.INTENT_ACTION_PROFILE_CHANGED)
+            addAction(Intents.INTENT_ACTION_NETWORK_CHANGED)
+        })
 
         reloadChannel.offer(Unit)
 
@@ -85,7 +88,7 @@ class ClashService : BaseService() {
 
         broadcastClashStopped(this, stopReason)
 
-        unregisterReceiver(profileObserver)
+        unregisterReceiver(reloadReceiver)
 
         isServiceRunning = false
 
