@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="access_control_mode_display">
+        <item>允许所有应用</item>
+        <item>仅允许已选择的应用</item>
+        <item>不允许已选择的应用</item>
+    </string-array>
+    <string-array name="dark_mode">
+        <item>自动</item>
+        <item>暗黑</item>
+        <item>明亮</item>
+    </string-array>
+    <string-array name="language">
+        <item>自动</item>
+        <item>英文</item>
+        <item>简体中文</item>
+    </string-array>
+</resources>

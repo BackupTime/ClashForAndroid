@@ -10,9 +10,14 @@ class SettingsDataStore: PreferenceDataStore() {
     }
 
     private val sources: MutableMap<String, Source> = mutableMapOf()
+    var applyListener: () -> Unit = {}
 
     fun on(key: String, source: Source) {
         sources[key] = source
+    }
+
+    fun onApply(block: () -> Unit) {
+        this.applyListener = block
     }
 
     inline fun <reified T>BaseSettings.Entry<T>.asSource(settings: BaseSettings): Source {
@@ -23,6 +28,8 @@ class SettingsDataStore: PreferenceDataStore() {
                 settings.commit {
                     put(this@asSource, v as T)
                 }
+
+                applyListener()
             }
 
             override fun get(): Any? {
