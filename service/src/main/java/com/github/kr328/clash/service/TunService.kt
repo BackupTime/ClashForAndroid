@@ -7,7 +7,6 @@ import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkChannel
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.broadcast
 import java.net.InetAddress
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
@@ -71,18 +70,22 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
                 Log.i("Network changed to ${d?.second}")
 
-                if ( d == null ) {
+                if (d == null) {
                     setUnderlyingNetworks(null)
                     continue
                 }
 
                 setUnderlyingNetworks(arrayOf(d.first))
 
-                if ( settings.get(Settings.AUTO_ADD_SYSTEM_DNS) ) {
+                if (settings.get(Settings.AUTO_ADD_SYSTEM_DNS)) {
                     withContext(Dispatchers.Default) {
-                        Clash.appendDns(d.second.dnsServers
-                            .map(InetAddress::getHostName)
-                            .filter(String::isNotBlank))
+                        val dnsServers = d.second?.dnsServers ?: emptyList()
+
+                        Clash.appendDns(
+                            dnsServers
+                                .map(InetAddress::getHostName)
+                                .filter(String::isNotBlank)
+                        )
                     }
                 }
 

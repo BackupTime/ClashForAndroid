@@ -9,8 +9,10 @@ import android.os.IBinder
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.util.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 
 class ClashService : BaseService() {
@@ -98,7 +100,7 @@ class ClashService : BaseService() {
     }
 
     private suspend fun reloadProfile() {
-        if ( !loadLock.tryLock() )
+        if (!loadLock.tryLock())
             return
 
         try {

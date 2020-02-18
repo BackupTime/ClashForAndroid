@@ -114,8 +114,7 @@ class ClashNotification(private val context: ClashService, enableRefresh: Boolea
 
                     delay(1000)
                 }
-            }
-            finally {
+            } finally {
                 Log.d("Clash Notification Stopped")
             }
         }

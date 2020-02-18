@@ -1,6 +1,8 @@
 package com.github.kr328.clash.service.data
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
 
 @Entity(
     tableName = "profile_select_proxies",
