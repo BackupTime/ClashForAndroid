@@ -14,4 +14,7 @@ class SettingsInterfaceActivity: BaseActivity() {
             .replace(R.id.fragment, InterfaceFragment())
             .commit()
     }
+
+    override val activityLabel: CharSequence?
+        get() = getText(R.string.interface_)
 }

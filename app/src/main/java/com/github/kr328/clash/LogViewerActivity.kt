@@ -63,6 +63,9 @@ class LogViewerActivity : BaseActivity() {
         }
     }
 
+    override val activityLabel: CharSequence
+        get() = getText(R.string.log_viewer)
+
     override fun onStart() {
         super.onStart()
 

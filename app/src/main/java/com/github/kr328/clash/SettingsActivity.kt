@@ -1,6 +1,5 @@
 package com.github.kr328.clash
 
-import android.location.SettingInjectorService
 import android.os.Bundle
 import com.github.kr328.clash.service.util.intent
 import kotlinx.android.synthetic.main.activity_settings.*
@@ -41,4 +40,7 @@ class SettingsActivity: BaseActivity() {
             }
         }
     }
+
+    override val activityLabel: CharSequence?
+        get() = getText(R.string.settings)
 }

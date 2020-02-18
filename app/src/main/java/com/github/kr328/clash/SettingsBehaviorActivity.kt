@@ -1,11 +1,7 @@
 package com.github.kr328.clash
 
 import android.os.Bundle
-import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.settings.BehaviorFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SettingsBehaviorActivity: BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,4 +14,7 @@ class SettingsBehaviorActivity: BaseActivity() {
             .replace(R.id.fragment, BehaviorFragment())
             .commit()
     }
+
+    override val activityLabel: CharSequence?
+        get() = getText(R.string.behavior)
 }

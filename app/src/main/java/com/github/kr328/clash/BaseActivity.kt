@@ -161,12 +161,20 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun setSupportActionBar(toolbar: Toolbar?) {
         super.setSupportActionBar(toolbar)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(shouldDisplayHomeAsUpEnabled())
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(shouldDisplayHomeAsUpEnabled())
+
+            activityLabel?.let {
+                title = it
+            }
+        }
     }
 
     open fun shouldDisplayHomeAsUpEnabled(): Boolean {
         return true
     }
+
+    abstract val activityLabel: CharSequence?
 
     override fun onSupportNavigateUp(): Boolean {
         this.onBackPressed()

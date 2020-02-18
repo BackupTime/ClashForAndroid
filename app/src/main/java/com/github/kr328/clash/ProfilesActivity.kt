@@ -62,6 +62,9 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         backgroundJob = null
     }
 
+    override val activityLabel: CharSequence?
+        get() = getText(R.string.profiles)
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EDITOR_REQUEST_CODE) {
             launch {

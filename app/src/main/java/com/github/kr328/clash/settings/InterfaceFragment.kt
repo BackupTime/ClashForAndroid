@@ -1,7 +1,5 @@
 package com.github.kr328.clash.settings
 
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import com.github.kr328.clash.R
 import com.github.kr328.clash.preference.UiSettings
 
