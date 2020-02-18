@@ -10,7 +10,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ClashClient(private val service: IClashManager) {
+class ClashClient(val service: IClashManager) {
     suspend fun setSelectProxy(name: String, proxy: String): Boolean = withContext(Dispatchers.IO) {
         return@withContext service.setSelectProxy(name, proxy)
     }

@@ -40,17 +40,16 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
     implementation 'androidx.browser:browser:1.2.0'
-    implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.core:core-ktx:1.3.0-alpha01'
     implementation 'androidx.fragment:fragment-ktx:1.2.1'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
     implementation "androidx.room:room-runtime:$room_version"
-    implementation "androidx.preference:preference-ktx:1.1.0"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
     implementation "com.google.android.material:material:1.2.0-alpha04"
+    implementation "moe.shizuku.preference:preference-appcompat:4.2.0"
+    implementation "moe.shizuku.preference:preference-simplemenu-appcompat:4.2.0"
     implementation "com.microsoft.appcenter:appcenter-analytics:$app_center_version"
     implementation "com.microsoft.appcenter:appcenter-crashes:$app_center_version"
 }

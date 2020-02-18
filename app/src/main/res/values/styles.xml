@@ -7,6 +7,7 @@
         <item name="colorSecondary">@color/colorPrimaryClashBlue</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
         <item name="android:windowLightStatusBar">@bool/lightStatusBar</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <style name="AppTheme.ThemeOverlay" />

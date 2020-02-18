@@ -9,7 +9,6 @@ import android.util.TypedValue
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.LogFileAdapter
@@ -22,7 +21,6 @@ import com.github.kr328.clash.utils.logsDir
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_logs.*
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -63,9 +63,36 @@
             android:exported="false"
             android:configChanges="uiMode"
             android:launchMode="singleTask"/>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/settings"
+            android:exported="false"
+            android:configChanges="uiMode" />
+        <activity
+            android:name=".SettingsNetworkActivity"
+            android:label="@string/network"
+            android:exported="false"
+            android:configChanges="uiMode" />
+        <activity
+            android:name=".SettingsBehaviorActivity"
+            android:label="@string/behavior"
+            android:exported="false"
+            android:configChanges="uiMode" />
+        <activity
+            android:name=".SettingsInterfaceActivity"
+            android:label="@string/interface_"
+            android:exported="false"
+            android:configChanges="uiMode" />
         <service
             android:name=".LogcatService"
             android:exported="false"
             android:label="@string/clash_logcat" />
+        <receiver
+            android:name=".OnBootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

@@ -10,7 +10,7 @@ import com.github.kr328.clash.adapter.ProxyAdapter
 import com.github.kr328.clash.adapter.ProxyChipAdapter
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
-import com.github.kr328.clash.preference.UiPreferences
+import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.utils.PrefixMerger
 import com.github.kr328.clash.utils.ProxySorter
@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
     private val scrollBinding = ScrollBinding(this, this)
     private val doScrollToLastProxy by lazy {
-        val selected = uiPreference.get(UiPreferences.PROXY_LAST_SELECT_GROUP)
+        val selected = uiSettings.get(UiSettings.PROXY_LAST_SELECT_GROUP)
 
         launch {
             scrollBinding.scrollMaster(selected)
@@ -88,11 +88,9 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
     }
 
     override fun onStop() {
-        uiPreference.edit {
-            put(
-                UiPreferences.PROXY_LAST_SELECT_GROUP,
-                (chipList.adapter!! as ProxyChipAdapter).selected
-            )
+        uiSettings.commit {
+            put(UiSettings.PROXY_LAST_SELECT_GROUP,
+                (chipList.adapter!! as ProxyChipAdapter).selected)
         }
 
         super.onStop()
@@ -136,40 +134,40 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
                     }
                 }
                 R.id.groupDefault -> {
-                    uiPreference.edit {
-                        put(UiPreferences.PROXY_GROUP_SORT, UiPreferences.PROXY_SORT_DEFAULT)
+                    uiSettings.commit {
+                        put(UiSettings.PROXY_GROUP_SORT, UiSettings.PROXY_SORT_DEFAULT)
                     }
                 }
                 R.id.groupName -> {
-                    uiPreference.edit {
-                        put(UiPreferences.PROXY_GROUP_SORT, UiPreferences.PROXY_SORT_NAME)
+                    uiSettings.commit {
+                        put(UiSettings.PROXY_GROUP_SORT, UiSettings.PROXY_SORT_NAME)
                     }
                 }
                 R.id.groupDelay -> {
-                    uiPreference.edit {
-                        put(UiPreferences.PROXY_GROUP_SORT, UiPreferences.PROXY_SORT_DELAY)
+                    uiSettings.commit {
+                        put(UiSettings.PROXY_GROUP_SORT, UiSettings.PROXY_SORT_DELAY)
                     }
                 }
                 R.id.proxyDefault -> {
-                    uiPreference.edit {
-                        put(UiPreferences.PROXY_PROXY_SORT, UiPreferences.PROXY_SORT_DEFAULT)
+                    uiSettings.commit {
+                        put(UiSettings.PROXY_PROXY_SORT, UiSettings.PROXY_SORT_DEFAULT)
                     }
                 }
                 R.id.proxyName -> {
-                    uiPreference.edit {
-                        put(UiPreferences.PROXY_PROXY_SORT, UiPreferences.PROXY_SORT_NAME)
+                    uiSettings.commit {
+                        put(UiSettings.PROXY_PROXY_SORT, UiSettings.PROXY_SORT_NAME)
                     }
                 }
                 R.id.proxyDelay -> {
-                    uiPreference.edit {
-                        put(UiPreferences.PROXY_PROXY_SORT, UiPreferences.PROXY_SORT_DELAY)
+                    uiSettings.commit {
+                        put(UiSettings.PROXY_PROXY_SORT, UiSettings.PROXY_SORT_DELAY)
                     }
                 }
                 R.id.utilsMergePrefix -> {
                     item.isChecked = !item.isChecked
 
-                    uiPreference.edit {
-                        put(UiPreferences.PROXY_MERGE_PREFIX, item.isChecked)
+                    uiSettings.commit {
+                        put(UiSettings.PROXY_MERGE_PREFIX, item.isChecked)
                     }
 
                     refreshList()
@@ -206,25 +204,25 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
                     General.Mode.RULE ->
                         findItem(R.id.modeRule).isChecked = true
                 }
-                when (uiPreference.get(UiPreferences.PROXY_GROUP_SORT)) {
-                    UiPreferences.PROXY_SORT_DEFAULT ->
+                when (uiSettings.get(UiSettings.PROXY_GROUP_SORT)) {
+                    UiSettings.PROXY_SORT_DEFAULT ->
                         findItem(R.id.groupDefault).isChecked = true
-                    UiPreferences.PROXY_SORT_NAME ->
+                    UiSettings.PROXY_SORT_NAME ->
                         findItem(R.id.groupName).isChecked = true
-                    UiPreferences.PROXY_SORT_DELAY ->
+                    UiSettings.PROXY_SORT_DELAY ->
                         findItem(R.id.proxyDelay).isChecked = true
                 }
-                when (uiPreference.get(UiPreferences.PROXY_PROXY_SORT)) {
-                    UiPreferences.PROXY_SORT_DEFAULT ->
+                when (uiSettings.get(UiSettings.PROXY_PROXY_SORT)) {
+                    UiSettings.PROXY_SORT_DEFAULT ->
                         findItem(R.id.proxyDefault).isChecked = true
-                    UiPreferences.PROXY_SORT_NAME ->
+                    UiSettings.PROXY_SORT_NAME ->
                         findItem(R.id.proxyName).isChecked = true
-                    UiPreferences.PROXY_SORT_DELAY ->
+                    UiSettings.PROXY_SORT_DELAY ->
                         findItem(R.id.proxyDelay).isChecked = true
                 }
 
                 findItem(R.id.utilsMergePrefix).isChecked =
-                    uiPreference.get(UiPreferences.PROXY_MERGE_PREFIX)
+                    uiSettings.get(UiSettings.PROXY_MERGE_PREFIX)
             }
         }
     }
@@ -239,7 +237,7 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
             }
 
             val prefixDeferred = async {
-                if (uiPreference.get(UiPreferences.PROXY_MERGE_PREFIX)) {
+                if (uiSettings.get(UiSettings.PROXY_MERGE_PREFIX)) {
                     proxies.map {
                         async { PrefixMerger.merge(it.proxies.map { p -> it.name to p.name }) { it.second } }
                     }.flatMap {
@@ -251,22 +249,22 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
             }
 
             val sortDeferred = async {
-                val groupSort = when (uiPreference.get(UiPreferences.PROXY_GROUP_SORT)) {
-                    UiPreferences.PROXY_SORT_DEFAULT ->
+                val groupSort = when (uiSettings.get(UiSettings.PROXY_GROUP_SORT)) {
+                    UiSettings.PROXY_SORT_DEFAULT ->
                         ProxySorter.Order.DEFAULT
-                    UiPreferences.PROXY_SORT_NAME ->
+                    UiSettings.PROXY_SORT_NAME ->
                         ProxySorter.Order.NAME_INCREASE
-                    UiPreferences.PROXY_SORT_DELAY ->
+                    UiSettings.PROXY_SORT_DELAY ->
                         ProxySorter.Order.DELAY_INCREASE
                     else -> throw IllegalArgumentException()
                 }
 
-                val proxySort = when (uiPreference.get(UiPreferences.PROXY_PROXY_SORT)) {
-                    UiPreferences.PROXY_SORT_DEFAULT ->
+                val proxySort = when (uiSettings.get(UiSettings.PROXY_PROXY_SORT)) {
+                    UiSettings.PROXY_SORT_DEFAULT ->
                         ProxySorter.Order.DEFAULT
-                    UiPreferences.PROXY_SORT_NAME ->
+                    UiSettings.PROXY_SORT_NAME ->
                         ProxySorter.Order.NAME_INCREASE
-                    UiPreferences.PROXY_SORT_DELAY ->
+                    UiSettings.PROXY_SORT_DELAY ->
                         ProxySorter.Order.DELAY_INCREASE
                     else -> throw IllegalArgumentException()
                 }

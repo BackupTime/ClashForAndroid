@@ -5,23 +5,29 @@ import android.net.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
+import java.net.InetAddress
 
 class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
     CoroutineScope by scope,
     Channel<Pair<Network, LinkProperties?>?> by Channel(Channel.CONFLATED) {
     private val sendLock = Mutex()
     private val connectivity = context.getSystemService(ConnectivityManager::class.java)!!
+
+    private var currentNetwork: Network? = null
+
     private val callback = object : ConnectivityManager.NetworkCallback() {
         private val capabilitiesCache = mutableMapOf<Network, NetworkCapabilities?>()
+        private val dnsServerCache = mutableMapOf<Network, List<InetAddress>>()
 
         override fun onAvailable(network: Network) {
-            sendDefaultNetwork()
+            sendDefaultNetwork(true)
         }
 
         override fun onLost(network: Network) {
-            sendDefaultNetwork()
+            sendDefaultNetwork(true)
 
             capabilitiesCache.remove(network)
+            dnsServerCache.remove(network)
         }
 
         override fun onCapabilitiesChanged(
@@ -31,11 +37,21 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
             val cap = capabilitiesCache[network]
 
             if (cap?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                != networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            )
-                sendDefaultNetwork()
+                != networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                sendDefaultNetwork(true)
+            }
 
             capabilitiesCache[network] = networkCapabilities
+        }
+
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+            val cache = dnsServerCache[network]
+
+            if ( cache != linkProperties.dnsServers ) {
+                sendDefaultNetwork(false)
+            }
+
+            dnsServerCache[network] = linkProperties.dnsServers
         }
     }
 
@@ -47,7 +63,7 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
         connectivity.unregisterNetworkCallback(callback)
     }
 
-    private fun sendDefaultNetwork() {
+    private fun sendDefaultNetwork(ignoreSame: Boolean) {
         if (!sendLock.tryLock())
             return
 
@@ -56,6 +72,11 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
 
             val network = detectDefaultNetwork()
             val link = network?.let(connectivity::getLinkProperties)
+
+            if ( ignoreSame && network == currentNetwork )
+                return@launch sendLock.unlock()
+
+            currentNetwork = network
 
             if (network != null)
                 send(network to link)

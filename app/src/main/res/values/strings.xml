@@ -104,4 +104,38 @@
     <string name="delete_log_warn">%s will be deleted</string>
     <string name="open_log_failure">Open Log File Failure</string>
     <string name="file_exported">File Exported</string>
+
+    <string name="behavior">Behavior</string>
+    <string name="network">Network</string>
+    <string name="interface_">Interface</string>
+
+    <string name="boot">Boot</string>
+    <string name="start_on_boot">Start on Boot</string>
+    <string name="start_clash_on_system_boot">Start slash on system boot</string>
+
+    <string name="notification">Notification</string>
+    <string name="show_traffic">Show Traffic</string>
+    <string name="show_traffic_summary">Auto refresh traffic in notification</string>
+
+    <string name="route_system_traffic">Route System Traffic</string>
+    <string name="routing_via_vpn_service">Routing all system traffic via VpnService</string>
+    
+    <string name="vpn_service">VPN Service</string>
+    <string name="ipv6">IPv6</string>
+    <string name="enable_ipv6">Enable IPv6 support (not recommend)</string>
+    <string name="bypass_private_network">Bypass Private Network</string>
+    <string name="bypass_private_network_summary">Bypass private network addresses</string>
+    <string name="dns_hijacking">DNS Hijacking</string>
+    <string name="dns_hijacking_summary">Handle all dns packet</string>
+    <string name="dns_override">DNS Config Override</string>
+    <string name="dns_override_summary">Force use builtin DNS config</string>
+    <string name="append_system_dns">Append System DNS</string>
+    <string name="append_system_dns_summary">Auto add system dns to clash</string>
+    <string name="access_control">Access Control</string>
+    <string name="access_control_mode">Access Control Mode</string>
+    <string name="access_control_packages">Access Control Packages</string>
+    <string name="access_control_packages_summary">Configure access permission for apps</string>
+
+    <string name="language">Language</string>
+    <string name="dark_mode">Dark Mode</string>
 </resources>

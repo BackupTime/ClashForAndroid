@@ -10,9 +10,10 @@ import android.view.*
 import android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.github.kr328.clash.preference.UiPreferences
+import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.google.android.material.snackbar.Snackbar
@@ -60,9 +61,10 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     val rootView: View
         get() = overrideRootView ?: window.decorView
     var menu: Menu? = null
-    lateinit var uiPreference: UiPreferences
+    lateinit var uiSettings: UiSettings
         private set
     lateinit var language: String
+    lateinit var darkMode: String
 
     open suspend fun onClashStarted() {}
     open suspend fun onClashStopped(reason: String?) {}
@@ -93,9 +95,9 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun attachBaseContext(newBase: Context?) {
         val base = newBase ?: return super.attachBaseContext(newBase)
 
-        uiPreference = UiPreferences(base)
+        uiSettings = UiSettings(base)
 
-        language = uiPreference.get(UiPreferences.LANGUAGE)
+        language = uiSettings.get(UiSettings.LANGUAGE)
 
         val languageOverride = language.split("-")
         if (language.isEmpty())
@@ -115,14 +117,20 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        resetDarkMode()
+
         resetLightNavigationBar()
     }
 
     override fun onStart() {
         super.onStart()
 
-        if (language != uiPreference.get(UiPreferences.LANGUAGE))
+        if (language != uiSettings.get(UiSettings.LANGUAGE))
             recreate()
+        if (darkMode != uiSettings.get(UiSettings.DARK_MODE)) {
+            resetDarkMode()
+            recreate()
+        }
 
         Broadcasts.register(receiver)
     }
@@ -183,6 +191,17 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
             AlertDialog.Builder(this).setTitle(R.string.detail).setMessage(detail ?: "Unknown")
                 .show()
         }.show()
+    }
+
+    private fun resetDarkMode() {
+        when ( uiSettings.get(UiSettings.DARK_MODE).also { darkMode = it } ) {
+            UiSettings.DARK_MODE_AUTO ->
+                delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            UiSettings.DARK_MODE_DARK ->
+                delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+            UiSettings.DARK_MODE_LIGHT ->
+                delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
+        }
     }
 
     private fun resetLightNavigationBar() {

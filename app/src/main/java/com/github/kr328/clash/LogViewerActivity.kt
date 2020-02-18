@@ -16,9 +16,6 @@ import kotlinx.android.synthetic.main.activity_log_viewer.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import java.io.File
-import java.io.FileReader
-import java.io.IOException
-import java.lang.Exception
 import kotlin.streams.toList
 
 class LogViewerActivity : BaseActivity() {

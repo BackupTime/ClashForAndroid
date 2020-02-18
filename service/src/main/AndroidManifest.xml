@@ -55,5 +55,10 @@
             android:name=".ServiceStatusProvider"
             android:exported="false"
             android:process=":background"/>
+        <provider
+            android:authorities="${applicationId}.settings"
+            android:name=".ServiceSettingsProvider"
+            android:exported="false"
+            android:process=":background"/>
     </application>
 </manifest>

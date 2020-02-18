@@ -13,6 +13,7 @@ class Option(screen: CommonUiScreen): Base(screen) {
     private val vIcon: View = view.findViewById(android.R.id.icon)
     private val vTitle: TextView = view.findViewById(android.R.id.title)
     private val vSummary: TextView = view.findViewById(android.R.id.summary)
+    private val vPadding: View = view.findViewById(R.id.heightPadding)
 
     private var click: () -> Unit = {}
 
@@ -36,6 +37,14 @@ class Option(screen: CommonUiScreen): Base(screen) {
         set(value) {
             vTitle.setTextColor(value)
             vSummary.setTextColor(value)
+        }
+    var paddingHeight: Boolean
+        get() = vPadding.visibility != View.GONE
+        set(value) {
+            if ( value )
+                vPadding.visibility = View.INVISIBLE
+            else
+                vPadding.visibility = View.GONE
         }
 
     init {

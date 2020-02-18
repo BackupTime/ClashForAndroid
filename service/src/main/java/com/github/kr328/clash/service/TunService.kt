@@ -5,6 +5,7 @@ import android.os.Build
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkChannel
+import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
 import kotlinx.coroutines.*
 import java.net.InetAddress
@@ -20,7 +21,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private lateinit var defaultNetworkChannel: DefaultNetworkChannel
-    private lateinit var settings: Settings
+    private lateinit var settings: ServiceSettings
 
     private fun startTun() {
         val fd = Builder()
@@ -35,14 +36,14 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             ?: throw NullPointerException("Unable to create VPN Service")
 
         val dnsAddress =
-            if (settings.get(Settings.DNS_HIJACKING))
+            if (settings.get(ServiceSettings.DNS_HIJACKING))
                 "$VLAN4_ANY:53"
             else
                 "$PRIVATE_VLAN_DNS:53"
 
         Log.i("TunService.startTun ${fd.fd}")
 
-        Clash.setDnsOverrideEnabled(settings.get(Settings.OVERRIDE_DNS))
+        Clash.setDnsOverrideEnabled(settings.get(ServiceSettings.OVERRIDE_DNS))
 
         Clash.startTunDevice(fd.fd, VPN_MTU, dnsAddress, this::protect, this::stopSelf)
 
@@ -54,7 +55,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
         Clash.initialize(this)
 
-        settings = Settings(ClashManager(this, this))
+        settings = ServiceSettings(this)
 
         defaultNetworkChannel = DefaultNetworkChannel(this, this)
 
@@ -77,7 +78,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
                 setUnderlyingNetworks(arrayOf(d.first))
 
-                if (settings.get(Settings.AUTO_ADD_SYSTEM_DNS)) {
+                if (settings.get(ServiceSettings.AUTO_ADD_SYSTEM_DNS)) {
                     withContext(Dispatchers.Default) {
                         val dnsServers = d.second?.dnsServers ?: emptyList()
 
@@ -112,7 +113,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
     private fun Builder.addBypassPrivateRoute(): Builder {
         // IPv4
-        if (settings.get(Settings.BYPASS_PRIVATE_NETWORK)) {
+        if (settings.get(ServiceSettings.BYPASS_PRIVATE_NETWORK)) {
             resources.getStringArray(R.array.bypass_private_route).forEach {
                 val address = it.split("/")
                 addRoute(address[0], address[1].toInt())
@@ -121,20 +122,25 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             addRoute("0.0.0.0", 0)
         }
 
+        // IPv6
+        if (settings.get(ServiceSettings.IPV6_SUPPORT)) {
+            addRoute("::", 0)
+        }
+
         return this
     }
 
     private fun Builder.addBypassApplications(): Builder {
-        when (settings.get(Settings.ACCESS_CONTROL_MODE)) {
-            Settings.ACCESS_CONTROL_MODE_ALL -> {
+        when (settings.get(ServiceSettings.ACCESS_CONTROL_MODE)) {
+            ServiceSettings.ACCESS_CONTROL_MODE_ALL -> {
                 for (app in resources.getStringArray(R.array.default_disallow_application)) {
                     runCatching {
                         addDisallowedApplication(app)
                     }
                 }
             }
-            Settings.ACCESS_CONTROL_MODE_WHITELIST -> {
-                for (app in settings.get(Settings.ACCESS_CONTROL_PACKAGES).toSet() -
+            ServiceSettings.ACCESS_CONTROL_MODE_WHITELIST -> {
+                for (app in settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toSet() -
                         resources.getStringArray(R.array.default_disallow_application)) {
                     runCatching {
                         addAllowedApplication(app)
@@ -143,8 +149,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                     }
                 }
             }
-            Settings.ACCESS_CONTROL_MODE_BLACKLIST -> {
-                for (app in settings.get(Settings.ACCESS_CONTROL_PACKAGES).toSet() +
+            ServiceSettings.ACCESS_CONTROL_MODE_BLACKLIST -> {
+                for (app in settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toSet() +
                         resources.getStringArray(R.array.default_disallow_application)) {
                     runCatching {
                         addDisallowedApplication(app)

@@ -54,6 +54,10 @@ class MainActivity : BaseActivity() {
         logs.setOnClickListener {
             startActivity(LogsActivity::class.intent)
         }
+
+        settings.setOnClickListener {
+            startActivity(SettingsActivity::class.intent)
+        }
     }
 
     override fun onStart() {

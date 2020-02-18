@@ -8,6 +8,7 @@ import android.os.Binder
 import android.os.IBinder
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
+import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.*
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +29,7 @@ class ClashService : BaseService() {
     private lateinit var notification: ClashNotification
     private var stopReason: String? = null
     private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
-    private val settings: Settings by lazy { Settings(ClashManager(this, this)) }
+    private val settings: ServiceSettings by lazy { ServiceSettings(this) }
     private val reloadReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.`package` != packageName)
@@ -40,7 +41,7 @@ class ClashService : BaseService() {
     override fun onCreate() {
         super.onCreate()
 
-        notification = ClashNotification(service, settings.get(Settings.NOTIFICATION_REFRESH))
+        notification = ClashNotification(service, settings.get(ServiceSettings.NOTIFICATION_REFRESH))
 
         launch {
             while (isActive) {
