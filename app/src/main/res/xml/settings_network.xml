@@ -40,6 +40,7 @@
             android:entryValues="@array/access_control_mode_value"
             android:defaultValue="access_control_mode_all" />
         <Preference
+            android:key="access_control_packages"
             android:title="@string/access_control_packages"
             android:summary="@string/access_control_packages_summary">
         </Preference>

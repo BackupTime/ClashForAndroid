@@ -1,10 +1,13 @@
 package com.github.kr328.clash.settings
 
 import android.os.Bundle
+import com.github.kr328.clash.AccessControlPackagesActivity
 import com.github.kr328.clash.BaseActivity
 import com.github.kr328.clash.R
 import com.github.kr328.clash.preference.UiSettings
+import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.settings.ServiceSettings
+import com.github.kr328.clash.service.util.intent
 
 class NetworkFragment: BaseSettingFragment() {
     companion object {
@@ -15,13 +18,18 @@ class NetworkFragment: BaseSettingFragment() {
         private const val KEY_DNS_OVERRIDE = "dns_override"
         private const val KEY_APPEND_SYS_DNS = "append_system_dns"
         private const val KEY_ACCESS_CONTROL_MODE = "access_control_mode"
+        private const val KEY_ACCESS_CONTROL_PACKAGES = "access_control_packages"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if ((requireActivity() as BaseActivity).clashRunning)
-            preferenceScreen.isEnabled = false
+        preferenceScreen.isEnabled = !Broadcasts.clashRunning
+
+        findPreference(KEY_ACCESS_CONTROL_PACKAGES).setOnPreferenceClickListener {
+            startActivity(AccessControlPackagesActivity::class.intent)
+            true
+        }
     }
 
     override fun onCreateDataStore(): SettingsDataStore {

@@ -83,6 +83,11 @@
             android:label="@string/interface_"
             android:exported="false"
             android:configChanges="uiMode" />
+        <activity
+            android:name=".AccessControlPackagesActivity"
+            android:label="@string/access_control_packages"
+            android:exported="false"
+            android:configChanges="uiMode" />
         <service
             android:name=".LogcatService"
             android:exported="false"

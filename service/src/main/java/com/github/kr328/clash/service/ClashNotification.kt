@@ -19,7 +19,7 @@ import com.github.kr328.clash.core.utils.asSpeedString
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 
-class ClashNotification(private val context: ClashService, enableRefresh: Boolean) :
+class ClashNotification(private val context: ClashService, private val enableRefresh: Boolean) :
     CoroutineScope by context {
     companion object {
         private const val CLASH_STATUS_NOTIFICATION_CHANNEL = "clash_status_channel"
@@ -63,7 +63,7 @@ class ClashNotification(private val context: ClashService, enableRefresh: Boolea
     init {
         createNotificationChannel()
 
-        notifyBaseNotification()
+        updateBase()
 
         if (enableRefresh) {
             launch {
@@ -119,7 +119,9 @@ class ClashNotification(private val context: ClashService, enableRefresh: Boolea
     }
 
     fun destroy() {
-        context.unregisterReceiver(observer)
+        if ( enableRefresh )
+            context.unregisterReceiver(observer)
+
         context.stopForeground(true)
     }
 
@@ -127,11 +129,14 @@ class ClashNotification(private val context: ClashService, enableRefresh: Boolea
         launch {
             this@ClashNotification.profile = profile
 
-            update()
+            if ( enableRefresh )
+                update()
+            else
+                updateBase()
         }
     }
 
-    private fun notifyBaseNotification() {
+    private fun updateBase() {
         val notification = baseBuilder
             .setContentTitle(profile)
             .setContentText(context.getText(R.string.running))
