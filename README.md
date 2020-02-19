@@ -46,11 +46,10 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
    ```properties
    sdk.dir=/path/to/android-sdk
    ndk.dir=/path/to/android-ndk
+   appcenter.key=<AppCenter Key>    # Optional, from "appcenter.ms"
    ```
 
-4. Get `google-service.json` from [Firebase](https://firebase.google.com) and copy it to `app/google-service.json`
-
-5. Build
+4. Build
 
    on Linux
 
