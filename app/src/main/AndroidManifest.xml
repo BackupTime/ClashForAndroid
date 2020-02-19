@@ -97,6 +97,15 @@
             android:name=".LogcatService"
             android:exported="false"
             android:label="@string/clash_logcat" />
+        <service
+            android:name=".TileService"
+            android:icon="@drawable/ic_notification"
+            android:label="@string/launch_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
         <receiver
             android:name=".OnBootReceiver"
             android:enabled="false">

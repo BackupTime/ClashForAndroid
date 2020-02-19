@@ -45,7 +45,7 @@
     <string name="profile_name">Profile Name</string>
     <string name="profile_url">Profile URL</string>
 
-    <string name="auto_update">Auto Update</string>
+    <string name="auto_update">Auto Update (Seconds)</string>
     <string name="seconds">Seconds</string>
     <string name="invalid_interval">Invalid Interval</string>
     <string name="download_failure">Download Failure</string>

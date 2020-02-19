@@ -8,6 +8,7 @@ import com.github.kr328.clash.service.net.DefaultNetworkChannel
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
 import kotlinx.coroutines.*
+import java.net.Inet6Address
 import java.net.InetAddress
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
@@ -82,11 +83,16 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                     withContext(Dispatchers.Default) {
                         val dnsServers = d.second?.dnsServers ?: emptyList()
 
-                        Clash.appendDns(
-                            dnsServers
-                                .map(InetAddress::getHostName)
-                                .filter(String::isNotBlank)
-                        )
+                        val dnsStrings = dnsServers.map {
+                            when ( it ) {
+                                is Inet6Address ->
+                                    "[${it.hostName}]:53"
+                                else ->
+                                    "${it.hostName}:53"
+                            }
+                        }
+
+                        Clash.appendDns(dnsStrings)
                     }
                 }
 

@@ -1,6 +1,8 @@
 package profile
 
 import (
+	"strings"
+
 	"github.com/Dreamacro/clash/component/fakeip"
 	"github.com/Dreamacro/clash/config"
 )
@@ -29,6 +31,22 @@ func patchRawConfig(rawConfig *config.RawConfig) {
 		copy(nameservers[len(append):], d.NameServer)
 
 		d.NameServer = nameservers
+	}
+
+	providers := rawConfig.ProxyProvider
+
+	for _, provider := range providers {
+		path, ok := provider["path"].(string)
+		if !ok {
+			continue
+		}
+
+		path = strings.TrimSuffix(path, ".yaml")
+		path = strings.Replace(path, "/", "", -1)
+		path = strings.Replace(path, ".", "", -1)
+		path = "./" + path + ".yaml"
+
+		provider["path"] = path
 	}
 }
 

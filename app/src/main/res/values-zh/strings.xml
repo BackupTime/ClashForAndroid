@@ -8,7 +8,7 @@
     <string name="append_system_dns_summary">自动追加系统 DNS 到 Clash</string>
     <string name="application_broken">应用损坏</string>
     <string name="application_name">Clash for Android</string>
-    <string name="auto_update">自动更新</string>
+    <string name="auto_update">自动更新 (秒)</string>
     <string name="behavior">行为</string>
     <string name="boot">启动</string>
     <string name="bypass_private_network">绕过私有网络</string>
@@ -60,7 +60,7 @@
     <string name="history">历史</string>
     <string name="import_from_file">从文件导入</string>
     <string name="import_from_url">从 URL 导入</string>
-    <string name="seconds">以分钟计算</string>
+    <string name="seconds">秒</string>
     <string name="interface_">界面</string>
     <string name="invalid_interval">无效的间隔</string>
     <string name="invalid_url">无效的 URL</string>

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -78,14 +79,8 @@ object Broadcasts {
                     addAction(Intents.INTENT_ACTION_PROFILE_LOADED)
                 })
 
-                val pong = application.contentResolver.call(
-                    "${application.packageName}${Constants.STATUS_PROVIDER_SUFFIX}",
-                    ServiceStatusProvider.METHOD_PING_CLASH_SERVICE,
-                    null,
-                    null
-                )
 
-                val current = pong != null
+                val current = RemoteUtils.detectClashRunning(application)
                 if (current != clashRunning) {
                     clashRunning = current
 

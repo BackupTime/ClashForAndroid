@@ -19,6 +19,7 @@ import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
 import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.RandomUtils
+import com.github.kr328.clash.service.util.UpdateUtils
 import com.github.kr328.clash.service.util.componentName
 import com.github.kr328.clash.service.util.intent
 import kotlinx.coroutines.channels.Channel
@@ -150,20 +151,7 @@ class ProfileBackgroundService : BaseService() {
 
     private suspend fun resetProfileUpdateAlarm() {
         for (entity in profiles.queryProfiles()) {
-            if (entity.updateInterval <= 0) continue
-
-            requireNotNull(getSystemService(AlarmManager::class.java)).set(
-                AlarmManager.RTC,
-                entity.lastUpdate + entity.updateInterval,
-                PendingIntent.getBroadcast(
-                    this,
-                    RandomUtils.nextInt(),
-                    Intent(Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST)
-                        .setComponent(ProfileRequestReceiver::class.componentName)
-                        .putExtra(Intents.INTENT_EXTRA_PROFILE_ID, entity.id),
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                )
-            )
+            UpdateUtils.resetProfileUpdateAlarm(this, entity)
         }
     }
 

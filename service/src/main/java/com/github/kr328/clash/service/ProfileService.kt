@@ -207,20 +207,7 @@ class ProfileService : BaseService() {
 
             processor.createOrUpdate(entity, id == -1L)
 
-            if (entity.updateInterval > 0) {
-                requireNotNull(getSystemService(AlarmManager::class.java)).set(
-                    AlarmManager.RTC,
-                    entity.lastUpdate + entity.updateInterval,
-                    PendingIntent.getBroadcast(
-                        service,
-                        RandomUtils.nextInt(),
-                        Intent(Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST)
-                            .setComponent(ProfileRequestReceiver::class.componentName)
-                            .putExtra(Intents.INTENT_EXTRA_PROFILE_ID, entity.id),
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                )
-            }
+            UpdateUtils.resetProfileUpdateAlarm(service, entity)
         }
 
     private suspend fun removeProfile(request: ProfileRequest) = withContext(Dispatchers.IO) {

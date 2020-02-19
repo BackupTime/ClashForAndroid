@@ -30,6 +30,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
 import java.io.FileWriter
 import java.io.IOException
+import java.lang.Exception
 import kotlin.math.max
 
 class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
@@ -131,43 +132,48 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
         launch {
             val pendingRequest: MutableList<Request> = mutableListOf()
 
-            withContext(Dispatchers.Default) {
-                while (isActive) {
-                    select<Unit> {
-                        logChannel.onReceive {
-                            cache.addLast(it)
+            try {
+                withContext(Dispatchers.Default) {
+                    while (isActive) {
+                        select<Unit> {
+                            logChannel.onReceive {
+                                cache.addLast(it)
 
-                            if (cache.size() > MAX_CACHE_COUNT) {
-                                cache.removeFromStart(1)
-                                cacheOffset++
+                                if (cache.size() > MAX_CACHE_COUNT) {
+                                    cache.removeFromStart(1)
+                                    cacheOffset++
+                                }
+                            }
+                            requestChannel.onReceive {
+                                pendingRequest.add(it)
                             }
                         }
-                        requestChannel.onReceive {
-                            pendingRequest.add(it)
+
+                        // Handle pending requests
+                        val iterator = pendingRequest.iterator()
+                        while (iterator.hasNext()) {
+                            val request = iterator.next()
+
+                            if (request.offset >= cacheOffset + cache.size())
+                                continue
+
+                            val logs = mutableListOf<LogEvent>()
+
+                            val responseOffset = max(cacheOffset, request.offset)
+                            val begin = (responseOffset - cacheOffset).toInt()
+
+                            for (i in begin until cache.size())
+                                logs.add(cache[i])
+
+                            request.response.complete(Response(responseOffset, logs))
+
+                            iterator.remove()
                         }
                     }
-
-                    // Handle pending requests
-                    val iterator = pendingRequest.iterator()
-                    while (iterator.hasNext()) {
-                        val request = iterator.next()
-
-                        if (request.offset >= cacheOffset + cache.size())
-                            continue
-
-                        val logs = mutableListOf<LogEvent>()
-
-                        val responseOffset = max(cacheOffset, request.offset)
-                        val begin = (responseOffset - cacheOffset).toInt()
-
-                        for (i in begin until cache.size())
-                            logs.add(cache[i])
-
-                        request.response.complete(Response(responseOffset, logs))
-
-                        iterator.remove()
-                    }
                 }
+            }
+            catch (e: Exception) {
+                return@launch
             }
         }
     }
