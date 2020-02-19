@@ -1,12 +1,14 @@
 package com.github.kr328.clash.service.data
 
 import android.content.ContentValues
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.github.kr328.clash.core.Global
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.Constants
+import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.resolveBase
 import com.github.kr328.clash.service.util.resolveProfile
 import java.io.File
@@ -103,6 +105,38 @@ object ClashDatabaseMigrations {
 
             database.execSQL("DROP TABLE _profiles")
             database.execSQL("DROP TABLE _profile_select_proxies")
+
+            // Migration settings
+            val oldSettings = Global.application
+                .getSharedPreferences("clash_service", Context.MODE_PRIVATE)
+            val newSettings = ServiceSettings(Global.application
+                .getSharedPreferences(Constants.SERVICE_SETTING_FILE_NAME, Context.MODE_PRIVATE))
+
+            val accessMode = oldSettings
+                .getInt("key_access_control_mode", 0)
+            val accessPackages = oldSettings
+                .getStringSet("ley_access_control_apps", emptySet())!! // just typo :)
+            val ipv6Enabled = oldSettings
+                .getBoolean("key_ipv6_enabled", false)
+            val dnsHijack = oldSettings
+                .getBoolean("key_dns_hijacking_enabled", true)
+            val bypassPrivate = oldSettings
+                .getBoolean("key_bypass_private_network", true)
+
+            newSettings.commit {
+                val newAccessMode = when ( accessMode ) {
+                    0 -> ServiceSettings.ACCESS_CONTROL_MODE_ALL
+                    1 -> ServiceSettings.ACCESS_CONTROL_MODE_WHITELIST
+                    2 -> ServiceSettings.ACCESS_CONTROL_MODE_BLACKLIST
+                    else -> ServiceSettings.ACCESS_CONTROL_MODE_ALL
+                }
+
+                put(ServiceSettings.ACCESS_CONTROL_MODE, newAccessMode)
+                put(ServiceSettings.ACCESS_CONTROL_PACKAGES, accessPackages)
+                put(ServiceSettings.IPV6_SUPPORT, ipv6Enabled)
+                put(ServiceSettings.DNS_HIJACKING, dnsHijack)
+                put(ServiceSettings.BYPASS_PRIVATE_NETWORK, bypassPrivate)
+            }
         }
 
         override fun migrate(database: SupportSQLiteDatabase) {
