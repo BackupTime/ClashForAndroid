@@ -21,9 +21,6 @@ import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.RandomUtils
 import com.github.kr328.clash.service.util.componentName
 import com.github.kr328.clash.service.util.intent
-import com.github.kr328.clash.service.util.timeout
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -33,17 +30,17 @@ class ProfileBackgroundService : BaseService() {
     companion object {
         private const val SERVICE_STATUS_CHANNEL = "profile_service_status"
         private const val SERVICE_RESULT_CHANNEL = "profile_service_result"
-        private const val SERVICE_NOTIFICATION_ID_BASE = 10000
     }
 
-    private val channel = Channel<ProfileRequest>(2)
-    private val queue = mutableListOf<CompletableDeferred<ProfileRequest>>()
+    private val requestChannel = Channel<ProfileRequest>(2)
+    private val responseChannel = Channel<ProfileRequest>(2)
     private val profiles: ClashProfileDao by lazy {
         ClashDatabase.getInstance(this).openClashProfileDao()
     }
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            channel.close()
+            requestChannel.close()
+            responseChannel.close()
             stopSelf()
         }
 
@@ -59,7 +56,7 @@ class ProfileBackgroundService : BaseService() {
 
         createNotificationChannels()
 
-        startForeground()
+        refreshStatusNotification(0)
 
         bindService(ProfileService::class.intent, connection, Context.BIND_AUTO_CREATE)
     }
@@ -80,7 +77,9 @@ class ProfileBackgroundService : BaseService() {
                 val request =
                     intent.getParcelableExtra<ProfileRequest>(Intents.INTENT_EXTRA_PROFILE_REQUEST)
                         ?: return START_NOT_STICKY
-                channel.offer(request)
+                launch {
+                    requestChannel.send(request)
+                }
             }
             Intents.INTENT_ACTION_PROFILE_SETUP -> {
                 launch {
@@ -97,71 +96,61 @@ class ProfileBackgroundService : BaseService() {
     }
 
     private fun startProfileProcessor(service: IProfileService) = launch {
-        while (isActive) {
-            val timeout = timeout(1000 * 30L)
+        val queue: MutableMap<Long, ProfileRequest> = mutableMapOf()
 
+        do {
             select<Unit> {
-                channel.onReceive {
-                    val deferred = CompletableDeferred<ProfileRequest>()
-                    val originalCallback = it.callback
+                requestChannel.onReceive {
+                    if ( !queue.containsKey(it.id) ) {
+                        queue[it.id] = it
 
-                    it.withCallback(object : IStreamCallback.Stub() {
-                        override fun complete() {
-                            originalCallback?.complete()
-                            deferred.complete(it)
-
-                            launch {
-                                updateUpdateComplete(it.id)
-                            }
-                        }
-
-                        override fun completeExceptionally(reason: String?) {
-                            originalCallback?.completeExceptionally(reason)
-                            deferred.complete(it)
-
-                            launch {
-                                updateUpdateFailure(it.id, reason ?: "Unknown")
-                            }
-                        }
-
-                        override fun send(data: ParcelableContainer?) {
-                            originalCallback?.send(data)
-
-                            launch {
-                                updateUpdating(it.id)
-                            }
-                        }
-                    })
-
-                    service.enqueueRequest(it)
-
-                    queue.add(deferred)
+                        sendRequest(it, service)
+                    }
                 }
-                if (queue.isNotEmpty()) {
-                    for (task in queue) {
-                        task.onAwait {
-                            queue.remove(task)
-                        }
-                    }
-                } else {
-                    timeout.onJoin {
-                        stopSelf()
-                        cancel()
-                    }
+                responseChannel.onReceive {
+                    queue.remove(it.id)
                 }
             }
 
-            timeout.cancel()
-        }
+            refreshStatusNotification(queue.size)
+        } while ( queue.isNotEmpty() )
+
+        stopSelf()
+    }
+
+    private fun sendRequest(request: ProfileRequest, service: IProfileService) {
+        val originalCallback = request.callback
+
+        request.withCallback(object: IStreamCallback.Stub() {
+            override fun complete() {
+                originalCallback?.complete()
+
+                launch {
+                    responseChannel.send(request)
+
+                    sendUpdateCompleted(request.id)
+                }
+            }
+
+            override fun completeExceptionally(reason: String?) {
+                originalCallback?.completeExceptionally(reason)
+
+                launch {
+                    responseChannel.send(request)
+
+                    sendUpdateFailure(request.id, reason?: "Unknown")
+                }
+            }
+
+            override fun send(data: ParcelableContainer?) {}
+        })
+
+        service.enqueueRequest(request)
     }
 
     private suspend fun resetProfileUpdateAlarm() {
         for (entity in profiles.queryProfiles()) {
             if (entity.updateInterval <= 0) continue
-
-            val nextRequest =
-                ProfileRequest().action(ProfileRequest.Action.UPDATE_OR_CREATE)
-                    .withId(entity.id)
 
             requireNotNull(getSystemService(AlarmManager::class.java)).set(
                 AlarmManager.RTC,
@@ -171,7 +160,7 @@ class ProfileBackgroundService : BaseService() {
                     RandomUtils.nextInt(),
                     Intent(Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST)
                         .setComponent(ProfileRequestReceiver::class.componentName)
-                        .putExtra(Intents.INTENT_EXTRA_PROFILE_REQUEST, nextRequest),
+                        .putExtra(Intents.INTENT_EXTRA_PROFILE_ID, entity.id),
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
             )
@@ -198,66 +187,38 @@ class ProfileBackgroundService : BaseService() {
         )
     }
 
-    private fun startForeground() {
+    private fun refreshStatusNotification(queueSize: Int) {
         val notification = NotificationCompat.Builder(this, SERVICE_STATUS_CHANNEL)
-            .setContentTitle(getText(R.string.profile_service_status_title))
+            .setContentTitle(getText(R.string.processing_profiles))
+            .setContentText(getString(R.string.format_in_queue, queueSize))
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
             .build()
 
-        startForeground(SERVICE_NOTIFICATION_ID_BASE, notification)
+        startForeground(RandomUtils.nextInt(), notification)
     }
 
-    private suspend fun updateUpdating(id: Long) {
-        val notificationId = ((id + 1) % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
+    private suspend fun sendUpdateCompleted(id: Long) {
         val entity = profiles.queryProfileById(id) ?: return
 
         val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
-            .setContentTitle(getText(R.string.profile_status_title))
-            .setContentText(getString(R.string.profile_status_updating, entity.name))
-            .setColor(getColor(R.color.colorAccentService))
-            .setSmallIcon(R.drawable.ic_notification)
-            .setOnlyAlertOnce(true)
-            .setOngoing(true)
-            .build()
-
-        NotificationManagerCompat.from(this)
-            .notify(SERVICE_NOTIFICATION_ID_BASE + notificationId, notification)
-    }
-
-    private suspend fun updateUpdateComplete(id: Long) {
-        val notificationId = ((id + 1) % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
-        val entity = profiles.queryProfileById(id)
-
-        if (entity == null) {
-            NotificationManagerCompat.from(this).cancel(notificationId)
-            return
-        }
-
-        val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
-            .setContentTitle(getText(R.string.profile_status_title))
-            .setContentText(getString(R.string.profile_status_update_completed, entity.name))
+            .setContentTitle(getText(R.string.process_result))
+            .setContentText(getString(R.string.format_update_complete, entity.name))
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
             .build()
 
         NotificationManagerCompat.from(this)
-            .notify(SERVICE_NOTIFICATION_ID_BASE + notificationId, notification)
+            .notify(RandomUtils.nextInt(), notification)
     }
 
-    private suspend fun updateUpdateFailure(id: Long, reason: String) {
-        val notificationId = ((id + 1) % (Int.MAX_VALUE - SERVICE_NOTIFICATION_ID_BASE)).toInt()
-        val entity = profiles.queryProfileById(id)
-
-        if (entity == null) {
-            NotificationManagerCompat.from(this).cancel(notificationId)
-            return
-        }
+    private suspend fun sendUpdateFailure(id: Long, reason: String) {
+        val entity = profiles.queryProfileById(id) ?: return
 
         val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
-            .setContentTitle(getString(R.string.profile_status_update_failure, entity.name))
+            .setContentTitle(getString(R.string.format_update_failure, entity.name, reason))
             .setContentText(reason)
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
@@ -265,6 +226,6 @@ class ProfileBackgroundService : BaseService() {
             .build()
 
         NotificationManagerCompat.from(this)
-            .notify(SERVICE_NOTIFICATION_ID_BASE + notificationId, notification)
+            .notify(RandomUtils.nextInt(), notification)
     }
 }

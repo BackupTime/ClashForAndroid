@@ -5,13 +5,13 @@
     <string name="clash_notification_content" translatable="false">"%1$s↑\t%2$s↓"</string>
 
     <string name="profile_service_status_channel">Profile Service Status</string>
-    <string name="profile_service_status_title">Profile Updater Running</string>
+    <string name="processing_profiles">Processing Profiles</string>
+    <string name="format_in_queue">%d items in Queue</string>
+    <string name="process_result">Process Result</string>
+    <string name="format_update_complete">Update %s Completed</string>
+    <string name="format_update_failure">Update %s Failure\n%s</string>
 
     <string name="profile_status_channel">Profile Processing Status</string>
-    <string name="profile_status_title">Processing Profile</string>
-    <string name="profile_status_updating">Updating %s</string>
-    <string name="profile_status_update_failure">Update %s Failure</string>
-    <string name="profile_status_update_completed">Update %s Completed</string>
 
     <string name="clash_service_label">Clash Core Service</string>
     <string name="tun_service_label">Tun Device Service</string>

@@ -4,18 +4,28 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.componentName
+import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.service.util.startForegroundServiceCompat
 
 class ProfileRequestReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action != Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST || context == null)
             return
 
-        intent.component = ProfileService::class.componentName
+        val id = intent.getLongExtra(Intents.INTENT_EXTRA_PROFILE_ID, -1)
+        if ( id < 0 )
+            return
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            context.startForegroundService(intent)
-        else
-            context.startService(intent)
+        val request = ProfileRequest()
+            .action(ProfileRequest.Action.UPDATE_OR_CREATE)
+            .withId(id)
+
+        val service = Intent(Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST)
+            .setComponent(ProfileBackgroundService::class.componentName)
+            .putExtra(Intents.INTENT_EXTRA_PROFILE_REQUEST, request)
+
+        context.startForegroundServiceCompat(service)
     }
 }

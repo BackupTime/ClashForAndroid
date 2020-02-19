@@ -208,10 +208,6 @@ class ProfileService : BaseService() {
             processor.createOrUpdate(entity, id == -1L)
 
             if (entity.updateInterval > 0) {
-                val nextRequest =
-                    ProfileRequest().action(ProfileRequest.Action.UPDATE_OR_CREATE)
-                        .withId(entity.id)
-
                 requireNotNull(getSystemService(AlarmManager::class.java)).set(
                     AlarmManager.RTC,
                     entity.lastUpdate + entity.updateInterval,
@@ -220,7 +216,7 @@ class ProfileService : BaseService() {
                         RandomUtils.nextInt(),
                         Intent(Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST)
                             .setComponent(ProfileRequestReceiver::class.componentName)
-                            .putExtra(Intents.INTENT_EXTRA_PROFILE_REQUEST, nextRequest),
+                            .putExtra(Intents.INTENT_EXTRA_PROFILE_ID, entity.id),
                         PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 )

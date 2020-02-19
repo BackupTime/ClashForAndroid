@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AlertDialog
+import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.design.common.TextInput
 import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.service.data.ClashProfileEntity
@@ -99,7 +100,7 @@ class ProfileEditActivity : BaseActivity() {
             textInput(
                 title = getString(R.string.auto_update),
                 icon = getDrawable(R.drawable.ic_update),
-                hint = getString(R.string.in_minutes),
+                hint = getString(R.string.seconds),
                 id = KEY_AUTO_UPDATE,
                 content = intent.getStringExtra("interval") ?: ""
             ) {
@@ -109,7 +110,7 @@ class ProfileEditActivity : BaseActivity() {
                     if (interval <= 0)
                         getString(R.string.disabled)
                     else
-                        getString(R.string.format_minutes, interval)
+                        getString(R.string.format_seconds, interval)
                 }
                 onTextChanged {
                     val s = it.toString()
@@ -135,7 +136,7 @@ class ProfileEditActivity : BaseActivity() {
                 val name = requireElement<TextInput>(KEY_NAME).content.toString()
                 val url = Uri.parse(requireElement<TextInput>(KEY_URL).content.toString())
                 val interval = requireElement<TextInput>(KEY_AUTO_UPDATE).content.toString()
-                    .toLongOrNull()?.minus(60) ?: 0
+                    .toLongOrNull()?: 0
 
                 if (name.isBlank()) {
                     Snackbar.make(rootView, R.string.empty_name, Snackbar.LENGTH_LONG).show()
@@ -251,6 +252,8 @@ class ProfileEditActivity : BaseActivity() {
                     ClashProfileEntity.TYPE_EXTERNAL
                 else -> throw IllegalArgumentException()
             }
+
+            Log.d(interval.toString())
 
             val request = ProfileRequest()
                 .action(ProfileRequest.Action.UPDATE_OR_CREATE)

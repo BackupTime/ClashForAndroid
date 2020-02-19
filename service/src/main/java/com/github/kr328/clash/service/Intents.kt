@@ -24,4 +24,6 @@ object Intents {
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.request"
     const val INTENT_EXTRA_START_TUN =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.start.tun"
+    const val INTENT_EXTRA_PROFILE_ID =
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.id"
 }

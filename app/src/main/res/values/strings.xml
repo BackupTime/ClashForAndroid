@@ -24,6 +24,7 @@
     <string name="unknown">Unknown</string>
 
     <string name="recently">Recently</string>
+    <string name="format_seconds">%d seconds</string>
     <string name="format_minutes">%d minutes</string>
     <string name="format_hours">%d hours</string>
     <string name="format_days">%d days</string>
@@ -45,7 +46,7 @@
     <string name="profile_url">Profile URL</string>
 
     <string name="auto_update">Auto Update</string>
-    <string name="in_minutes">In minutes</string>
+    <string name="seconds">Seconds</string>
     <string name="invalid_interval">Invalid Interval</string>
     <string name="download_failure">Download Failure</string>
     <string name="detail">Detail</string>
@@ -135,4 +136,26 @@
     <string name="dark_mode">Dark Mode</string>
 
     <string name="options_unavailable">Options Unavailable until Clash Stopped</string>
+
+    <string name="system_apps">System Apps</string>
+    <string name="sort">Sort</string>
+    <string name="package_name">Package Name</string>
+    <string name="update_time">Update Time</string>
+    <string name="install_time">Install Time</string>
+    <string name="reverse">Reverse</string>
+    <string name="search">Search</string>
+
+    <string name="sources">Sources</string>
+    <string name="clash">Clash</string>
+    <string name="clash_for_android">Clash for Android</string>
+    <string name="clash_url" translatable="false">https://github.com/Dreamacro/clash</string>
+    <string name="clash_for_android_url" translatable="false">https://github.com/Kr328/ClashForAndroid</string>
+
+    <string name="contacts">Contacts</string>
+    <string name="email">E-Mail</string>
+    <string name="github_issues">Github Issues</string>
+    <string name="telegram_channel">Telegram Channel</string>
+    <string name="email_url" translatable="false">kr328app@outlook.com</string>
+    <string name="github_issues_url" translatable="false">https://github.com/Kr328/ClashForAndroid/issues</string>
+    <string name="telegram_channel_url" translatable="false">https://t.me/clash_for_android_channel</string>
 </resources>

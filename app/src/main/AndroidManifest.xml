@@ -84,8 +84,13 @@
             android:exported="false"
             android:configChanges="uiMode" />
         <activity
-            android:name=".AccessControlPackagesActivity"
+            android:name=".PackagesActivity"
             android:label="@string/access_control_packages"
+            android:exported="false"
+            android:configChanges="uiMode" />
+        <activity
+            android:name=".SupportActivity"
+            android:label="@string/support"
             android:exported="false"
             android:configChanges="uiMode" />
         <service

@@ -140,6 +140,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/support"
             android:padding="15dp"
             android:layout_marginStart="35dp"
             android:layout_marginEnd="30dp"
@@ -165,6 +166,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/about"
             android:padding="15dp"
             android:layout_marginStart="35dp"
             android:layout_marginEnd="30dp"

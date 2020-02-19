@@ -1,8 +1,6 @@
 package com.github.kr328.clash.adapter
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
+import com.github.kr328.clash.core.utils.Log
 import com.google.android.material.checkbox.MaterialCheckBox
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.streams.toList
@@ -27,6 +25,8 @@ class PackagesAdapter(private val context: Context,
     enum class Sort {
         NAME, PACKAGE, INSTALL_TIME, UPDATE_TIME
     }
+
+    val selectedPackages: MutableSet<String> = mutableSetOf()
 
     private var filteredCache: List<AppInfo> = apps
 
@@ -42,10 +42,9 @@ class PackagesAdapter(private val context: Context,
         withContext(Dispatchers.Default) {
             val newList = apps.parallelStream()
                 .filter {
-                    it.label.contains(keyword, true)
-                            || it.packageName.contains(keyword, true)
-                            || systemApp
-                            || it.isSystem
+                    (it.label.contains(keyword, true)
+                            || it.packageName.contains(keyword, true))
+                            && (systemApp || !it.isSystem)
                 }
                 .sorted { a, b ->
                     val result = when (sort) {
@@ -77,7 +76,9 @@ class PackagesAdapter(private val context: Context,
                     oldItemPosition: Int,
                     newItemPosition: Int
                 ): Boolean {
-                    return areItemsTheSame(oldItemPosition, newItemPosition)
+                    return areItemsTheSame(oldItemPosition, newItemPosition) &&
+                            (selectedPackages.contains(oldList[oldItemPosition].packageName) ==
+                                    selectedPackages.contains(newList[newItemPosition].packageName))
                 }
 
             })
@@ -103,5 +104,16 @@ class PackagesAdapter(private val context: Context,
         holder.icon.setImageDrawable(current.icon)
         holder.label.text = current.label
         holder.packageName.text = current.packageName
+        holder.checkbox.isChecked = selectedPackages.contains(current.packageName)
+        holder.root.setOnClickListener {
+            if ( selectedPackages.contains(current.packageName) ) {
+                selectedPackages.remove(current.packageName)
+            }
+            else {
+                selectedPackages.add(current.packageName)
+            }
+
+            notifyItemChanged(filteredCache.indexOf(current))
+        }
     }
 }

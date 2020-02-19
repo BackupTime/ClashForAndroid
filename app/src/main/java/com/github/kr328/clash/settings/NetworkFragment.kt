@@ -1,8 +1,7 @@
 package com.github.kr328.clash.settings
 
 import android.os.Bundle
-import com.github.kr328.clash.AccessControlPackagesActivity
-import com.github.kr328.clash.BaseActivity
+import com.github.kr328.clash.PackagesActivity
 import com.github.kr328.clash.R
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.Broadcasts
@@ -27,7 +26,7 @@ class NetworkFragment: BaseSettingFragment() {
         preferenceScreen.isEnabled = !Broadcasts.clashRunning
 
         findPreference(KEY_ACCESS_CONTROL_PACKAGES).setOnPreferenceClickListener {
-            startActivity(AccessControlPackagesActivity::class.intent)
+            startActivity(PackagesActivity::class.intent)
             true
         }
     }
