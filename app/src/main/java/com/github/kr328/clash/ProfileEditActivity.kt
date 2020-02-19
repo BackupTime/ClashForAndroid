@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Html
 import android.view.View
 import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AlertDialog
@@ -68,6 +69,10 @@ class ProfileEditActivity : BaseActivity() {
         setSupportActionBar(toolbar)
 
         settings.build {
+            tips(icon = getDrawable(R.drawable.ic_info)) {
+                title = Html.fromHtml(getString(R.string.tips_profile), Html.FROM_HTML_MODE_LEGACY)
+            }
+
             textInput(
                 title = getString(R.string.name),
                 icon = getDrawable(R.drawable.ic_label_outline),

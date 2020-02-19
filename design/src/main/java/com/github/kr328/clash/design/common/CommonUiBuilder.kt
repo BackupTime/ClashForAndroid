@@ -71,6 +71,20 @@ class CommonUiBuilder(val screen: CommonUiScreen) {
         screen.addElement(category)
     }
 
+    fun tips(
+        title: String = "",
+        icon: Drawable? = null,
+        setup: Tips.() -> Unit) {
+        val tips = Tips(screen)
+
+        tips.title = title
+        tips.icon = icon
+
+        setup(tips)
+
+        screen.addElement(tips)
+    }
+
     fun custom(
         view: View,
         setup: Custom.() -> Unit

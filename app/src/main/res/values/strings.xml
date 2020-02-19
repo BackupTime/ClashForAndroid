@@ -159,4 +159,6 @@
     <string name="email_url" translatable="false">kr328app@outlook.com</string>
     <string name="github_issues_url" translatable="false">https://github.com/Kr328/ClashForAndroid/issues</string>
     <string name="telegram_channel_url" translatable="false">https://t.me/clash_for_android_channel</string>
+
+    <string name="tips_profile"><![CDATA[Accept Only <strong>Clash Config</strong> which contains <br /><strong>Proxies, Proxy Groups and Rules</strong>]]></string>
 </resources>

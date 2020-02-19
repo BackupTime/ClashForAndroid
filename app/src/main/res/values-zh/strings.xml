@@ -126,4 +126,5 @@
     <string name="github_issues">Github Issues</string>
     <string name="format_seconds">%d 秒</string>
     <string name="copied">已复制</string>
+    <string name="tips_profile"><![CDATA[仅接受 <strong>Clash 配置文件</strong> <br />其中包含了 <strong>代理, 代理组 和 规则</strong>]]></string>
 </resources>
