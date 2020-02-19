@@ -70,6 +70,7 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="clash_start_failure">Clash Start Failure</string>
     <string name="refresh">Refresh</string>
+    <string name="copied">Copied</string>
 
     <string name="delay">Delay</string>
     <string name="direct">Direct</string>
