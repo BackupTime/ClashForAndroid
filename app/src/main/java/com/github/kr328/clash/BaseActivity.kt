@@ -103,7 +103,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         if (language.isEmpty())
             return super.attachBaseContext(base)
 
-        val configuration = base.resources.configuration
+        val configuration = Configuration()
         val localeOverride = if (languageOverride.size == 2)
             Locale(languageOverride[0], languageOverride[1])
         else
@@ -116,6 +116,8 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        language = uiSettings.get(UiSettings.LANGUAGE)
 
         resetDarkMode()
 

@@ -68,8 +68,6 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
             return
 
         launch {
-            delay(1000)
-
             val network = detectDefaultNetwork()
             val link = network?.let(connectivity::getLinkProperties)
 

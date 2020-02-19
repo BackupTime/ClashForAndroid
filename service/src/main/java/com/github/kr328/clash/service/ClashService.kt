@@ -18,9 +18,6 @@ import kotlinx.coroutines.sync.Mutex
 
 class ClashService : BaseService() {
     companion object {
-        const val INTENT_EXTRA_START_TUN =
-            "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.start.tun"
-
         var isServiceRunning = false
     }
 
@@ -29,7 +26,6 @@ class ClashService : BaseService() {
     private lateinit var notification: ClashNotification
     private var stopReason: String? = null
     private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
-    private val settings: ServiceSettings by lazy { ServiceSettings(this) }
     private val reloadReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.`package` != packageName)
@@ -64,7 +60,8 @@ class ClashService : BaseService() {
 
         broadcastClashStarted(this)
 
-        val startVpn = intent?.getBooleanExtra(INTENT_EXTRA_START_TUN, true) ?: true
+        val startVpn = intent?.getBooleanExtra(
+            Intents.INTENT_EXTRA_START_TUN, true) ?: true
 
         if (startVpn)
             startService(TunService::class.intent)

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <cache-path
-        name="export_logs"
-        path="logs" />
-    <external-cache-path
-        name="export_external_logs"
-        path="logs" />
-</paths>

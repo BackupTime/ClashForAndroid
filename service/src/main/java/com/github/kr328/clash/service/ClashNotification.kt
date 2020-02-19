@@ -63,9 +63,7 @@ class ClashNotification(private val context: ClashService, enableRefresh: Boolea
     init {
         createNotificationChannel()
 
-        runBlocking {
-            update()
-        }
+        notifyBaseNotification()
 
         if (enableRefresh) {
             launch {
@@ -131,6 +129,15 @@ class ClashNotification(private val context: ClashService, enableRefresh: Boolea
 
             update()
         }
+    }
+
+    private fun notifyBaseNotification() {
+        val notification = baseBuilder
+            .setContentTitle(profile)
+            .setContentText(context.getText(R.string.running))
+            .build()
+
+        context.startForeground(CLASH_STATUS_NOTIFICATION_ID, notification)
     }
 
     private suspend fun update() {

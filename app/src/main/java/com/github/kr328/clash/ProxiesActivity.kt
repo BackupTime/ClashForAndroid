@@ -294,11 +294,18 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
                                 PrefixMerger.Result(p.name, "", p)
                             }
 
+                            val data = if ( r.content.isEmpty() ) {
+                                r.prefix to p.type.toString()
+                            }
+                            else {
+                                r.content to r.prefix
+                            }
+
                             ProxyAdapter.ProxyInfo(
                                 p.name,
                                 it.name,
-                                r.prefix,
-                                if (r.content.isEmpty()) p.type.toString() else r.content,
+                                data.first,
+                                data.second,
                                 p.delay.toShort(),
                                 it.type == Proxy.Type.SELECT,
                                 p.name == it.current

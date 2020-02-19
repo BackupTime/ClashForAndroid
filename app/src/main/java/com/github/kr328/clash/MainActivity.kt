@@ -13,6 +13,7 @@ import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.service.util.startForegroundServiceCompat
+import com.github.kr328.clash.utils.startClashService
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -35,10 +36,8 @@ class MainActivity : BaseActivity() {
             if (clashRunning) {
                 stopService(ClashService::class.intent)
             } else {
-                val vpnRequest = VpnService.prepare(this)
-                if (vpnRequest == null)
-                    startForegroundServiceCompat(ClashService::class.intent)
-                else
+                val vpnRequest = startClashService()
+                if ( vpnRequest != null )
                     startActivityForResult(vpnRequest, REQUEST_CODE)
             }
         }

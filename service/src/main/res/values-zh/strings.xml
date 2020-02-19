@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="clash_manager_service_label">Clash 管理器服务</string>
+    <string name="clash_profile_service_label">Clash 配置管理服务</string>
+    <string name="clash_service_label">Clash 核心服务</string>
+    <string name="clash_service_status_channel">Clash 状态</string>
+    <string name="profile_service_status_channel">配置服务状态</string>
+    <string name="profile_service_status_title">配置更新工具正在运行</string>
+    <string name="profile_status_channel">配置处理状态</string>
+    <string name="profile_status_title">正在处理配置文件</string>
+    <string name="profile_status_update_completed">更新 %s 完成</string>
+    <string name="profile_status_update_failure">更新 %s 失败</string>
+    <string name="profile_status_updating">正在更新 %s</string>
+    <string name="running">正在运行</string>
+    <string name="tun_service_label">Tun 服务</string>
+</resources>

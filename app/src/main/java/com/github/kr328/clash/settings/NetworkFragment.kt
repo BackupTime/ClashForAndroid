@@ -1,5 +1,7 @@
 package com.github.kr328.clash.settings
 
+import android.os.Bundle
+import com.github.kr328.clash.BaseActivity
 import com.github.kr328.clash.R
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.settings.ServiceSettings
@@ -13,6 +15,13 @@ class NetworkFragment: BaseSettingFragment() {
         private const val KEY_DNS_OVERRIDE = "dns_override"
         private const val KEY_APPEND_SYS_DNS = "append_system_dns"
         private const val KEY_ACCESS_CONTROL_MODE = "access_control_mode"
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if ((requireActivity() as BaseActivity).clashRunning)
+            preferenceScreen.isEnabled = false
     }
 
     override fun onCreateDataStore(): SettingsDataStore {

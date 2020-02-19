@@ -1,5 +1,6 @@
 package com.github.kr328.clash.utils
 
+import android.content.Context
 import com.github.kr328.clash.R
 import com.github.kr328.clash.core.Global
 
@@ -11,9 +12,7 @@ object IntervalUtils {
     private const val MILLIS_MONTH = MILLIS_DAY * 30
     private const val MILLIS_YEAR = MILLIS_MONTH * 12
 
-    fun intervalString(interval: Long): String {
-        val context = Global.application
-
+    fun intervalString(context: Context, interval: Long): String {
         val year = interval / MILLIS_YEAR
         val month = interval / MILLIS_MONTH
         val day = interval / MILLIS_DAY

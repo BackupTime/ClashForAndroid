@@ -12,6 +12,8 @@ class ServiceSettings(context: Context):
         const val ACCESS_CONTROL_MODE_BLACKLIST = "access_control_mode_blacklist"
         const val ACCESS_CONTROL_MODE_WHITELIST = "access_control_mode_whitelist"
 
+        val LANGUAGE =
+            StringEntry("language", "")
         val IPV6_SUPPORT =
             BooleanEntry("ipv6_support", false)
         val BYPASS_PRIVATE_NETWORK =
