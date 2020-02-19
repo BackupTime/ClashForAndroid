@@ -4,14 +4,14 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion gCompileSdkVersion
+    buildToolsVersion gBuildToolsVersion
 
     defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion gMinSdkVersion
+        targetSdkVersion gTargetSdkVersion
+        versionCode gVersionCode
+        versionName gVersionName
 
         consumerProguardFiles 'consumer-rules.pro'
     }
@@ -40,10 +40,10 @@ android {
 }
 
 dependencies {
-    implementation "androidx.core:core-ktx:1.2.0"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutine_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
+    implementation "androidx.core:core-ktx:$gAndroidKtxVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$gKotlinCoroutineVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$gKotlinSerializationVersion"
 }
 
 afterEvaluate {

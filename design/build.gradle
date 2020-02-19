@@ -2,16 +2,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion gCompileSdkVersion
+    buildToolsVersion gBuildToolsVersion
 
     defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion gMinSdkVersion
+        targetSdkVersion gTargetSdkVersion
+        versionCode gVersionCode
+        versionName gVersionName
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
     }
     buildTypes {
@@ -30,9 +29,8 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.2.0'
-    implementation "com.google.android.material:material:1.2.0-alpha04"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$gKotlinVersion"
+    implementation "androidx.appcompat:appcompat:$gAppCompatVersion"
+    implementation "androidx.core:core-ktx:$gAndroidKtxVersion"
+    implementation "com.google.android.material:material:$gMaterialDesignVersion"
 }

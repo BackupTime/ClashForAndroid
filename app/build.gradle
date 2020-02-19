@@ -5,14 +5,14 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion gCompileSdkVersion
+    buildToolsVersion gBuildToolsVersion
     defaultConfig {
         applicationId "com.github.kr328.clash"
-        minSdkVersion 24
-        targetSdkVersion 29
-        versionCode 10100
-        versionName "1.1.0"
+        minSdkVersion gMinSdkVersion
+        targetSdkVersion gTargetSdkVersion
+        versionCode gVersionCode
+        versionName gVersionName
     }
     buildTypes {
         release {
@@ -30,28 +30,25 @@ android {
 }
 
 dependencies {
-    kapt "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$gRoomVersion"
 
     implementation project(":core")
     implementation project(":service")
     implementation project(":design")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutine_version"
-    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
-    implementation 'androidx.browser:browser:1.2.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.0-alpha01'
-    implementation 'androidx.fragment:fragment-ktx:1.2.1'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
-    implementation "androidx.room:room-runtime:$room_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
-    implementation "com.google.android.material:material:1.2.0-alpha04"
-    implementation "moe.shizuku.preference:preference-appcompat:4.2.0"
-    implementation "moe.shizuku.preference:preference-simplemenu-appcompat:4.2.0"
-    implementation "com.microsoft.appcenter:appcenter-analytics:$app_center_version"
-    implementation "com.microsoft.appcenter:appcenter-crashes:$app_center_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$gKotlinCoroutineVersion"
+    implementation "androidx.lifecycle:lifecycle-extensions:$gLifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$gLifecycleVersion"
+    implementation "androidx.recyclerview:recyclerview:$gRecyclerviewVersion"
+    implementation "androidx.core:core-ktx:$gAndroidKtxVersion"
+    implementation "androidx.appcompat:appcompat:$gAppCompatVersion"
+    implementation "androidx.room:room-runtime:$gRoomVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$gKotlinSerializationVersion"
+    implementation "com.google.android.material:material:$gMaterialDesignVersion"
+    implementation "moe.shizuku.preference:preference-appcompat:$gShizukuPreferenceVersion"
+    implementation "moe.shizuku.preference:preference-simplemenu-appcompat:$gShizukuPreferenceVersion"
+    implementation "com.microsoft.appcenter:appcenter-analytics:$gAppCenterVersion"
+    implementation "com.microsoft.appcenter:appcenter-crashes:$gAppCenterVersion"
 }
 
 task injectAppCenterKey() {
