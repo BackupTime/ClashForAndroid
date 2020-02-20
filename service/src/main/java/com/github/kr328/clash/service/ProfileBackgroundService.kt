@@ -81,6 +81,8 @@ class ProfileBackgroundService : BaseService() {
             Intents.INTENT_ACTION_PROFILE_SETUP -> {
                 launch {
                     resetProfileUpdateAlarm()
+
+                    stopSelf()
                 }
             }
         }
