@@ -15,6 +15,8 @@ import (
 	"github.com/Dreamacro/clash/tunnel"
 )
 
+var ApplicationVersion = "Unknown"
+
 const defaultFileMode = 0600
 
 var client = &http.Client{
@@ -45,7 +47,14 @@ var client = &http.Client{
 }
 
 func DownloadAndCheck(url, output, baseDir string) error {
-	response, err := client.Get(url)
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+
+	request.Header.Set("User-Agent", "ClashForAndroid/"+ApplicationVersion)
+
+	response, err := client.Do(request)
 	if err != nil {
 		return err
 	}

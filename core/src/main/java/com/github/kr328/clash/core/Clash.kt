@@ -31,6 +31,7 @@ object Clash {
 
         Bridge.loadMMDB(bytes)
         Bridge.setHome(context.cacheDir.absolutePath)
+        Bridge.setApplicationVersion(BuildConfig.VERSION_NAME)
         Bridge.reset()
 
         Log.d("MMDB loaded ${bytes.size}")

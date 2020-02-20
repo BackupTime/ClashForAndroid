@@ -22,3 +22,7 @@ func Reset() {
 	profile.LoadDefault()
 	tunnel.DefaultManager.ResetStatistic()
 }
+
+func SetApplicationVersion(version string) {
+	profile.ApplicationVersion = version
+}
