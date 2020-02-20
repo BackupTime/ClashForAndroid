@@ -8,8 +8,8 @@ buildscript {
         gMinSdkVersion = 24
         gTargetSdkVersion = 29
 
-        gVersionCode = 10100
-        gVersionName = "1.1.0"
+        gVersionCode = 10101
+        gVersionName = "1.1.1"
 
         gKotlinVersion = '1.3.61'
         gKotlinCoroutineVersion = '1.3.3'
