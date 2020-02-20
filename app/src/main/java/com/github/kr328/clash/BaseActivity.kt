@@ -63,8 +63,8 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     var menu: Menu? = null
     lateinit var uiSettings: UiSettings
         private set
-    lateinit var language: String
-    lateinit var darkMode: String
+    private lateinit var language: String
+    private lateinit var darkMode: String
 
     open suspend fun onClashStarted() {}
     open suspend fun onClashStopped(reason: String?) {}

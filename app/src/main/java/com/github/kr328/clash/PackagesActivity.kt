@@ -8,7 +8,6 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.PackagesAdapter
-import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.settings.ServiceSettings
 import kotlinx.android.synthetic.main.activity_access_control_packages.*
 import kotlinx.coroutines.*

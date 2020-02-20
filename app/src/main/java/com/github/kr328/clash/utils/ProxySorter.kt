@@ -5,7 +5,7 @@ import com.github.kr328.clash.core.model.ProxyGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ProxySorter(val groupOrder: Order, val proxyOrder: Order) {
+class ProxySorter(private val groupOrder: Order, private val proxyOrder: Order) {
     enum class Order {
         DEFAULT, DELAY_INCREASE, DELAY_DECREASE, NAME_INCREASE, NAME_DECREASE
     }

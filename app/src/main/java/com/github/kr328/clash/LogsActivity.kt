@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.util.TypedValue
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
@@ -17,6 +16,7 @@ import com.github.kr328.clash.design.view.CommonUiLayout
 import com.github.kr328.clash.model.LogFile
 import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.service.util.startForegroundServiceCompat
+import com.github.kr328.clash.utils.format
 import com.github.kr328.clash.utils.logsDir
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -228,10 +228,8 @@ class LogsActivity : BaseActivity() {
             return
 
         val d = Date(file.date)
-        val date = DateFormat.getDateFormat(this)
-        val time = DateFormat.getTimeFormat(this)
 
-        val exportName = getString(R.string.format_export_log_name, date.format(d), time.format(d))
+        val exportName = getString(R.string.format_export_log_name, d.format(this))
 
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
             .setType("text/plain")

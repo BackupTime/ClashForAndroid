@@ -1,7 +1,6 @@
 package com.github.kr328.clash.adapter
 
 import android.content.Context
-import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
 import com.github.kr328.clash.core.event.LogEvent
+import com.github.kr328.clash.utils.format
 import java.util.*
 
 class LogAdapter(
@@ -19,11 +19,10 @@ class LogAdapter(
         private val level: TextView = view.findViewById(R.id.level)
         private val time: TextView = view.findViewById(R.id.time)
         private val payload: TextView = view.findViewById(R.id.payload)
-        private val timeFormat = DateFormat.getTimeFormat(view.context)
 
         fun bind(logEvent: LogEvent) {
             level.text = logEvent.level.toString()
-            time.text = timeFormat.format(Date(logEvent.time))
+            time.text = Date(logEvent.time).format(itemView.context, includeDate = false)
             payload.text = logEvent.message
         }
     }

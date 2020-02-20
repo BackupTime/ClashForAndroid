@@ -2,7 +2,6 @@ package com.github.kr328.clash.settings
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import com.github.kr328.clash.BaseActivity
 import com.github.kr328.clash.OnBootReceiver
 import com.github.kr328.clash.R
 import com.github.kr328.clash.remote.Broadcasts

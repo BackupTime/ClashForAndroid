@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="PluralsCandidate">
     <string name="launch_name">Clash</string>
     <string name="application_name">Clash for Android</string>
 
@@ -24,6 +24,7 @@
     <string name="unknown">Unknown</string>
 
     <string name="recently">Recently</string>
+
     <string name="format_seconds">%d seconds</string>
     <string name="format_minutes">%d minutes</string>
     <string name="format_hours">%d hours</string>
@@ -93,8 +94,7 @@
     <string name="clash_logcat">Clash Logcat</string>
     <string name="history">History</string>
     <string name="log_viewer">Log Viewer</string>
-    <string name="format_date_time">%s %s</string>
-    <string name="format_export_log_name">%s %s.log</string>
+    <string name="format_export_log_name">%s.log</string>
 
     <string name="delete_all_logs">Delete All Logs</string>
     <string name="delete_all_logs_warn">All historical logs will *LOST*</string>

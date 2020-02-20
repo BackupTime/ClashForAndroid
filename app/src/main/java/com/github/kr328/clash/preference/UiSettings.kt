@@ -20,7 +20,7 @@ class UiSettings(context: Context):
         val PROXY_GROUP_SORT = StringEntry("proxy_group_sort", PROXY_SORT_DEFAULT)
         val PROXY_PROXY_SORT = StringEntry("proxy_proxy_sort", PROXY_SORT_DEFAULT)
         val PROXY_LAST_SELECT_GROUP = StringEntry("proxy_last_select_group", "")
-        val PROXY_MERGE_PREFIX = BooleanEntry("proxy_merge_prefix", true)
+        val PROXY_MERGE_PREFIX = BooleanEntry("proxy_merge_prefix", false)
         val LANGUAGE = StringEntry("language", "")
         val DARK_MODE = StringEntry("dark_mode", DARK_MODE_AUTO)
     }

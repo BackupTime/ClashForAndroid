@@ -38,8 +38,9 @@ object PrefixMerger {
 
             for (group in groups) {
                 var diffIndex = 0
+                val size = group.map { it.first.length }.min() ?: 0
 
-                diff@ for (charIndex in group[0].first.indices) {
+                diff@ for (charIndex in 0 until size) {
                     for (stringIndex in 0 until (group.size - 1)) {
                         if (group[stringIndex].first[charIndex] != group[stringIndex + 1].first[charIndex])
                             break@diff

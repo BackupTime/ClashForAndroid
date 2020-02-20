@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
-import com.github.kr328.clash.core.utils.Log
 import com.google.android.material.checkbox.MaterialCheckBox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

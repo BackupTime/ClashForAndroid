@@ -2,9 +2,12 @@ package com.github.kr328.clash.service.net
 
 import android.content.Context
 import android.net.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 import java.net.InetAddress
 
 class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :

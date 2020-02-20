@@ -12,7 +12,6 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.IInterface
-import android.text.format.DateFormat
 import androidx.collection.CircularArray
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -24,13 +23,14 @@ import com.github.kr328.clash.service.IClashManager
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
 import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.utils.format
 import com.github.kr328.clash.utils.logsDir
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
 import java.io.FileWriter
 import java.io.IOException
-import java.lang.Exception
+import java.util.*
 import kotlin.math.max
 
 class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
@@ -184,10 +184,9 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
                 logsDir.mkdirs()
                 try {
                     FileWriter(logsDir.resolve(entity.fileName)).buffered().use { output ->
-                        val dateFormat = DateFormat.getDateFormat(this@LogcatService)
                         var offset = 0L
 
-                        output.write("# Logcat on ${dateFormat.format(entity.date)}")
+                        output.write("# Logcat on ${Date(entity.date).format(this@LogcatService)}")
                         output.newLine()
 
                         while (isActive) {

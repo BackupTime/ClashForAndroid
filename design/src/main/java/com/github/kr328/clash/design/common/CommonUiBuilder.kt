@@ -2,7 +2,6 @@ package com.github.kr328.clash.design.common
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.view.View
 
 class CommonUiBuilder(val screen: CommonUiScreen) {
     val context: Context
@@ -83,16 +82,5 @@ class CommonUiBuilder(val screen: CommonUiScreen) {
         setup(tips)
 
         screen.addElement(tips)
-    }
-
-    fun custom(
-        view: View,
-        setup: Custom.() -> Unit
-    ) {
-        val custom = Custom(screen, view)
-
-        setup(custom)
-
-        screen.addElement(custom)
     }
 }

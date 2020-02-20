@@ -3,10 +3,8 @@ package com.github.kr328.clash.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.componentName
-import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.service.util.startForegroundServiceCompat
 
 class ProfileRequestReceiver : BroadcastReceiver() {

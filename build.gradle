@@ -14,7 +14,7 @@ buildscript {
         gKotlinVersion = '1.3.61'
         gKotlinCoroutineVersion = '1.3.3'
         gKotlinSerializationVersion = '0.14.0'
-        gRoomVersion = '2.2.3'
+        gRoomVersion = '2.2.4'
         gAppCenterVersion = '2.5.1'
         gAndroidKtxVersion = "1.2.0"
         gLifecycleVersion = "2.2.0"

@@ -46,9 +46,8 @@
     <string name="external">外部</string>
     <string name="file">文件</string>
     <string name="file_exported">文件已导出</string>
-    <string name="format_date_time">%s %s</string>
     <string name="format_days">%d 天</string>
-    <string name="format_export_log_name">%s %s.log</string>
+    <string name="format_export_log_name">%s.log</string>
     <string name="format_hours">%d 小时</string>
     <string name="format_minutes">%d 分钟</string>
     <string name="format_months">%d 月</string>

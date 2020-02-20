@@ -6,8 +6,6 @@ object Constants {
 
     const val LOG_DIR_NAME = "logs"
 
-    const val FILE_PROVIDER_AUTH = BuildConfig.APPLICATION_ID + ".files"
-
     const val URL_PROVIDER_TYPE_FILE = "file"
     const val URL_PROVIDER_TYPE_URL = "url"
     const val URL_PROVIDER_TYPE_EXTERNAL = "external"

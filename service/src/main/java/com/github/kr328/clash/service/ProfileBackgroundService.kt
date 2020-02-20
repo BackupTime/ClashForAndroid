@@ -1,9 +1,7 @@
 package com.github.kr328.clash.service
 
-import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -20,10 +18,8 @@ import com.github.kr328.clash.service.ipc.ParcelableContainer
 import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.RandomUtils
 import com.github.kr328.clash.service.util.UpdateUtils
-import com.github.kr328.clash.service.util.componentName
 import com.github.kr328.clash.service.util.intent
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 

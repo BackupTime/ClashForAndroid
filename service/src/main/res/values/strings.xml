@@ -1,22 +1,14 @@
 <resources>
-    <string name="clash_service_status_channel">Clash Status</string>
-
     <!-- from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/res/values/strings.xml -->
     <string name="clash_notification_content" translatable="false">"%1$s↑\t%2$s↓"</string>
 
+    <string name="clash_service_status_channel">Clash Status</string>
     <string name="profile_service_status_channel">Profile Service Status</string>
     <string name="processing_profiles">Processing Profiles</string>
     <string name="format_in_queue">%d items in Queue</string>
     <string name="process_result">Process Result</string>
     <string name="format_update_complete">Update %s Completed</string>
     <string name="format_update_failure">Update %s Failure\n%s</string>
-
     <string name="profile_status_channel">Profile Processing Status</string>
-
-    <string name="clash_service_label">Clash Core Service</string>
-    <string name="tun_service_label">Tun Device Service</string>
-    <string name="clash_manager_service_label">Clash Manager Service</string>
-    <string name="clash_profile_service_label">Clash Profile Manager Service</string>
-
     <string name="running">Running</string>
 </resources>

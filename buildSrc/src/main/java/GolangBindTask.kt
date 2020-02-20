@@ -75,14 +75,14 @@ open class GolangBindTask : DefaultTask() {
 
     @TaskAction
     fun process() {
-        environment.put("GOPATH", goPath.absolutePath)
-        environment.put("ANDROID_HOME", findAndroidSdkPath().absolutePath)
-        environment.put("ANDROID_NDK_HOME", findAndroidNdkPath().absolutePath)
+        environment["GOPATH"] = goPath.absolutePath
+        environment["ANDROID_HOME"] = findAndroidSdkPath().absolutePath
+        environment["ANDROID_NDK_HOME"] = findAndroidNdkPath().absolutePath
 
         if (Os.isFamily(Os.FAMILY_WINDOWS))
-            environment.put("Path", System.getenv("Path") + ";" + goPath.resolve("bin"))
+            environment["Path"] = System.getenv("Path") + ";" + goPath.resolve("bin")
         else
-            environment.put("PATH", System.getenv("PATH") + ":" + goPath.resolve("bin"))
+            environment["PATH"] = System.getenv("PATH") + ":" + goPath.resolve("bin")
 
         goPath.resolve("src/github.com/kr328").deleteRecursively()
         goBindPath.deleteRecursively()

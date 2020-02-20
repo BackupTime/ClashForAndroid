@@ -5,13 +5,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.github.kr328.clash.service.Constants
 import com.github.kr328.clash.service.Intents
-import com.github.kr328.clash.service.ServiceStatusProvider
 import com.github.kr328.clash.service.data.ClashProfileEntity
 
 object Broadcasts {

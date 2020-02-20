@@ -2,7 +2,6 @@ package com.github.kr328.clash.utils
 
 import android.content.Context
 import com.github.kr328.clash.R
-import com.github.kr328.clash.core.Global
 
 object IntervalUtils {
     private const val MILLIS_SECOND = 1000L

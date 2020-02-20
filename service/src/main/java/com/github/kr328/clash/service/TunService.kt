@@ -9,7 +9,6 @@ import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
 import kotlinx.coroutines.*
 import java.net.Inet6Address
-import java.net.InetAddress
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
