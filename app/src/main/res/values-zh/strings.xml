@@ -126,4 +126,8 @@
     <string name="format_seconds">%d 秒</string>
     <string name="copied">已复制</string>
     <string name="tips_profile"><![CDATA[仅接受 <strong>Clash 配置文件</strong> <br />其中包含了 <strong>代理, 代理组 和 规则</strong>]]></string>
+    <string name="application_broken_description"><![CDATA[这通常意味着您使用来自 <strong>Google Play</strong> 的副本, 但是生成该副本的应用未能正确处理 <strong>分包机制</strong><br />这意味着您获取的是 <strong>应用的一部分</strong>]]></string>
+    <string name="learn_more_about_split_apks">了解更多关于分包机制</string>
+    <string name="reinstall_from_google_play">重新从 Google Play 安装</string>
+    <string name="download_from_github_releases">从 Github Release 下载</string>
 </resources>

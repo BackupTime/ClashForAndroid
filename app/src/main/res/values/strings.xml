@@ -161,4 +161,13 @@
     <string name="telegram_channel_url" translatable="false">https://t.me/clash_for_android_channel</string>
 
     <string name="tips_profile"><![CDATA[Accept Only <strong>Clash Config</strong> which contains <br /><strong>Proxies, Proxy Groups and Rules</strong>]]></string>
+
+    <string name="application_broken_description"><![CDATA[This is usually because you used a copy from <strong>Google Play</strong>, but the app that generated the copy did not handle <strong>Split Apks</strong> correctly <br />This means you get <strong>part of the app</strong>, not all of it]]></string>
+    <string name="learn_more_about_split_apks">Learn more about Split Apks</string>
+    <string name="reinstall_from_google_play">Reinstall from Google Play</string>
+    <string name="download_from_github_releases">Download from Github Releases</string>
+
+    <string name="about_split_apks_url" translatable="false">https://developer.android.com/platform/technology/app-bundle</string>
+    <string name="google_play_url" translatable="false">https://play.google.com/store/apps/details?id=com.github.kr328.clash</string>
+    <string name="github_releases_url" translatable="false">https://github.com/Kr328/ClashForAndroid/releases</string>
 </resources>

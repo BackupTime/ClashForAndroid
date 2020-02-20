@@ -3,6 +3,7 @@ package com.github.kr328.clash.remote
 import android.app.Application
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
@@ -91,7 +92,8 @@ object Remote {
 
                 GlobalScope.launch {
                     if (!verifyApk(application)) {
-                        application.startActivity(ApkBrokenActivity::class.intent)
+                        application.startActivity(ApkBrokenActivity::class.intent
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                         return@launch
                     }
 
