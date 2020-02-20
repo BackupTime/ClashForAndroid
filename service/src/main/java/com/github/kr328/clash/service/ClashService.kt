@@ -8,6 +8,7 @@ import android.os.Binder
 import android.os.IBinder
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
+import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.*
 import kotlinx.coroutines.cancel
@@ -19,6 +20,7 @@ import kotlinx.coroutines.sync.Mutex
 class ClashService : BaseService() {
     companion object {
         var isServiceRunning = false
+        var currentProfile: ClashProfileEntity? = null
     }
 
     private val loadLock = Mutex()
@@ -115,11 +117,13 @@ class ClashService : BaseService() {
                     Clash.setSelectedProxy(it.proxy, it.selected)
                 }
 
+            currentProfile = active
+
             notification.setProfile(active.name)
 
-            broadcastProfileLoaded(this, active)
+            broadcastProfileLoaded(this)
         } catch (e: Exception) {
-            stopSelf("Load profile failure")
+            stopSelf(e.message ?: "Unknown")
         } finally {
             loadLock.unlock()
         }

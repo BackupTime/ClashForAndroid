@@ -16,12 +16,12 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.service.util.createLanguageConfigurationContext
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import java.util.*
 
 abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     class EmptyBroadcastReceiver : BroadcastReceiver() {
@@ -47,9 +47,9 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
             }
         }
 
-        override fun onProfileLoaded(profileEntity: ClashProfileEntity) {
+        override fun onProfileLoaded() {
             launch {
-                onClashProfileLoaded(profileEntity)
+                onClashProfileLoaded()
             }
         }
     }
@@ -69,7 +69,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     open suspend fun onClashStarted() {}
     open suspend fun onClashStopped(reason: String?) {}
     open suspend fun onClashProfileChanged() {}
-    open suspend fun onClashProfileLoaded(profile: ClashProfileEntity) {}
+    open suspend fun onClashProfileLoaded() {}
 
     override fun setContentView(layoutResID: Int) {
         val base = CoordinatorLayout(this).apply {
@@ -99,19 +99,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
 
         language = uiSettings.get(UiSettings.LANGUAGE)
 
-        val languageOverride = language.split("-")
-        if (language.isEmpty())
-            return super.attachBaseContext(base)
-
-        val configuration = Configuration()
-        val localeOverride = if (languageOverride.size == 2)
-            Locale(languageOverride[0], languageOverride[1])
-        else
-            Locale(languageOverride[0])
-
-        configuration.setLocale(localeOverride)
-
-        super.attachBaseContext(base.createConfigurationContext(configuration))
+        super.attachBaseContext(base.createLanguageConfigurationContext(language))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

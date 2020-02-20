@@ -7,6 +7,8 @@ import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkChannel
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
+import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.service.util.startForegroundServiceCompat
 import kotlinx.coroutines.*
 import java.net.Inet6Address
 
@@ -54,6 +56,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         super.onCreate()
 
         Clash.initialize(this)
+
+        startForegroundServiceCompat(ClashService::class.intent)
 
         settings = ServiceSettings(this)
 

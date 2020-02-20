@@ -14,7 +14,7 @@ class ScrollBinding(
         fun getCurrentMasterToken(): String
         fun onMasterTokenChanged(token: String)
         fun getMasterTokenPosition(token: String): Int
-        fun doMasterScroll(scroller: LinearSmoothScroller)
+        fun doMasterScroll(scroller: LinearSmoothScroller, target: Int)
     }
 
     private val updateChannel = Channel<Unit>(Channel.CONFLATED)
@@ -47,16 +47,12 @@ class ScrollBinding(
                 preventSlaveScroll = true
             }
 
-            override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics?): Float {
-                return super.calculateSpeedPerPixel(displayMetrics) * 0.8f
-            }
-
             init {
                 targetPosition = position
             }
         })
 
-        callback.doMasterScroll(scroller)
+        callback.doMasterScroll(scroller, position)
     }
 
     suspend fun exec() {

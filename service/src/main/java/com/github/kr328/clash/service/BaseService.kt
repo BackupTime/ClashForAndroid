@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Configuration
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.settings.ServiceSettings
+import com.github.kr328.clash.service.util.createLanguageConfigurationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -17,19 +18,8 @@ abstract class BaseService : Service(), CoroutineScope by MainScope() {
         settings = ServiceSettings(base ?: return super.attachBaseContext(base))
 
         val language = settings.get(ServiceSettings.LANGUAGE)
-        if ( language.isEmpty() )
-            return super.attachBaseContext(base)
-        val languageOverride = language.split("-")
 
-        val configuration = Configuration()
-        val localeOverride = if (languageOverride.size == 2)
-            Locale(languageOverride[0], languageOverride[1])
-        else
-            Locale(languageOverride[0])
-
-        configuration.setLocale(localeOverride)
-
-        super.attachBaseContext(base.createConfigurationContext(configuration))
+        super.attachBaseContext(base.createLanguageConfigurationContext(language))
     }
 
     override fun onCreate() {

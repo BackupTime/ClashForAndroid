@@ -16,7 +16,7 @@ object Broadcasts {
         fun onStarted()
         fun onStopped(cause: String?)
         fun onProfileChanged()
-        fun onProfileLoaded(profileEntity: ClashProfileEntity)
+        fun onProfileLoaded()
     }
 
     var clashRunning: Boolean = false
@@ -47,11 +47,8 @@ object Broadcasts {
                         it.onProfileChanged()
                     }
                 Intents.INTENT_ACTION_PROFILE_LOADED -> {
-                    val profile = intent
-                        .getParcelableExtra<ClashProfileEntity>(Intents.INTENT_EXTRA_PROFILE) ?: return
-
                     receivers.forEach {
-                        it.onProfileLoaded(profile)
+                        it.onProfileLoaded()
                     }
                 }
             }

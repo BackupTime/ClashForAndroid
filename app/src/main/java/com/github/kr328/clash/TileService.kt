@@ -4,12 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.github.kr328.clash.remote.RemoteUtils
 import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.Intents
-import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.utils.startClashService
 
@@ -48,6 +48,8 @@ class TileService : TileService() {
         else
             currentProfile
 
+        qsTile.icon = Icon.createWithResource(this, R.drawable.ic_launcher_foreground)
+
         qsTile.updateTile()
     }
 
@@ -65,10 +67,8 @@ class TileService : TileService() {
                     currentProfile = ""
                 }
                 Intents.INTENT_ACTION_PROFILE_LOADED -> {
-                    val entity = intent.
-                        getParcelableExtra<ClashProfileEntity>(Intents.INTENT_EXTRA_PROFILE)
-
-                    currentProfile = entity?.name ?: ""
+                    currentProfile = RemoteUtils
+                        .getCurrentClashProfileName(this@TileService) ?: ""
                 }
             }
 
@@ -88,7 +88,10 @@ class TileService : TileService() {
             }
         )
 
-        clashRunning = RemoteUtils.detectClashRunning(this)
+        val name = RemoteUtils.getCurrentClashProfileName(this)
+
+        clashRunning = name != null
+        currentProfile = name ?: ""
     }
 
     override fun onDestroy() {

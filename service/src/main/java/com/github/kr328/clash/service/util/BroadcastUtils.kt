@@ -3,7 +3,6 @@ package com.github.kr328.clash.service.util
 import android.content.Context
 import android.content.Intent
 import com.github.kr328.clash.service.Intents
-import com.github.kr328.clash.service.data.ClashProfileEntity
 
 fun Context.sendBroadcastSelf(intent: Intent) {
     this.sendBroadcast(intent.setPackage(this.packageName))
@@ -15,9 +14,8 @@ fun broadcastProfileChanged(context: Context) {
     context.sendBroadcastSelf(intent)
 }
 
-fun broadcastProfileLoaded(context: Context, profileEntity: ClashProfileEntity) {
+fun broadcastProfileLoaded(context: Context) {
     val intent = Intent(Intents.INTENT_ACTION_PROFILE_LOADED)
-        .putExtra(Intents.INTENT_EXTRA_PROFILE, profileEntity)
 
     context.sendBroadcastSelf(intent)
 }

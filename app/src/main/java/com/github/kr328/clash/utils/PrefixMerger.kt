@@ -16,11 +16,11 @@ object PrefixMerger {
 
             val groups = mutableListOf<List<Pair<String, T>>>()
             var mergingGroup = mutableListOf<Pair<String, T>>()
-            var currentChar: Char = 0.toChar()
+            var currentCodePoint = 0
             val result = mutableListOf<Result<T>>()
 
             for (pair in pairs) {
-                if (pair.first[0] == currentChar) {
+                if (pair.first.codePointAt(0) == currentCodePoint) {
                     mergingGroup.add(pair)
                 } else {
                     if (mergingGroup.isNotEmpty()) {
@@ -28,7 +28,7 @@ object PrefixMerger {
                         mergingGroup = mutableListOf()
                     }
 
-                    currentChar = pair.first[0]
+                    currentCodePoint = pair.first.codePointAt(0)
                     mergingGroup.add(pair)
                 }
             }
@@ -50,14 +50,11 @@ object PrefixMerger {
                 }
 
                 group.forEach {
-                    result.add(
-                        Result(
-                            it.first.substring(0, diffIndex)
-                                .replace(REGEX_PREFIX_TRIM, ""),
-                            it.first.substring(diffIndex),
-                            it.second
-                        )
-                    )
+                    val prefix = it.first.substring(0, diffIndex)
+                        .replace(REGEX_PREFIX_TRIM, "")
+                    val content = it.first.substring(diffIndex)
+
+                    result.add(Result(prefix, content, it.second))
                 }
             }
 

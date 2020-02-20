@@ -12,19 +12,30 @@ class ProxySorter(private val groupOrder: Order, private val proxyOrder: Order) 
 
     suspend fun sort(proxyGroup: List<ProxyGroup>): List<ProxyGroup> =
         withContext(Dispatchers.Default) {
-            val global = proxyGroup.singleOrNull {
-                it.name == "GLOBAL"
+            val groups = proxyGroup.groupBy {
+                if ( it.name == "GLOBAL" )
+                    "GLOBAL"
+                else
+                    "OTHER"
             }
+
+            val global = groups["GLOBAL"]?.singleOrNull()
+            val other = groups["OTHER"] ?: emptyList()
 
             val sortedGroup = when (groupOrder) {
-                Order.DEFAULT -> groupSortWithDefault(global, proxyGroup)
-                Order.DELAY_INCREASE -> groupSortWithDelay(true, proxyGroup)
-                Order.DELAY_DECREASE -> groupSortWithDelay(false, proxyGroup)
-                Order.NAME_INCREASE -> groupSortWithName(true, proxyGroup)
-                Order.NAME_DECREASE -> groupSortWithName(false, proxyGroup)
+                Order.DEFAULT -> groupSortWithDefault(global, other)
+                Order.DELAY_INCREASE -> groupSortWithDelay(true, other)
+                Order.DELAY_DECREASE -> groupSortWithDelay(false, other)
+                Order.NAME_INCREASE -> groupSortWithName(true, other)
+                Order.NAME_DECREASE -> groupSortWithName(false, other)
             }
 
-            sortedGroup.map {
+            val sorted = if ( global == null )
+                sortedGroup
+            else
+                listOf(global) + sortedGroup
+
+            sorted.map {
                 val sortedProxy = when (proxyOrder) {
                     Order.DEFAULT -> it.proxies
                     Order.DELAY_INCREASE -> proxySortWithDelay(true, it.proxies)

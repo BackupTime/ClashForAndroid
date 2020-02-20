@@ -2,6 +2,7 @@ package com.github.kr328.clash.service.data
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.github.kr328.clash.core.serialization.Parcels
@@ -9,6 +10,7 @@ import kotlinx.serialization.Serializable
 
 @Entity(tableName = "profiles", primaryKeys = ["id"])
 @Serializable
+@Keep
 data class ClashProfileEntity(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "type") val type: Int,

@@ -15,7 +15,9 @@ class ServiceStatusProvider : ContentProvider() {
         return when (method) {
             METHOD_PING_CLASH_SERVICE -> {
                 return if (ClashService.isServiceRunning)
-                    Bundle()
+                    Bundle().apply {
+                        putString("name", ClashService.currentProfile?.name)
+                    }
                 else
                     null
             }

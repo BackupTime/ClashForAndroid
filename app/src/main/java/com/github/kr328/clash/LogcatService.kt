@@ -18,10 +18,12 @@ import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.model.LogFile
+import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
+import com.github.kr328.clash.service.util.createLanguageConfigurationContext
 import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.utils.format
 import com.github.kr328.clash.utils.logsDir
@@ -117,6 +119,14 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
                 return this@LogcatService
             }
         }
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        val b = base ?: return super.attachBaseContext(base)
+
+        val language = UiSettings(b).get(UiSettings.LANGUAGE)
+
+        super.attachBaseContext(b.createLanguageConfigurationContext(language))
     }
 
     // Export to UI

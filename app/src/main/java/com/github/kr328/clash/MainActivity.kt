@@ -102,7 +102,7 @@ class MainActivity : BaseActivity() {
             makeSnackbarException(getString(R.string.clash_start_failure), reason)
     }
 
-    override suspend fun onClashProfileLoaded(profile: ClashProfileEntity) {
+    override suspend fun onClashProfileLoaded() {
         updateClashStatus()
     }
 
