@@ -23,8 +23,8 @@
     </string-array>
     <string-array name="access_control_mode_value" translatable="false">
         <item>access_control_mode_all</item>
-        <item>access_control_mode_blacklist</item>
         <item>access_control_mode_whitelist</item>
+        <item>access_control_mode_blacklist</item>
     </string-array>
     <string-array name="language_value" translatable="false">
         <item />

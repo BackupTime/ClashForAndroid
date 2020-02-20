@@ -50,7 +50,6 @@ class PackagesActivity : BaseActivity() {
                                 it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
                             )
                         }
-                        .sorted(compareBy(PackagesAdapter.AppInfo::label))
                         .toList()
                 }
             }
@@ -73,10 +72,13 @@ class PackagesActivity : BaseActivity() {
 
             progress.visibility = View.GONE
 
+            refreshChannel.offer(Unit)
+
             while (isActive) {
                 refreshChannel.receive()
 
                 adapter.applyFilter(keyword, sort, decrease, systemApp)
+                mainList.scrollToPosition(0)
 
                 delay(200)
             }

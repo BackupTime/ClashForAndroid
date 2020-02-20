@@ -46,6 +46,16 @@ class PackagesAdapter(private val context: Context,
                             && (systemApp || !it.isSystem)
                 }
                 .sorted { a, b ->
+                    val sA = selectedPackages.contains(a.packageName)
+                    val sB = selectedPackages.contains(b.packageName)
+
+                    if ( sA != sB ) {
+                        when {
+                            sA -> return@sorted -1
+                            sB -> return@sorted 1
+                        }
+                    }
+
                     val result = when (sort) {
                         Sort.NAME -> a.label.compareTo(b.label, true)
                         Sort.PACKAGE -> a.packageName.compareTo(b.packageName)
