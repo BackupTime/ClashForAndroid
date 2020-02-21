@@ -17,6 +17,7 @@ import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.utils.ScrollBinding
 import kotlinx.android.synthetic.main.activity_proxies.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 
@@ -264,6 +265,8 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
 
                 scrollBinding.scrollMaster(selected)
             }
+
+            delay(200)
 
             refreshMutex.unlock()
         }
