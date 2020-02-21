@@ -170,4 +170,6 @@
     <string name="about_split_apks_url" translatable="false">https://developer.android.com/platform/technology/app-bundle</string>
     <string name="google_play_url" translatable="false">https://play.google.com/store/apps/details?id=com.github.kr328.clash</string>
     <string name="github_releases_url" translatable="false">https://github.com/Kr328/ClashForAndroid/releases</string>
+
+    <string name="format_proxy_group_title" translatable="false">%s - %s</string>
 </resources>

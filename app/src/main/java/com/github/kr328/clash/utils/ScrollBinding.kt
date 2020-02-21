@@ -30,27 +30,7 @@ class ScrollBinding(
         if (position < 0)
             return
 
-        val scroller = (object : LinearSmoothScroller(context) {
-            override fun getVerticalSnapPreference(): Int {
-                return SNAP_TO_START
-            }
-
-            override fun onStop() {
-                super.onStop()
-
-                preventSlaveScroll = false
-            }
-
-            override fun onStart() {
-                super.onStart()
-
-                preventSlaveScroll = true
-            }
-
-            init {
-                targetPosition = position
-            }
-        })
+        val scroller = QuickSmoothScroller(context, position)
 
         callback.doMasterScroll(scroller, position)
     }

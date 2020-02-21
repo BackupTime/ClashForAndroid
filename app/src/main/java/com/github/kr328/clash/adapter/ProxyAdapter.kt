@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 
 
@@ -29,14 +28,15 @@ class ProxyAdapter(
 
     data class ProxyGroupInfo(
         val name: String,
+        val current: String,
         val proxies: List<ProxyInfo>
     )
 
     data class ProxyInfo(
         val name: String,
         val group: String,
-        val prefix: String,
-        val content: String,
+        val title: String,
+        val summary: String,
         val delay: Short,
         val selectable: Boolean,
         val active: Boolean
@@ -62,8 +62,6 @@ class ProxyAdapter(
             get() = info.group
     }
 
-
-    private var rootMutex = Mutex()
     private var urlTesting: Set<String> = emptySet()
     private var renderList = mutableListOf<RenderInfo>()
     private var activeList: MutableMap<String, Int> = mutableMapOf()
@@ -98,7 +96,7 @@ class ProxyAdapter(
     private var root = listOf<ProxyGroupInfo>()
 
     private class ProxyGroupHeader(view: View) : RecyclerView.ViewHolder(view) {
-        val name: TextView = view.findViewById(R.id.name)
+        val title: TextView = view.findViewById(R.id.name)
         val urlTest: View = view.findViewById(R.id.urlTest)
         val urlTestProgress: View = view.findViewById(R.id.urlTestProgress)
     }
@@ -112,8 +110,6 @@ class ProxyAdapter(
 
     suspend fun applyChange(newList: List<ProxyGroupInfo>, testing: Set<String>) =
         withContext(Dispatchers.Default) {
-            rootMutex.lock()
-
             val newRenderList = newList
                 .flatMap {
                     listOf(ProxyGroupRenderInfo(it)) + it.proxies.map { p -> ProxyRenderInfo(p) }
@@ -155,8 +151,6 @@ class ProxyAdapter(
                 activeList = activeCache
                 result.dispatchUpdatesTo(this@ProxyAdapter)
             }
-
-            rootMutex.unlock()
         }
 
     fun getGroupPosition(name: String): Int {
@@ -195,7 +189,8 @@ class ProxyAdapter(
 
                 groupPosition[current.name] = position
 
-                holder.name.text = current.info.name
+                holder.title.text = context.getString(R.string.format_proxy_group_title,
+                    current.info.name, current.info.current)
                 holder.urlTest.setOnClickListener {
                     holder.urlTest.visibility = View.GONE
                     holder.urlTestProgress.visibility = View.VISIBLE
@@ -214,8 +209,8 @@ class ProxyAdapter(
             is ProxyItem -> {
                 val current = renderList[position] as ProxyRenderInfo
 
-                holder.prefix.text = current.info.prefix
-                holder.content.text = current.info.content
+                holder.prefix.text = current.info.title
+                holder.content.text = current.info.summary
 
                 if (current.info.delay > 0)
                     holder.delay.text = current.info.delay.toString()
@@ -239,14 +234,18 @@ class ProxyAdapter(
                 if (current.info.selectable) {
                     holder.root.setOnClickListener {
                         val oldPosition = activeList[current.group] ?: return@setOnClickListener
+                        val groupPosition = groupPosition[current.group] ?: return@setOnClickListener
                         val old = renderList[oldPosition] as ProxyRenderInfo
                         val new = renderList[position] as ProxyRenderInfo
+                        val group = renderList[groupPosition] as ProxyGroupRenderInfo
 
                         renderList[oldPosition] = old.copy(info = old.info.copy(active = false))
                         renderList[position] = new.copy(info = new.info.copy(active = true))
+                        renderList[groupPosition] = group.copy(info = group.info.copy(current = current.name))
 
                         notifyItemChanged(oldPosition)
                         notifyItemChanged(position)
+                        notifyItemChanged(groupPosition)
 
                         onSelect(current.group, current.name)
                     }

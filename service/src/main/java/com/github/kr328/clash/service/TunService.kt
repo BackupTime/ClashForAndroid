@@ -89,9 +89,9 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                         val dnsStrings = dnsServers.map {
                             when ( it ) {
                                 is Inet6Address ->
-                                    "[${it.hostName}]:53"
+                                    "[${it.hostAddress}]:53"
                                 else ->
-                                    "${it.hostName}:53"
+                                    "${it.hostAddress}:53"
                             }
                         }
 

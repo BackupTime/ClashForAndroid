@@ -9,30 +9,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.adapter.ProxyAdapter
 import com.github.kr328.clash.adapter.ProxyChipAdapter
 import com.github.kr328.clash.core.model.General
-import com.github.kr328.clash.core.model.Proxy
-import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.pipeline.Pipeline
+import com.github.kr328.clash.pipeline.mergePrefix
+import com.github.kr328.clash.pipeline.sort
+import com.github.kr328.clash.pipeline.toAdapterElement
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.withClash
-import com.github.kr328.clash.utils.PrefixMerger
-import com.github.kr328.clash.utils.ProxySorter
 import com.github.kr328.clash.utils.ScrollBinding
 import kotlinx.android.synthetic.main.activity_proxies.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 
 class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
     private val refreshMutex = Mutex()
     private val scrollBinding = ScrollBinding(this, this)
-    private val doScrollToLastProxy by lazy {
-        val selected = uiSettings.get(UiSettings.PROXY_LAST_SELECT_GROUP)
-
-        launch {
-            scrollBinding.scrollMaster(selected)
-        }
-    }
+    private var scrollToLast = true
 
     private val mainListAdapter: ProxyAdapter
         get() = mainList.adapter as ProxyAdapter
@@ -45,35 +36,10 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
         setContentView(R.layout.activity_proxies)
         setSupportActionBar(toolbar)
 
-        mainList.adapter = ProxyAdapter(this, { group, proxy ->
-            launch {
-                withClash {
-                    setSelectProxy(group, proxy)
-                }
-            }
-        }, {
-            launch {
-                urlTesting.add(it)
-
-                withClash {
-                    urlTesting.add(it)
-
-                    startHealthCheck(it)
-
-                    urlTesting.remove(it)
-
-                    refreshList()
-                }
-            }
-        })
-
+        mainList.adapter = ProxyAdapter(this, this::setGroupSelected, this::startUrlTesting)
         mainList.layoutManager = mainListAdapter.layoutManager
 
-        chipList.adapter = ProxyChipAdapter(this) {
-            launch {
-                scrollBinding.scrollMaster(it)
-            }
-        }
+        chipList.adapter = ProxyChipAdapter(this, this::chipClicked)
         chipList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         chipList.itemAnimator?.changeDuration = 0
 
@@ -195,7 +161,7 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
     override val activityLabel: CharSequence?
         get() = getText(R.string.proxy)
 
-    override suspend fun onClashStarted() {
+    override suspend fun onClashStopped(reason: String?) {
         finish()
     }
 
@@ -237,6 +203,34 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
         }
     }
 
+    private fun setGroupSelected(group: String, select: String) {
+        launch {
+            withClash {
+                setSelectProxy(group, select)
+            }
+        }
+    }
+
+    private fun startUrlTesting(group: String) {
+        launch {
+            urlTesting.add(group)
+
+            withClash {
+                startHealthCheck(group)
+            }
+
+            urlTesting.remove(group)
+
+            refreshList()
+        }
+    }
+
+    private fun chipClicked(name: String) {
+        launch {
+            scrollBinding.scrollMaster(name)
+        }
+    }
+
     private fun refreshList(scrollTop: Boolean = false) {
         launch {
             if ( !refreshMutex.tryLock() )
@@ -249,93 +243,27 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
                 queryAllProxyGroups()
             }
 
-            val prefixDeferred = async {
-                if (uiSettings.get(UiSettings.PROXY_MERGE_PREFIX)) {
-                    proxies.map {
-                        async { PrefixMerger.merge(it.proxies.map { p -> it.name to p.name }) { it.second } }
-                    }.flatMap {
-                        it.await()
-                    }.map {
-                        it.value to it
-                    }.toMap()
-                } else emptyMap()
-            }
+            val merged = Pipeline(proxies, uiSettings).mergePrefix()
+            val sorted = Pipeline(proxies, uiSettings).sort()
 
-            val sortDeferred = async {
-                val groupSort = when (uiSettings.get(UiSettings.PROXY_GROUP_SORT)) {
-                    UiSettings.PROXY_SORT_DEFAULT ->
-                        ProxySorter.Order.DEFAULT
-                    UiSettings.PROXY_SORT_NAME ->
-                        ProxySorter.Order.NAME_INCREASE
-                    UiSettings.PROXY_SORT_DELAY ->
-                        ProxySorter.Order.DELAY_INCREASE
-                    else -> throw IllegalArgumentException()
-                }
-
-                val proxySort = when (uiSettings.get(UiSettings.PROXY_PROXY_SORT)) {
-                    UiSettings.PROXY_SORT_DEFAULT ->
-                        ProxySorter.Order.DEFAULT
-                    UiSettings.PROXY_SORT_NAME ->
-                        ProxySorter.Order.NAME_INCREASE
-                    UiSettings.PROXY_SORT_DELAY ->
-                        ProxySorter.Order.DELAY_INCREASE
-                    else -> throw IllegalArgumentException()
-                }
-
-                val sorter = ProxySorter(groupSort, proxySort)
-
-                sorter.sort(proxies).run {
-                    when (general.mode) {
-                        General.Mode.GLOBAL -> this
-                        General.Mode.DIRECT -> emptyList()
-                        General.Mode.RULE -> this.filter { it.name != "GLOBAL" }
-                    }
-                }
-            }
-
-            val prefix = prefixDeferred.await()
-            val sorted = sortDeferred.await()
-
-            val newList = withContext(Dispatchers.Default) {
-                sorted.map {
-                    ProxyAdapter.ProxyGroupInfo(it.name,
-                        it.proxies.map { p ->
-                            val r = prefix.getOrElse(it.name to p.name) {
-                                PrefixMerger.Result(p.name, "", p)
-                            }
-
-                            val data = if ( r.content.isEmpty() ) {
-                                r.prefix to p.type.toString()
-                            }
-                            else {
-                                r.content to r.prefix
-                            }
-
-                            ProxyAdapter.ProxyInfo(
-                                p.name,
-                                it.name,
-                                data.first,
-                                data.second,
-                                p.delay.toShort(),
-                                it.type == Proxy.Type.SELECT,
-                                p.name == it.current
-                            )
-                        }
-                    )
-                }
-            }
+            val newList = sorted.toAdapterElement(merged.input, general)
 
             mainListAdapter.applyChange(newList, urlTesting)
 
             (chipList.adapter!! as ProxyChipAdapter).apply {
-                chips = sorted.map { it.name }
+                chips = newList.map { it.name }
                 notifyDataSetChanged()
             }
 
-            doScrollToLastProxy
-
             if ( scrollTop )
                 mainList.smoothScrollToPosition(0)
+            else if ( scrollToLast ) {
+                scrollToLast = false
+
+                val selected = uiSettings.get(UiSettings.PROXY_LAST_SELECT_GROUP)
+
+                scrollBinding.scrollMaster(selected)
+            }
 
             refreshMutex.unlock()
         }
