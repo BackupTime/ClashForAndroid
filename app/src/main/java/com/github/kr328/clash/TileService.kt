@@ -48,7 +48,7 @@ class TileService : TileService() {
         else
             currentProfile
 
-        qsTile.icon = Icon.createWithResource(this, R.drawable.ic_launcher_foreground)
+        qsTile.icon = Icon.createWithResource(this, R.drawable.ic_notification)
 
         qsTile.updateTile()
     }

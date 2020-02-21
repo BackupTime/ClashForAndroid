@@ -20,7 +20,7 @@
             android:name=".MainActivity"
             android:label="@string/launch_name"
             android:configChanges="uiMode"
-            android:launchMode="singleTask">
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -65,7 +65,7 @@
             android:label="@string/log_viewer"
             android:exported="false"
             android:configChanges="uiMode"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTop"/>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/settings"
