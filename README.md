@@ -39,7 +39,7 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
    git submodule update --init --recursive
    ```
 
-2. Install `Android SDK` ,`Android NDK` and `Golang`
+2. Install `Android SDK (include JDK)` ,`Android NDK` and `Golang`
 
 3. Configure `local.properties` 
 
