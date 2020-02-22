@@ -111,6 +111,7 @@ class ClashCore(private val service: Service): CoroutineScope by MainScope() {
 
         broadcastClashStopped(service, stopReason)
 
+        Clash.stopTunDevice()
         Clash.stop()
 
         ServiceStatusProvider.serviceRunning = false
