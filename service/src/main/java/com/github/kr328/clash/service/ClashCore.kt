@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
+import androidx.core.content.contentValuesOf
 import androidx.core.content.getSystemService
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.Log
@@ -101,6 +102,8 @@ class ClashCore(private val service: Service): CoroutineScope by MainScope() {
 
     fun destroy() {
         cancel()
+
+        service.unregisterReceiver(receivers)
 
         reloadChannel.close()
 
