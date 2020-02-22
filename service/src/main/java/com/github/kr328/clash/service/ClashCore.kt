@@ -64,6 +64,8 @@ class ClashCore(private val service: Service): CoroutineScope by MainScope() {
 
         ServiceStatusProvider.serviceRunning = true
 
+        reloadChannel.offer(Unit)
+
         launch {
             val ticker = Channel<Unit>()
             var enableRefresh = settings.get(ServiceSettings.NOTIFICATION_REFRESH)
