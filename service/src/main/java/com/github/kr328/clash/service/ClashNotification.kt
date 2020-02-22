@@ -6,10 +6,12 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.core.Clash
+import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.core.utils.asSpeedString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.serializer
 
 class ClashNotification(
     private val context: Service
@@ -49,9 +51,9 @@ class ClashNotification(
     }
 
     fun destroy() {
-        updateDestroy()
-
         context.stopForeground(true)
+
+        updateDestroy()
     }
 
     fun setProfile(profile: String) {
@@ -78,10 +80,17 @@ class ClashNotification(
     private fun updateDestroy() {
         // just waiting system cancel our notification :)
         // fxxking google
+
         val notification = baseBuilder
             .setContentTitle(context.getText(R.string.destroying))
             .setContentText(context.getText(R.string.recycling_resources))
+            .setSubText(null)
             .build()
+
+        NotificationManagerCompat.from(context).apply {
+            notify(CLASH_STATUS_NOTIFICATION_ID, notification)
+            cancel(CLASH_STATUS_NOTIFICATION_ID)
+        }
     }
 
     private fun createNotification(): Notification {
