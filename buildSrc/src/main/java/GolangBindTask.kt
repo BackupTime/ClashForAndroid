@@ -161,7 +161,7 @@ open class GolangBindTask : DefaultTask() {
                     .asSequence()
                     .filter { line -> line.startsWith("replace") }
                     .map { replace ->
-                        replace.replace(REGEX_REPLACE_TARGET_LOCAL, "=> " + file.parentFile.absolutePath + "/")
+                        replace.replace(REGEX_REPLACE_TARGET_LOCAL, "=> " + file.parentFile.absolutePath.replace('\\','/') + "/")
                     }
                     .map { replace ->
                         replace.replace(REGEX_REPLACE_SOURCE_VERSION, " =>")
