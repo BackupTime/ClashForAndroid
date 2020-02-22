@@ -84,7 +84,7 @@ class MainActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK)
-                startForegroundServiceCompat(ClashService::class.intent)
+                startClashService()
             return
         }
 
