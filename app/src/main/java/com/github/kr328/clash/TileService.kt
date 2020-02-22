@@ -8,10 +8,9 @@ import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.github.kr328.clash.remote.RemoteUtils
-import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.Intents
-import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.utils.startClashService
+import com.github.kr328.clash.utils.stopClashService
 
 class TileService : TileService() {
     private var currentProfile = ""
@@ -25,7 +24,7 @@ class TileService : TileService() {
                 startClashService()
             }
             Tile.STATE_ACTIVE -> {
-                stopService(ClashService::class.intent)
+                stopClashService()
             }
         }
     }

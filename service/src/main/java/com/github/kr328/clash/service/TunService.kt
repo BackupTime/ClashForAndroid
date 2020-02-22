@@ -6,11 +6,9 @@ import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.net.DefaultNetworkChannel
 import com.github.kr328.clash.service.settings.ServiceSettings
+import com.github.kr328.clash.service.util.asSocketAddressText
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
-import com.github.kr328.clash.service.util.intent
-import com.github.kr328.clash.service.util.startForegroundServiceCompat
 import kotlinx.coroutines.*
-import java.net.Inet6Address
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
@@ -21,6 +19,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         private const val PRIVATE_VLAN_DNS = "172.31.255.254"
         private const val VLAN4_ANY = "0.0.0.0"
     }
+
+    private var clashCore: ClashCore? = null
 
     private lateinit var defaultNetworkChannel: DefaultNetworkChannel
     private lateinit var settings: ServiceSettings
@@ -57,7 +57,12 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
         Clash.initialize(this)
 
-        startForegroundServiceCompat(ClashService::class.intent)
+        if ( ServiceStatusProvider.serviceRunning )
+            return stopSelf()
+
+        clashCore = ClashCore(this)
+
+        clashCore?.start()
 
         settings = ServiceSettings(this)
 
@@ -87,12 +92,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                         val dnsServers = d.second?.dnsServers ?: emptyList()
 
                         val dnsStrings = dnsServers.map {
-                            when ( it ) {
-                                is Inet6Address ->
-                                    "[${it.hostAddress}]:53"
-                                else ->
-                                    "${it.hostAddress}:53"
-                            }
+                            it.asSocketAddressText(53)
                         }
 
                         Clash.appendDns(dnsStrings)
@@ -107,7 +107,11 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     override fun onDestroy() {
         cancel()
 
-        defaultNetworkChannel.unregister()
+        clashCore?.apply {
+            destroy()
+
+            defaultNetworkChannel.unregister()
+        }
 
         Log.i("TunService.onDestroy")
 

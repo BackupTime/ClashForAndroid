@@ -2,6 +2,7 @@ package com.github.kr328.clash.service.util
 
 import android.content.Context
 import android.content.Intent
+import com.github.kr328.clash.core.Global
 import com.github.kr328.clash.service.Intents
 
 fun Context.sendBroadcastSelf(intent: Intent) {
@@ -35,4 +36,11 @@ fun broadcastClashStopped(context: Context, reason: String?) {
             reason
         )
     )
+}
+
+fun Intent.enforceSelfPackage(block: () -> Unit) {
+    if ( `package` != Global.application.packageName )
+        return
+
+    block()
 }

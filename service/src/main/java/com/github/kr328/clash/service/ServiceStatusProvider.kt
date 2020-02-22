@@ -9,14 +9,17 @@ import android.os.Bundle
 class ServiceStatusProvider : ContentProvider() {
     companion object {
         const val METHOD_PING_CLASH_SERVICE = "pingClashService"
+
+        var serviceRunning: Boolean = false
+        var currentProfile: String? = null
     }
 
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
         return when (method) {
             METHOD_PING_CLASH_SERVICE -> {
-                return if (ClashService.isServiceRunning)
+                return if (serviceRunning)
                     Bundle().apply {
-                        putString("name", ClashService.currentProfile?.name)
+                        putString("name", currentProfile)
                     }
                 else
                     null

@@ -15,6 +15,8 @@ object Intents {
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.loaded"
     const val INTENT_ACTION_NETWORK_CHANGED =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.network.changed"
+    const val INTENT_ACTION_REQUEST_STOP =
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.request.stop"
 
     const val INTENT_EXTRA_CLASH_STOP_REASON =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.clash.stop.reason"

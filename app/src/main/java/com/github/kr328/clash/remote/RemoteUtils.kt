@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import com.github.kr328.clash.service.Constants
 import com.github.kr328.clash.service.ServiceStatusProvider
-import com.github.kr328.clash.service.data.ClashProfileEntity
 
 object RemoteUtils {
     fun detectClashRunning(context: Context): Boolean {

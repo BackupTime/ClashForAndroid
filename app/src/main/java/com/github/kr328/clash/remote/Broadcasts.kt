@@ -9,7 +9,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.github.kr328.clash.service.Intents
-import com.github.kr328.clash.service.data.ClashProfileEntity
 
 object Broadcasts {
     interface Receiver {

@@ -11,4 +11,6 @@
     <string name="format_update_failure">Update %s Failure\n%s</string>
     <string name="profile_status_channel">Profile Processing Status</string>
     <string name="running">Running</string>
+    <string name="destroying">Destroying</string>
+    <string name="recycling_resources">Recycling resources</string>
 </resources>

@@ -13,10 +13,10 @@ import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.service.ClashService
-import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.service.util.startForegroundServiceCompat
 import com.github.kr328.clash.utils.startClashService
+import com.github.kr328.clash.utils.stopClashService
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 
@@ -34,7 +34,7 @@ class MainActivity : BaseActivity() {
 
         status.setOnClickListener {
             if (clashRunning) {
-                stopService(ClashService::class.intent)
+                stopClashService()
             } else {
                 val vpnRequest = startClashService()
                 if (vpnRequest != null)

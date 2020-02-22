@@ -6,7 +6,9 @@ import android.net.VpnService
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.service.Intents
+import com.github.kr328.clash.service.TunService
 import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.service.util.sendBroadcastSelf
 import com.github.kr328.clash.service.util.startForegroundServiceCompat
 
 fun Context.startClashService(): Intent? {
@@ -16,10 +18,16 @@ fun Context.startClashService(): Intent? {
         val vpnRequest = VpnService.prepare(this)
         if ( vpnRequest != null )
             return vpnRequest
+
+        startForegroundServiceCompat(TunService::class.intent)
+    }
+    else {
+        startForegroundServiceCompat(ClashService::class.intent)
     }
 
-    startForegroundServiceCompat(ClashService::class.intent
-        .putExtra(Intents.INTENT_EXTRA_START_TUN, startTun))
-
     return null
+}
+
+fun Context.stopClashService() {
+    sendBroadcastSelf(Intent(Intents.INTENT_ACTION_REQUEST_STOP))
 }

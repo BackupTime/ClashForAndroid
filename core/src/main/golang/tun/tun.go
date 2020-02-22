@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/Dreamacro/clash/component/resolver"
+	"github.com/Dreamacro/clash/dns"
 	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/proxy/tun"
 )
@@ -56,5 +57,5 @@ func ResetDnsRedirect() {
 		return
 	}
 
-	(*tunInstance).ReCreateDNSServer(resolver.DefaultResolver, dnsAddress)
+	(*tunInstance).ReCreateDNSServer(resolver.DefaultResolver.(*dns.Resolver), dnsAddress)
 }

@@ -84,7 +84,10 @@ class ProxyAdapter(
     val layoutManager = GridLayoutManager(context, DEFAULT_SPAN_COUNT).apply {
         spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (renderList[position]) {
+                val current = renderList.getOrNull(position)
+                    ?: renderList.getOrNull(position) ?: return spanCount
+
+                return when (current) {
                     is ProxyGroupRenderInfo -> spanCount
                     is ProxyRenderInfo -> 1
                     else -> throw IllegalArgumentException()

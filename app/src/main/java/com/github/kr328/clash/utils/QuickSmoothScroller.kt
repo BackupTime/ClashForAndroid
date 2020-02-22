@@ -1,7 +1,6 @@
 package com.github.kr328.clash.utils
 
 import android.content.Context
-import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller

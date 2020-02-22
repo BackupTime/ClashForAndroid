@@ -249,6 +249,7 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
             .setColor(getColor(R.color.colorAccentService))
             .setContentTitle(getString(R.string.clash_logcat))
             .setContentText(getString(R.string.running))
+            .setGroup(NOTIFICATION_CHANNEL_ID)
             .setContentIntent(
                 PendingIntent.getActivity(
                     this,

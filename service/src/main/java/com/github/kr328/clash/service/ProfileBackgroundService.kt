@@ -180,6 +180,7 @@ class ProfileBackgroundService : BaseService() {
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
+            .setGroup(SERVICE_STATUS_CHANNEL)
             .build()
 
         startForeground(RandomUtils.nextInt(), notification)
@@ -194,6 +195,7 @@ class ProfileBackgroundService : BaseService() {
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
+            .setGroup(SERVICE_RESULT_CHANNEL)
             .build()
 
         NotificationManagerCompat.from(this)
@@ -209,6 +211,7 @@ class ProfileBackgroundService : BaseService() {
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
+            .setGroup(SERVICE_RESULT_CHANNEL)
             .build()
 
         NotificationManagerCompat.from(this)
