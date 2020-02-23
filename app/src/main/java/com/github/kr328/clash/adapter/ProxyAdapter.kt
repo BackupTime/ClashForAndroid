@@ -141,7 +141,7 @@ class ProxyAdapter(
                         groupCache[it.name] = index
                     is ProxyRenderInfo -> {
                         if (it.info.active)
-                            activeCache[it.name] = index
+                            activeCache[it.group] = index
                     }
                 }
             }
