@@ -153,6 +153,10 @@ class ProxyAdapter(
                 groupPosition = groupCache
                 activeList = activeCache
                 result.dispatchUpdatesTo(this@ProxyAdapter)
+
+                groupCache.forEach { (_, u) ->
+                    notifyItemChanged(u)
+                }
             }
         }
 
@@ -190,8 +194,6 @@ class ProxyAdapter(
             is ProxyGroupHeader -> {
                 val current = renderList[position] as ProxyGroupRenderInfo
 
-                groupPosition[current.name] = position
-
                 holder.title.text = context.getString(R.string.format_proxy_group_title,
                     current.info.name, current.info.current)
                 holder.urlTest.setOnClickListener {
@@ -221,8 +223,6 @@ class ProxyAdapter(
                     holder.delay.text = if (current.info.selectable) "" else "N/A"
 
                 if (current.info.active) {
-                    activeList[current.group] = position
-
                     holder.prefix.setTextColor(Color.WHITE)
                     holder.content.setTextColor(Color.WHITE)
                     holder.delay.setTextColor(Color.WHITE)
@@ -245,6 +245,8 @@ class ProxyAdapter(
                         renderList[oldPosition] = old.copy(info = old.info.copy(active = false))
                         renderList[position] = new.copy(info = new.info.copy(active = true))
                         renderList[groupPosition] = group.copy(info = group.info.copy(current = current.name))
+
+                        activeList[current.group] = position
 
                         notifyItemChanged(oldPosition)
                         notifyItemChanged(position)

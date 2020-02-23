@@ -8,10 +8,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
-import android.os.IInterface
+import android.os.*
 import androidx.collection.CircularArray
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -27,6 +24,8 @@ import com.github.kr328.clash.service.util.createLanguageConfigurationContext
 import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.utils.format
 import com.github.kr328.clash.utils.logsDir
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
@@ -57,7 +56,9 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            stopSelf()
+            logChannel.offer(LogEvent(LogEvent.Level.ERROR, "Clash Service Crashed"))
+
+            Crashes.trackError(RemoteException("Clash Service Crashed"))
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
