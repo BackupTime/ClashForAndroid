@@ -114,12 +114,8 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun onStart() {
         super.onStart()
 
-        if (language != uiSettings.get(UiSettings.LANGUAGE))
+        if (language != uiSettings.get(UiSettings.LANGUAGE) || darkMode != uiSettings.get(UiSettings.DARK_MODE))
             recreate()
-        if (darkMode != uiSettings.get(UiSettings.DARK_MODE)) {
-            resetDarkMode()
-            recreate()
-        }
 
         Broadcasts.register(receiver)
     }
