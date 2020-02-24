@@ -16,6 +16,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         private const val VPN_MTU = 1500
         private const val PRIVATE_VLAN4_SUBNET = 30
         private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
+        private const val PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1"
         private const val PRIVATE_VLAN_DNS = "172.31.255.254"
         private const val VLAN4_ANY = "0.0.0.0"
     }
@@ -125,8 +126,11 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private fun Builder.addBypassPrivateRoute(): Builder {
+        val ipv6Support = settings.get(ServiceSettings.IPV6_SUPPORT)
+        val bypassPrivate = settings.get(ServiceSettings.BYPASS_PRIVATE_NETWORK)
+
         // IPv4
-        if (settings.get(ServiceSettings.BYPASS_PRIVATE_NETWORK)) {
+        if (bypassPrivate) {
             resources.getStringArray(R.array.bypass_private_route).forEach {
                 val address = it.split("/")
                 addRoute(address[0], address[1].toInt())
@@ -136,8 +140,12 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         }
 
         // IPv6
-        if (settings.get(ServiceSettings.IPV6_SUPPORT)) {
-            addRoute("::", 0)
+        if (ipv6Support) {
+            if ( bypassPrivate )
+                // from https://github.com/shadowsocks/shadowsocks-android/commit/cc840c9fddb3f4f6677005de18f1fcb387b84064#diff-e089fe63dcb3674c0a1e459a95508e3e
+                addRoute("2000::", 3)
+            else
+                addRoute("::", 0)
         }
 
         return this
@@ -180,6 +188,9 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
     private fun Builder.addAddress(): Builder {
         addAddress(PRIVATE_VLAN4_CLIENT, PRIVATE_VLAN4_SUBNET)
+
+        if ( settings.get(ServiceSettings.IPV6_SUPPORT) )
+            addRoute(PRIVATE_VLAN6_CLIENT, 126)
 
         return this
     }
