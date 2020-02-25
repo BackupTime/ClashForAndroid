@@ -7,20 +7,25 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
+import android.os.RemoteException
 import androidx.core.content.edit
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.github.kr328.clash.ApkBrokenActivity
 import com.github.kr328.clash.Constants
+import com.github.kr328.clash.dump.LogcatDumper
 import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager
 import com.github.kr328.clash.service.IProfileService
 import com.github.kr328.clash.service.ProfileService
 import com.github.kr328.clash.service.util.intent
+import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.util.zip.ZipFile
+import kotlin.system.exitProcess
 
 object Remote {
     var clash = Channel<ClashClient>()
@@ -44,6 +49,14 @@ object Remote {
                 instance = ClashClient(IClashManager.Stub.asInterface(service))
 
             service?.linkToDeath({
+                val log = LogcatDumper.dump().joinToString(separator = "\n")
+
+                val attachmentLog = ErrorAttachmentLog
+                    .attachmentWithText(log, "logcat.txt")
+
+                Crashes.trackError(RemoteException("Clash Service Crashed"),
+                    null, listOf(attachmentLog))
+
                 onServiceDisconnected(null)
             }, 0)
 

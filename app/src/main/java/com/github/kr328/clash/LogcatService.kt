@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.dump.LogcatDumper
 import com.github.kr328.clash.model.LogFile
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.ClashManagerService
@@ -26,6 +27,7 @@ import com.github.kr328.clash.utils.format
 import com.github.kr328.clash.utils.logsDir
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
@@ -56,9 +58,19 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
+            val dump = LogcatDumper.dump()
+
             logChannel.offer(LogEvent(LogEvent.Level.ERROR, "Clash Service Crashed"))
 
-            Crashes.trackError(RemoteException("Clash Service Crashed"))
+            dump.forEach {
+                logChannel.offer(LogEvent(LogEvent.Level.ERROR, it))
+            }
+
+            val textLog = ErrorAttachmentLog
+                .attachmentWithText(dump.joinToString(separator = "\n"), "logcat.txt")
+
+            Crashes.trackError(RemoteException("Clash Service Crashed"),
+                null, listOf(textLog))
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
