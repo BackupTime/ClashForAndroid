@@ -20,7 +20,7 @@ buildscript {
         gLifecycleVersion = "2.2.0"
         gRecyclerviewVersion = "1.1.0"
         gAppCompatVersion = "1.1.0"
-        gMaterialDesignVersion = "1.2.0-alpha04"
+        gMaterialDesignVersion = '1.2.0-alpha05'
         gShizukuPreferenceVersion = "4.2.0"
         gMultiprocessPreferenceVersion = "1.0.0"
     }
@@ -29,7 +29,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.3'
+        classpath 'com.android.tools.build:gradle:3.6.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$gKotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$gKotlinVersion"
         // NOTE: Do not place your application dependencies here; they belong
