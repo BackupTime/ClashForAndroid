@@ -27,10 +27,6 @@ object LogcatDumper {
 
             process.waitFor()
 
-            result.forEach {
-                Log.d("Catch $it")
-            }
-
             result
         } catch (e: Exception) {
             emptyList()
