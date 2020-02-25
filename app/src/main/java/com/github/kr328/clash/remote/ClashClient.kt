@@ -12,39 +12,50 @@ import kotlinx.coroutines.withContext
 
 class ClashClient(val service: IClashManager) {
     suspend fun setSelectProxy(name: String, proxy: String): Boolean = withContext(Dispatchers.IO) {
-        return@withContext service.setSelectProxy(name, proxy)
+        Utils.callRemote {
+            service.setSelectProxy(name, proxy)
+        }
     }
 
     suspend fun startHealthCheck(group: String) = withContext(Dispatchers.IO) {
-        CompletableDeferred<Unit>().apply {
-            service.startHealthCheck(group, object : IStreamCallback.Stub() {
-                override fun complete() {
-                    this@apply.complete(Unit)
-                }
+        Utils.callRemote {
+            CompletableDeferred<Unit>().apply {
+                service.startHealthCheck(group, object : IStreamCallback.Stub() {
+                    override fun complete() {
+                        this@apply.complete(Unit)
+                    }
 
-                override fun completeExceptionally(reason: String?) {
-                    this@apply.completeExceptionally(RemoteException(reason))
-                }
+                    override fun completeExceptionally(reason: String?) {
+                        this@apply.completeExceptionally(RemoteException(reason))
+                    }
 
-                override fun send(data: ParcelableContainer?) {}
-            })
+                    override fun send(data: ParcelableContainer?) {}
+                })
+            }
         }
     }.await()
 
     suspend fun queryAllProxyGroups(): List<ProxyGroup> = withContext(Dispatchers.IO) {
-        service.queryAllProxies().list
+        Utils.callRemote {
+            service.queryAllProxies().list
+        }
     }
 
     suspend fun queryGeneral(): General = withContext(Dispatchers.IO) {
-        service.queryGeneral()
+        Utils.callRemote {
+            service.queryGeneral()
+        }
     }
 
-    suspend fun queryBandwidth(): Long =
-        withContext(Dispatchers.IO) {
-            service.queryBandwidth()
+    suspend fun queryBandwidth(): Long = withContext(Dispatchers.IO) {
+            Utils.callRemote {
+                service.queryBandwidth()
+            }
         }
 
     suspend fun setProxyMode(mode: General.Mode) = withContext(Dispatchers.IO) {
-        service.setProxyMode(mode.toString())
+        Utils.callRemote {
+            service.setProxyMode(mode.toString())
+        }
     }
 }

@@ -1,7 +1,5 @@
 package com.github.kr328.clash.dump
 
-import com.github.kr328.clash.core.utils.Log
-
 object LogcatDumper {
     fun dump(): List<String> {
         return try {

@@ -7,7 +7,12 @@ import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.remote.Remote
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.AbstractCrashesListener
 import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.crashes.CrashesListener
+import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
+import com.microsoft.appcenter.crashes.model.ErrorReport
+import java.lang.Exception
 
 @Suppress("unused")
 class MainApplication : Application() {
