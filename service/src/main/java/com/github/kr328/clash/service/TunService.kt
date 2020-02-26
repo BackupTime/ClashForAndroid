@@ -190,7 +190,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         addAddress(PRIVATE_VLAN4_CLIENT, PRIVATE_VLAN4_SUBNET)
 
         if (settings.get(ServiceSettings.IPV6_SUPPORT))
-            addRoute(PRIVATE_VLAN6_CLIENT, 126)
+            addAddress(PRIVATE_VLAN6_CLIENT, 126)
 
         return this
     }

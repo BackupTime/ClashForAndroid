@@ -3,15 +3,13 @@ package com.github.kr328.clash.service.settings
 import android.content.Context
 import android.content.SharedPreferences
 import com.github.kr328.clash.service.Constants
+import com.github.kr328.clash.service.ServiceSettingsProvider
 import rikka.preference.MultiProcessPreference
 
 class ServiceSettings(preference: SharedPreferences) :
     BaseSettings(preference) {
     constructor(context: Context) : this(
-        MultiProcessPreference(
-            context,
-            context.packageName + Constants.SETTING_PROVIDER_SUFFIX
-        )
+        ServiceSettingsProvider.createSharedPreferencesFromContext(context)
     )
 
     companion object {
