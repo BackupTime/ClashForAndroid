@@ -8,7 +8,7 @@ import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.settings.ServiceSettings
 import moe.shizuku.preference.PreferenceFragment
 
-abstract class BaseSettingFragment: PreferenceFragment() {
+abstract class BaseSettingFragment : PreferenceFragment() {
     abstract fun onCreateDataStore(): SettingsDataStore
     abstract val xmlResourceId: Int
 

@@ -9,7 +9,7 @@ import androidx.core.content.getSystemService
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_support.*
 
-class SupportActivity: BaseActivity() {
+class SupportActivity : BaseActivity() {
     override val activityLabel: CharSequence?
         get() = getText(R.string.support)
 
@@ -24,10 +24,13 @@ class SupportActivity: BaseActivity() {
 
             option(
                 title = getString(R.string.clash),
-                summary = getString(R.string.clash_url)) {
+                summary = getString(R.string.clash_url)
+            ) {
                 onClick {
-                    startActivity(Intent(Intent.ACTION_VIEW)
-                        .setData(Uri.parse(getString(R.string.clash_url))))
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(getString(R.string.clash_url)))
+                    )
                 }
             }
             option(
@@ -35,8 +38,10 @@ class SupportActivity: BaseActivity() {
                 summary = getString(R.string.clash_for_android_url)
             ) {
                 onClick {
-                    startActivity(Intent(Intent.ACTION_VIEW)
-                        .setData(Uri.parse(getString(R.string.clash_for_android_url))))
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(getString(R.string.clash_for_android_url)))
+                    )
                 }
             }
 
@@ -59,20 +64,25 @@ class SupportActivity: BaseActivity() {
                 summary = getString(R.string.github_issues_url)
             ) {
                 onClick {
-                    startActivity(Intent(Intent.ACTION_VIEW)
-                        .setData(Uri.parse(getString(R.string.github_issues_url))))
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(getString(R.string.github_issues_url)))
+                    )
                 }
             }
 
-            if ( resources.configuration.locales.get(0)
-                    .language.equals("zh", true) ) {
+            if (resources.configuration.locales.get(0)
+                    .language.equals("zh", true)
+            ) {
                 option(
                     title = getString(R.string.telegram_channel),
                     summary = getString(R.string.telegram_channel_url)
                 ) {
                     onClick {
-                        startActivity(Intent(Intent.ACTION_VIEW)
-                            .setData(Uri.parse(getString(R.string.telegram_channel_url))))
+                        startActivity(
+                            Intent(Intent.ACTION_VIEW)
+                                .setData(Uri.parse(getString(R.string.telegram_channel_url)))
+                        )
                     }
                 }
             }

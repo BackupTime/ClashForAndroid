@@ -1,26 +1,15 @@
 package com.github.kr328.clash.service
 
 import android.content.Context
-import android.os.ParcelFileDescriptor
-import androidx.core.content.edit
 import com.github.kr328.clash.core.Clash
-import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroupList
-import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.data.ClashProfileProxyEntity
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.toUtf8Bytes
-import java.io.DataOutputStream
-import java.lang.Exception
-import java.nio.channels.FileChannel
-import kotlin.concurrent.thread
 
 class ClashManager(context: Context, parent: CoroutineScope) :
     IClashManager.Stub(), CoroutineScope by parent {
@@ -80,8 +69,7 @@ class ClashManager(context: Context, parent: CoroutineScope) :
         Clash.registerLogReceiver(key) {
             try {
                 callback.send(ParcelableContainer(it))
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 Clash.unregisterLogReceiver(key)
             }
         }

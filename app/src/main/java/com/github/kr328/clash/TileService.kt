@@ -37,12 +37,12 @@ class TileService : TileService() {
         if (qsTile == null)
             return
 
-        qsTile.state = if ( clashRunning )
+        qsTile.state = if (clashRunning)
             Tile.STATE_ACTIVE
         else
             Tile.STATE_INACTIVE
 
-        qsTile.label = if ( currentProfile.isEmpty() )
+        qsTile.label = if (currentProfile.isEmpty())
             getText(R.string.launch_name)
         else
             currentProfile
@@ -54,7 +54,7 @@ class TileService : TileService() {
 
     private val clashStatusReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            when ( intent?.action ) {
+            when (intent?.action) {
                 Intents.INTENT_ACTION_CLASH_STARTED -> {
                     clashRunning = true
 

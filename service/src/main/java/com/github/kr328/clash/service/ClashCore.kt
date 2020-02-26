@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
-import androidx.core.content.contentValuesOf
 import androidx.core.content.getSystemService
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.Log
@@ -17,16 +16,16 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
 
-class ClashCore(private val service: Service): CoroutineScope by MainScope() {
+class ClashCore(private val service: Service) : CoroutineScope by MainScope() {
     private var stopReason: String? = null
     private val settings = ServiceSettings(service)
     private val database = ClashDatabase.getInstance(service)
     private val notification = ClashNotification(service)
     private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
     private val screenChannel = Channel<Boolean>(Channel.CONFLATED)
-    private val receivers = object: BroadcastReceiver() {
+    private val receivers = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            when ( intent?.action ) {
+            when (intent?.action) {
                 Intent.ACTION_SCREEN_ON ->
                     screenChannel.offer(true)
                 Intent.ACTION_SCREEN_OFF ->
@@ -53,7 +52,7 @@ class ClashCore(private val service: Service): CoroutineScope by MainScope() {
             addAction(Intents.INTENT_ACTION_REQUEST_STOP)
             addAction(Intents.INTENT_ACTION_NETWORK_CHANGED)
 
-            if ( settings.get(ServiceSettings.NOTIFICATION_REFRESH) ) {
+            if (settings.get(ServiceSettings.NOTIFICATION_REFRESH)) {
                 addAction(Intent.ACTION_SCREEN_ON)
                 addAction(Intent.ACTION_SCREEN_OFF)
             }
@@ -73,14 +72,14 @@ class ClashCore(private val service: Service): CoroutineScope by MainScope() {
                     && service.getSystemService<PowerManager>()!!.isInteractive
 
             launch {
-                while ( isActive ) {
+                while (isActive) {
                     ticker.send(Unit)
 
                     delay(1000)
                 }
             }
 
-            while ( isActive ) {
+            while (isActive) {
                 select<Unit> {
                     reloadChannel.onReceive {
                         reload()
@@ -90,7 +89,7 @@ class ClashCore(private val service: Service): CoroutineScope by MainScope() {
 
                         Log.i("Clash Notification Status $it")
                     }
-                    if ( enableRefresh ) {
+                    if (enableRefresh) {
                         ticker.onReceive {
                             notification.update()
                         }

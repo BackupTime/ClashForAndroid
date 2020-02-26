@@ -74,14 +74,14 @@ class TextInput(screen: CommonUiScreen) : Base(screen) {
     }
 
     override fun saveState(bundle: Bundle) {
-        if ( id == null )
+        if (id == null)
             return
 
         bundle.putCharSequence(id, content)
     }
 
     override fun restoreState(bundle: Bundle) {
-        if ( id == null )
+        if (id == null)
             return
 
         bundle.getCharSequence(id)?.apply {

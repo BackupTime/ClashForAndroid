@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 
-class QuickSmoothScroller(context: Context, target: Int):
+class QuickSmoothScroller(context: Context, target: Int) :
     LinearSmoothScroller(context) {
     companion object {
         const val MAX_OFFSET = 2

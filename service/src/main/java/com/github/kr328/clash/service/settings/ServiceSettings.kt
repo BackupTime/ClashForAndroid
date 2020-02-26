@@ -5,10 +5,15 @@ import android.content.SharedPreferences
 import com.github.kr328.clash.service.Constants
 import rikka.preference.MultiProcessPreference
 
-class ServiceSettings(preference: SharedPreferences):
+class ServiceSettings(preference: SharedPreferences) :
     BaseSettings(preference) {
-    constructor(context: Context): this(MultiProcessPreference(context,
-        context.packageName + Constants.SETTING_PROVIDER_SUFFIX))
+    constructor(context: Context) : this(
+        MultiProcessPreference(
+            context,
+            context.packageName + Constants.SETTING_PROVIDER_SUFFIX
+        )
+    )
+
     companion object {
         const val ACCESS_CONTROL_MODE_ALL = "access_control_mode_all"
         const val ACCESS_CONTROL_MODE_BLACKLIST = "access_control_mode_blacklist"

@@ -1,10 +1,8 @@
 package com.github.kr328.clash.core
 
 import android.content.Context
-import android.os.Messenger
 import bridge.Bridge
 import bridge.TunCallback
-import com.github.kr328.clash.core.event.EventStream
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
@@ -13,7 +11,6 @@ import com.github.kr328.clash.core.model.Traffic
 import com.github.kr328.clash.core.transact.DoneCallbackImpl
 import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
-import com.github.kr328.clash.core.utils.Log
 import kotlinx.coroutines.CompletableDeferred
 import java.io.File
 import java.io.InputStream
@@ -157,7 +154,7 @@ object Clash {
         synchronized(logReceivers) {
             logReceivers.remove(key)
 
-            if ( logReceivers.isEmpty() )
+            if (logReceivers.isEmpty())
                 Bridge.setLogCallback(null)
         }
     }

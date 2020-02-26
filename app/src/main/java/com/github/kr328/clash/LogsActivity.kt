@@ -40,7 +40,7 @@ class LogsActivity : BaseActivity() {
 
         setSupportActionBar(toolbar)
 
-        if ( LogcatService.isServiceRunning ) {
+        if (LogcatService.isServiceRunning) {
             startActivity(LogViewerActivity::class.intent)
             finish()
             return
@@ -67,12 +67,16 @@ class LogsActivity : BaseActivity() {
             showClearAllDialog()
         }
 
-        val adapter = LogFileAdapter(this@LogsActivity,
+        val adapter = LogFileAdapter(
+            this@LogsActivity,
             onItemClicked = {
-                startActivity(LogViewerActivity::class.intent
-                    .setData(Uri.fromFile(logsDir.resolve(it.fileName))))
+                startActivity(
+                    LogViewerActivity::class.intent
+                        .setData(Uri.fromFile(logsDir.resolve(it.fileName)))
+                )
             },
-            onMenuClicked = this::showMenu)
+            onMenuClicked = this::showMenu
+        )
         val layoutManager = LinearLayoutManager(this@LogsActivity)
 
         mainList.layoutManager = layoutManager
@@ -82,7 +86,7 @@ class LogsActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
 
-        if ( LogcatService.isServiceRunning )
+        if (LogcatService.isServiceRunning)
             return
 
         refreshList()
@@ -92,8 +96,8 @@ class LogsActivity : BaseActivity() {
         get() = getText(R.string.logs)
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if ( requestCode == REQUEST_CODE ) {
-            if ( resultCode == Activity.RESULT_OK ) {
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
                 val url = data?.data ?: return
                 val file = lastWriteFile ?: return
 
@@ -135,8 +139,11 @@ class LogsActivity : BaseActivity() {
             val old = adapter.fileList
 
             val result = withContext(Dispatchers.Default) {
-                DiffUtil.calculateDiff(object: DiffUtil.Callback() {
-                    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                    override fun areItemsTheSame(
+                        oldItemPosition: Int,
+                        newItemPosition: Int
+                    ): Boolean {
                         return old[oldItemPosition].fileName == files[newItemPosition].fileName
                     }
 
@@ -188,7 +195,8 @@ class LogsActivity : BaseActivity() {
         menu.build {
             option(
                 icon = getDrawable(R.drawable.ic_save),
-                title = getString(R.string.export)) {
+                title = getString(R.string.export)
+            ) {
                 onClick {
                     export(logFile)
 
@@ -197,7 +205,8 @@ class LogsActivity : BaseActivity() {
             }
             option(
                 icon = getDrawable(R.drawable.ic_delete_colorful),
-                title = getString(R.string.delete)) {
+                title = getString(R.string.delete)
+            ) {
                 textColor = errorColor
 
                 onClick {
@@ -224,7 +233,7 @@ class LogsActivity : BaseActivity() {
     }
 
     private fun export(file: LogFile) {
-        if ( lastWriteFile != null )
+        if (lastWriteFile != null)
             return
 
         val d = Date(file.date)

@@ -15,11 +15,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
-class PackagesAdapter(private val context: Context,
-                      private val apps: List<AppInfo>) :
+class PackagesAdapter(
+    private val context: Context,
+    private val apps: List<AppInfo>
+) :
     RecyclerView.Adapter<PackagesAdapter.Holder>() {
-    data class AppInfo(val packageName: String, val label: String, val icon: Drawable,
-                       val installTime: Long, val updateTime: Long, val isSystem: Boolean)
+    data class AppInfo(
+        val packageName: String, val label: String, val icon: Drawable,
+        val installTime: Long, val updateTime: Long, val isSystem: Boolean
+    )
 
     enum class Sort {
         NAME, PACKAGE, INSTALL_TIME, UPDATE_TIME
@@ -49,7 +53,7 @@ class PackagesAdapter(private val context: Context,
                     val sA = selectedPackages.contains(a.packageName)
                     val sB = selectedPackages.contains(b.packageName)
 
-                    if ( sA != sB ) {
+                    if (sA != sB) {
                         when {
                             sA -> return@sorted -1
                             sB -> return@sorted 1
@@ -115,10 +119,9 @@ class PackagesAdapter(private val context: Context,
         holder.packageName.text = current.packageName
         holder.checkbox.isChecked = selectedPackages.contains(current.packageName)
         holder.root.setOnClickListener {
-            if ( selectedPackages.contains(current.packageName) ) {
+            if (selectedPackages.contains(current.packageName)) {
                 selectedPackages.remove(current.packageName)
-            }
-            else {
+            } else {
                 selectedPackages.add(current.packageName)
             }
 

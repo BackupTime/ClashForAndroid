@@ -73,7 +73,8 @@ class CommonUiBuilder(val screen: CommonUiScreen) {
     fun tips(
         title: String = "",
         icon: Drawable? = null,
-        setup: Tips.() -> Unit) {
+        setup: Tips.() -> Unit
+    ) {
         val tips = Tips(screen)
 
         tips.title = title

@@ -7,8 +7,9 @@ import android.view.View
 import android.widget.TextView
 import com.github.kr328.clash.design.R
 
-class Option(screen: CommonUiScreen): Base(screen) {
-    override val view: View = LayoutInflater.from(context).inflate(R.layout.view_setting_option, screen.layout, false)
+class Option(screen: CommonUiScreen) : Base(screen) {
+    override val view: View =
+        LayoutInflater.from(context).inflate(R.layout.view_setting_option, screen.layout, false)
 
     private val vIcon: View = view.findViewById(android.R.id.icon)
     private val vTitle: TextView = view.findViewById(android.R.id.title)
@@ -19,15 +20,19 @@ class Option(screen: CommonUiScreen): Base(screen) {
 
     var icon: Drawable?
         get() = vIcon.background
-        set(value) { vIcon.background = value }
+        set(value) {
+            vIcon.background = value
+        }
     var title: CharSequence
         get() = vTitle.text
-        set(value) { vTitle.text = value }
+        set(value) {
+            vTitle.text = value
+        }
     var summary: CharSequence
         get() = vSummary.text
         set(value) {
             vSummary.text = value
-            if ( value.isEmpty() )
+            if (value.isEmpty())
                 vSummary.visibility = View.GONE
             else
                 vSummary.visibility = View.VISIBLE
@@ -41,7 +46,7 @@ class Option(screen: CommonUiScreen): Base(screen) {
     var paddingHeight: Boolean
         get() = vPadding.visibility != View.GONE
         set(value) {
-            if ( value )
+            if (value)
                 vPadding.visibility = View.INVISIBLE
             else
                 vPadding.visibility = View.GONE

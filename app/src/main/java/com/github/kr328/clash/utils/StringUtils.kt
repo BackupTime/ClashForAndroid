@@ -4,7 +4,7 @@ fun String.toCodePointList(): List<Int> {
     var offset = 0
     val result = mutableListOf<Int>()
 
-    while ( offset < length ) {
+    while (offset < length) {
         val codePoint = codePointAt(offset)
         result.add(codePoint)
 

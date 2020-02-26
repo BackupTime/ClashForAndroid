@@ -12,7 +12,7 @@ class ClashService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        if ( ServiceStatusProvider.serviceRunning )
+        if (ServiceStatusProvider.serviceRunning)
             return stopSelf()
 
         Clash.initialize(this)

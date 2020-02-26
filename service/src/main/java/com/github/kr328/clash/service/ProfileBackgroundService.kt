@@ -100,7 +100,7 @@ class ProfileBackgroundService : BaseService() {
         do {
             select<Unit> {
                 requestChannel.onReceive {
-                    if ( !queue.containsKey(it.id) ) {
+                    if (!queue.containsKey(it.id)) {
                         queue[it.id] = it
 
                         sendRequest(it, service)
@@ -112,7 +112,7 @@ class ProfileBackgroundService : BaseService() {
             }
 
             refreshStatusNotification(queue.size)
-        } while ( queue.isNotEmpty() )
+        } while (queue.isNotEmpty())
 
         stopSelf()
     }
@@ -120,7 +120,7 @@ class ProfileBackgroundService : BaseService() {
     private fun sendRequest(request: ProfileRequest, service: IProfileService) {
         val originalCallback = request.callback
 
-        request.withCallback(object: IStreamCallback.Stub() {
+        request.withCallback(object : IStreamCallback.Stub() {
             override fun complete() {
                 originalCallback?.complete()
 
@@ -137,7 +137,7 @@ class ProfileBackgroundService : BaseService() {
                 launch {
                     responseChannel.send(request)
 
-                    sendUpdateFailure(request.id, reason?: "Unknown")
+                    sendUpdateFailure(request.id, reason ?: "Unknown")
                 }
             }
 

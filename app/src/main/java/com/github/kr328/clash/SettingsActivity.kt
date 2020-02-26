@@ -4,7 +4,7 @@ import android.os.Bundle
 import com.github.kr328.clash.service.util.intent
 import kotlinx.android.synthetic.main.activity_settings.*
 
-class SettingsActivity: BaseActivity() {
+class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -13,7 +13,8 @@ class SettingsActivity: BaseActivity() {
         commonUi.build {
             option(
                 icon = getDrawable(R.drawable.ic_settings_applications),
-                title = getString(R.string.behavior)) {
+                title = getString(R.string.behavior)
+            ) {
                 paddingHeight = true
 
                 onClick {
@@ -22,7 +23,8 @@ class SettingsActivity: BaseActivity() {
             }
             option(
                 icon = getDrawable(R.drawable.ic_network),
-                title = getString(R.string.network)) {
+                title = getString(R.string.network)
+            ) {
                 paddingHeight = true
 
                 onClick {
@@ -31,7 +33,8 @@ class SettingsActivity: BaseActivity() {
             }
             option(
                 icon = getDrawable(R.drawable.ic_interface),
-                title = getString(R.string.interface_)) {
+                title = getString(R.string.interface_)
+            ) {
                 paddingHeight = true
 
                 onClick {

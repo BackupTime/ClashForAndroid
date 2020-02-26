@@ -5,12 +5,12 @@ import android.content.res.Configuration
 import java.util.*
 
 fun Context.createLanguageConfigurationContext(language: String): Context {
-    if ( language.isBlank() ) {
+    if (language.isBlank()) {
         return this
     }
 
     val split = language.split("-")
-    val locale = if ( split.size == 1 )
+    val locale = if (split.size == 1)
         Locale(split[0])
     else
         Locale(split[0], split[1])

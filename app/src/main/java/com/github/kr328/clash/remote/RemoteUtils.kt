@@ -24,8 +24,7 @@ object RemoteUtils {
             )
 
             return pong != null
-        }
-        catch (e: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             context.startActivity(ApkBrokenActivity::class.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
 
             return false
@@ -47,8 +46,7 @@ object RemoteUtils {
             )
 
             return pong?.getString("name")
-        }
-        catch (e: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             context.startActivity(ApkBrokenActivity::class.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
 
             return null

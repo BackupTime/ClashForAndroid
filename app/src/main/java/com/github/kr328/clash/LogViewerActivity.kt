@@ -70,7 +70,7 @@ class LogViewerActivity : BaseActivity() {
         super.onStart()
 
         launch {
-            if ( pauseMutex.isLocked )
+            if (pauseMutex.isLocked)
                 pauseMutex.unlock()
         }
     }
@@ -99,13 +99,12 @@ class LogViewerActivity : BaseActivity() {
                         .split("\n")
                         .parallelStream()
                         .map { it.trim() }
-                        .filter { it.isNotEmpty() && !it.startsWith("#")}
+                        .filter { it.isNotEmpty() && !it.startsWith("#") }
                         .map { it.split(" ", limit = 3) }
                         .filter { it.size == 3 }
                         .map { LogEvent(LogEvent.Level.valueOf(it[1]), it[2], it[0].toLong()) }
                         .toList()
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     makeSnackbarException(getString(R.string.open_log_failure), e.message)
 
                     throw CancellationException()
@@ -130,7 +129,7 @@ class LogViewerActivity : BaseActivity() {
                 (mainList.adapter as LiveLogAdapter).insertItems(response.logs)
 
                 mainList.apply {
-                    if ( computeVerticalScrollOffset() < 30 )
+                    if (computeVerticalScrollOffset() < 30)
                         scrollToPosition(0)
                 }
 

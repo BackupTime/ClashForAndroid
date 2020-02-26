@@ -141,7 +141,7 @@ class ProfileEditActivity : BaseActivity() {
                 val name = requireElement<TextInput>(KEY_NAME).content.toString()
                 val url = Uri.parse(requireElement<TextInput>(KEY_URL).content.toString())
                 val interval = requireElement<TextInput>(KEY_AUTO_UPDATE).content.toString()
-                    .toLongOrNull()?: 0
+                    .toLongOrNull() ?: 0
 
                 if (name.isBlank()) {
                     Snackbar.make(rootView, R.string.empty_name, Snackbar.LENGTH_LONG).show()

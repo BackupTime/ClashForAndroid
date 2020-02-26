@@ -68,13 +68,13 @@ object ClashDatabaseMigrations {
                     cursor.moveToNext()
                 }
                 cursor.close()
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.d("Migration profiles failure", e)
             }
 
             try {
-                val cursor = database.query("SELECT profile_id, proxy, selected FROM _profile_select_proxies ORDER BY id")
+                val cursor =
+                    database.query("SELECT profile_id, proxy, selected FROM _profile_select_proxies ORDER BY id")
 
                 cursor.moveToFirst()
                 while (!cursor.isAfterLast) {
@@ -98,8 +98,7 @@ object ClashDatabaseMigrations {
                     cursor.moveToNext()
                 }
                 cursor.close()
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.d("Migration selected failure")
             }
 
@@ -109,8 +108,10 @@ object ClashDatabaseMigrations {
             // Migration settings
             val oldSettings = Global.application
                 .getSharedPreferences("clash_service", Context.MODE_PRIVATE)
-            val newSettings = ServiceSettings(Global.application
-                .getSharedPreferences(Constants.SERVICE_SETTING_FILE_NAME, Context.MODE_PRIVATE))
+            val newSettings = ServiceSettings(
+                Global.application
+                    .getSharedPreferences(Constants.SERVICE_SETTING_FILE_NAME, Context.MODE_PRIVATE)
+            )
 
             val accessMode = oldSettings
                 .getInt("key_access_control_mode", 0)
@@ -124,7 +125,7 @@ object ClashDatabaseMigrations {
                 .getBoolean("key_bypass_private_network", true)
 
             newSettings.commit {
-                val newAccessMode = when ( accessMode ) {
+                val newAccessMode = when (accessMode) {
                     0 -> ServiceSettings.ACCESS_CONTROL_MODE_ALL
                     1 -> ServiceSettings.ACCESS_CONTROL_MODE_WHITELIST
                     2 -> ServiceSettings.ACCESS_CONTROL_MODE_BLACKLIST
@@ -143,8 +144,7 @@ object ClashDatabaseMigrations {
             try {
                 process(database)
                 Log.i("Database Migrated 1 -> 2")
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.e("Migration failure", e)
             }
         }

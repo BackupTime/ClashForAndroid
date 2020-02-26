@@ -41,7 +41,7 @@ class CommonUiScreen(val layout: CommonUiLayout) {
     }
 
     fun restoreState(bundle: Bundle?) {
-        if ( bundle == null )
+        if (bundle == null)
             return
 
         elements.forEach {

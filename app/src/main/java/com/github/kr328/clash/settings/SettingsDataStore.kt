@@ -3,7 +3,7 @@ package com.github.kr328.clash.settings
 import com.github.kr328.clash.service.settings.BaseSettings
 import moe.shizuku.preference.PreferenceDataStore
 
-class SettingsDataStore: PreferenceDataStore() {
+class SettingsDataStore : PreferenceDataStore() {
     interface Source {
         fun set(value: Any?)
         fun get(): Any?
@@ -20,8 +20,8 @@ class SettingsDataStore: PreferenceDataStore() {
         this.applyListener = block
     }
 
-    inline fun <reified T>BaseSettings.Entry<T>.asSource(settings: BaseSettings): Source {
-        return object: Source {
+    inline fun <reified T> BaseSettings.Entry<T>.asSource(settings: BaseSettings): Source {
+        return object : Source {
             override fun set(value: Any?) {
                 val v = value ?: throw NullPointerException()
 

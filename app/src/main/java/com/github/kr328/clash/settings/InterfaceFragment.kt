@@ -4,7 +4,7 @@ import com.github.kr328.clash.R
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.settings.ServiceSettings
 
-class InterfaceFragment: BaseSettingFragment() {
+class InterfaceFragment : BaseSettingFragment() {
     companion object {
         private const val KEY_DARK_MODE = "dark_mode"
         private const val KEY_LANGUAGE = "language"

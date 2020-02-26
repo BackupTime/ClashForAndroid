@@ -13,8 +13,10 @@ class ApkBrokenActivity : BaseActivity() {
         setContentView(R.layout.activity_application_broken)
         setSupportActionBar(toolbar)
 
-        text.text = Html.fromHtml(getString(R.string.application_broken_description),
-            Html.FROM_HTML_MODE_COMPACT)
+        text.text = Html.fromHtml(
+            getString(R.string.application_broken_description),
+            Html.FROM_HTML_MODE_COMPACT
+        )
 
         commonUi.build {
             option(
@@ -22,8 +24,10 @@ class ApkBrokenActivity : BaseActivity() {
                 title = getString(R.string.learn_more_about_split_apks)
             ) {
                 onClick {
-                    startActivity(Intent(Intent.ACTION_VIEW)
-                        .setData(Uri.parse(getString(R.string.about_split_apks_url))))
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(getString(R.string.about_split_apks_url)))
+                    )
                 }
             }
             option(
@@ -31,8 +35,10 @@ class ApkBrokenActivity : BaseActivity() {
                 title = getString(R.string.reinstall_from_google_play)
             ) {
                 onClick {
-                    startActivity(Intent(Intent.ACTION_VIEW)
-                        .setData(Uri.parse(getString(R.string.google_play_url))))
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(getString(R.string.google_play_url)))
+                    )
                 }
             }
             option(
@@ -40,8 +46,10 @@ class ApkBrokenActivity : BaseActivity() {
                 title = getString(R.string.download_from_github_releases)
             ) {
                 onClick {
-                    startActivity(Intent(Intent.ACTION_VIEW)
-                        .setData(Uri.parse(getString(R.string.github_releases_url))))
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(getString(R.string.github_releases_url)))
+                    )
                 }
             }
         }

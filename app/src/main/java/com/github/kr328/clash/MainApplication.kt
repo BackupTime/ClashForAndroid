@@ -2,7 +2,6 @@ package com.github.kr328.clash
 
 import android.app.Application
 import android.content.Context
-import android.os.DeadObjectException
 import com.github.kr328.clash.core.Global
 import com.github.kr328.clash.dump.LogcatDumper
 import com.github.kr328.clash.remote.Broadcasts
@@ -11,10 +10,8 @@ import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.AbstractCrashesListener
 import com.microsoft.appcenter.crashes.Crashes
-import com.microsoft.appcenter.crashes.CrashesListener
 import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import com.microsoft.appcenter.crashes.model.ErrorReport
-import java.lang.Exception
 
 @Suppress("unused")
 class MainApplication : Application() {
@@ -35,11 +32,11 @@ class MainApplication : Application() {
                 Analytics::class.java, Crashes::class.java
             )
 
-            Crashes.setListener(object: AbstractCrashesListener() {
+            Crashes.setListener(object : AbstractCrashesListener() {
                 override fun getErrorAttachments(report: ErrorReport?): MutableIterable<ErrorAttachmentLog> {
                     report ?: return mutableListOf()
 
-                    if ( !report.stackTrace.contains("DeadObjectException") )
+                    if (!report.stackTrace.contains("DeadObjectException"))
                         return mutableListOf()
 
                     val logcat = LogcatDumper.dump().joinToString(separator = "\n")

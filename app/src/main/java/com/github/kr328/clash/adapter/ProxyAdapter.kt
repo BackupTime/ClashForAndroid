@@ -194,8 +194,10 @@ class ProxyAdapter(
             is ProxyGroupHeader -> {
                 val current = renderList[position] as ProxyGroupRenderInfo
 
-                holder.title.text = context.getString(R.string.format_proxy_group_title,
-                    current.info.name, current.info.current)
+                holder.title.text = context.getString(
+                    R.string.format_proxy_group_title,
+                    current.info.name, current.info.current
+                )
                 holder.urlTest.setOnClickListener {
                     holder.urlTest.visibility = View.GONE
                     holder.urlTestProgress.visibility = View.VISIBLE
@@ -237,14 +239,16 @@ class ProxyAdapter(
                 if (current.info.selectable) {
                     holder.root.setOnClickListener {
                         val oldPosition = activeList[current.group] ?: return@setOnClickListener
-                        val groupPosition = groupPosition[current.group] ?: return@setOnClickListener
+                        val groupPosition =
+                            groupPosition[current.group] ?: return@setOnClickListener
                         val old = renderList[oldPosition] as ProxyRenderInfo
                         val new = renderList[position] as ProxyRenderInfo
                         val group = renderList[groupPosition] as ProxyGroupRenderInfo
 
                         renderList[oldPosition] = old.copy(info = old.info.copy(active = false))
                         renderList[position] = new.copy(info = new.info.copy(active = true))
-                        renderList[groupPosition] = group.copy(info = group.info.copy(current = current.name))
+                        renderList[groupPosition] =
+                            group.copy(info = group.info.copy(current = current.name))
 
                         activeList[current.group] = position
 

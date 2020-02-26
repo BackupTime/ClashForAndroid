@@ -3,7 +3,7 @@ package com.github.kr328.clash.preference
 import android.content.Context
 import com.github.kr328.clash.service.settings.BaseSettings
 
-class UiSettings(context: Context):
+class UiSettings(context: Context) :
     BaseSettings(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)) {
     companion object {
         private const val FILE_NAME = "ui"

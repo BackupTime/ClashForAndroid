@@ -187,7 +187,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     }
 
     private fun resetDarkMode() {
-        when ( uiSettings.get(UiSettings.DARK_MODE).also { darkMode = it } ) {
+        when (uiSettings.get(UiSettings.DARK_MODE).also { darkMode = it }) {
             UiSettings.DARK_MODE_AUTO ->
                 delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             UiSettings.DARK_MODE_DARK ->

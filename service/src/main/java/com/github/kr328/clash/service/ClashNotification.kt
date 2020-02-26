@@ -6,12 +6,10 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.core.Clash
-import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.core.utils.asSpeedString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.serializer
 
 class ClashNotification(
     private val context: Service

@@ -59,8 +59,10 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
 
     override fun onStop() {
         uiSettings.commit {
-            put(UiSettings.PROXY_LAST_SELECT_GROUP,
-                (chipList.adapter!! as ProxyChipAdapter).selected)
+            put(
+                UiSettings.PROXY_LAST_SELECT_GROUP,
+                (chipList.adapter!! as ProxyChipAdapter).selected
+            )
         }
 
         super.onStop()
@@ -234,7 +236,7 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
 
     private fun refreshList(scrollTop: Boolean = false) {
         launch {
-            if ( !refreshMutex.tryLock() )
+            if (!refreshMutex.tryLock())
                 return@launch
 
             val general = withClash {
@@ -256,9 +258,9 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
                 notifyDataSetChanged()
             }
 
-            if ( scrollTop )
+            if (scrollTop)
                 mainList.smoothScrollToPosition(0)
-            else if ( scrollToLast ) {
+            else if (scrollToLast) {
                 scrollToLast = false
 
                 val selected = uiSettings.get(UiSettings.PROXY_LAST_SELECT_GROUP)

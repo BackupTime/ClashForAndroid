@@ -16,7 +16,7 @@ data class ProxyEntry(val group: String, val name: String)
 data class ProxyMerged(val prefix: String, val content: String)
 
 suspend fun Pipeline<List<ProxyGroup>>.mergePrefix(): Pipeline<Map<ProxyEntry, ProxyMerged>> {
-    if ( !settings.get(UiSettings.PROXY_MERGE_PREFIX) )
+    if (!settings.get(UiSettings.PROXY_MERGE_PREFIX))
         return Pipeline(emptyMap(), settings)
 
     val result = coroutineScope {
@@ -31,7 +31,10 @@ suspend fun Pipeline<List<ProxyGroup>>.mergePrefix(): Pipeline<Map<ProxyEntry, P
             }
             .flatMap {
                 it.second.map { merged ->
-                    ProxyEntry(it.first, merged.value.name) to ProxyMerged(merged.prefix, merged.content)
+                    ProxyEntry(it.first, merged.value.name) to ProxyMerged(
+                        merged.prefix,
+                        merged.content
+                    )
                 }
             }
             .toMap()
@@ -66,7 +69,10 @@ suspend fun Pipeline<List<ProxyGroup>>.sort(): Pipeline<List<ProxyGroup>> {
     return copy(input = sorter.sort(input))
 }
 
-suspend fun Pipeline<List<ProxyGroup>>.toAdapterElement(prefixMerged: Map<ProxyEntry, ProxyMerged>, general: General):
+suspend fun Pipeline<List<ProxyGroup>>.toAdapterElement(
+    prefixMerged: Map<ProxyEntry, ProxyMerged>,
+    general: General
+):
         List<ProxyAdapter.ProxyGroupInfo> {
     return input.map { group ->
         val proxies = group.proxies.map { proxy ->
@@ -74,19 +80,21 @@ suspend fun Pipeline<List<ProxyGroup>>.toAdapterElement(prefixMerged: Map<ProxyE
                 it.prefix.isNotBlank() && it.content.isNotBlank()
             } ?: ProxyMerged(proxy.type.toString(), proxy.name)
 
-            ProxyAdapter.ProxyInfo(proxy.name, group.name, merged.content, merged.prefix,
+            ProxyAdapter.ProxyInfo(
+                proxy.name, group.name, merged.content, merged.prefix,
                 proxy.delay.toShort(), group.type == Proxy.Type.SELECT,
-                group.current == proxy.name)
+                group.current == proxy.name
+            )
         }
 
 
         ProxyAdapter.ProxyGroupInfo(group.name, group.current, proxies)
     }.let {
         withContext(Dispatchers.Default) {
-            when ( general.mode ) {
+            when (general.mode) {
                 General.Mode.DIRECT -> emptyList()
                 General.Mode.GLOBAL -> it
-                General.Mode.RULE -> it.filter { it.name != "GLOBAL"}
+                General.Mode.RULE -> it.filter { it.name != "GLOBAL" }
             }
         }
     }

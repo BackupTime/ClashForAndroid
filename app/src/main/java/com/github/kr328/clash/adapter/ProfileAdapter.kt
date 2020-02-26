@@ -132,6 +132,6 @@ class ProfileAdapter(private val context: Context, private val callback: Callbac
     }
 
     private fun offsetDate(date: Long): CharSequence {
-        return IntervalUtils.intervalString(context,System.currentTimeMillis() - date)
+        return IntervalUtils.intervalString(context, System.currentTimeMillis() - date)
     }
 }

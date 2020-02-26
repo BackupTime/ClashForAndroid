@@ -13,7 +13,7 @@ class ProxySorter(private val groupOrder: Order, private val proxyOrder: Order) 
     suspend fun sort(proxyGroup: List<ProxyGroup>): List<ProxyGroup> =
         withContext(Dispatchers.Default) {
             val groups = proxyGroup.groupBy {
-                if ( it.name == "GLOBAL" )
+                if (it.name == "GLOBAL")
                     "GLOBAL"
                 else
                     "OTHER"
@@ -30,7 +30,7 @@ class ProxySorter(private val groupOrder: Order, private val proxyOrder: Order) 
                 Order.NAME_DECREASE -> groupSortWithName(false, other)
             }
 
-            val sorted = if ( global == null )
+            val sorted = if (global == null)
                 sortedGroup
             else
                 listOf(global) + sortedGroup

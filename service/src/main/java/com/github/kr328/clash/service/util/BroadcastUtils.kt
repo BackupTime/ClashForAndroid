@@ -39,7 +39,7 @@ fun broadcastClashStopped(context: Context, reason: String?) {
 }
 
 fun Intent.enforceSelfPackage(block: () -> Unit) {
-    if ( `package` != Global.application.packageName )
+    if (`package` != Global.application.packageName)
         return
 
     block()

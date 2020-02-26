@@ -20,7 +20,7 @@ object PrefixMerger {
             val result = mutableListOf<Result<T>>()
 
             for (pair in pairs) {
-                if ( pair.first.isEmpty() )
+                if (pair.first.isEmpty())
                     continue
 
                 if (pair.first[0] == currentCodePoint) {
@@ -56,8 +56,12 @@ object PrefixMerger {
                     val prefix = it.first.subList(0, diffIndex)
                     val content = it.first.subList(diffIndex, it.first.size)
 
-                    result.add(Result(prefix.asCodePointString().replace(REGEX_PREFIX_TRIM, ""),
-                        content.asCodePointString(), it.second))
+                    result.add(
+                        Result(
+                            prefix.asCodePointString().replace(REGEX_PREFIX_TRIM, ""),
+                            content.asCodePointString(), it.second
+                        )
+                    )
                 }
             }
 

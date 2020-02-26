@@ -8,7 +8,7 @@ import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.intent
 
-class NetworkFragment: BaseSettingFragment() {
+class NetworkFragment : BaseSettingFragment() {
     companion object {
         private const val KEY_ENABLE_VPN_SERVICE = "enable_vpn_service"
         private const val KEY_IPV6 = "ipv6"

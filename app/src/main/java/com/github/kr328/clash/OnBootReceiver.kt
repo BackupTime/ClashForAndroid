@@ -9,13 +9,15 @@ import com.github.kr328.clash.service.util.componentName
 import com.github.kr328.clash.service.util.startForegroundServiceCompat
 import com.github.kr328.clash.utils.startClashService
 
-class OnBootReceiver: BroadcastReceiver() {
+class OnBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        if ( intent?.action != Intent.ACTION_BOOT_COMPLETED || context == null )
+        if (intent?.action != Intent.ACTION_BOOT_COMPLETED || context == null)
             return
 
         context.startClashService()
-        context.startForegroundServiceCompat(Intent(Intents.INTENT_ACTION_PROFILE_SETUP)
-            .setComponent(ProfileBackgroundService::class.componentName))
+        context.startForegroundServiceCompat(
+            Intent(Intents.INTENT_ACTION_PROFILE_SETUP)
+                .setComponent(ProfileBackgroundService::class.componentName)
+        )
     }
 }

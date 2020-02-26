@@ -8,13 +8,15 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.*
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
+import android.os.IInterface
 import androidx.collection.CircularArray
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.utils.Log
-import com.github.kr328.clash.dump.LogcatDumper
 import com.github.kr328.clash.model.LogFile
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.ClashManagerService
@@ -25,17 +27,12 @@ import com.github.kr328.clash.service.util.createLanguageConfigurationContext
 import com.github.kr328.clash.service.util.intent
 import com.github.kr328.clash.utils.format
 import com.github.kr328.clash.utils.logsDir
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.crashes.Crashes
-import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
-import java.io.DataInputStream
 import java.io.FileWriter
 import java.io.IOException
 import java.util.*
-import kotlin.concurrent.thread
 import kotlin.math.max
 
 class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
@@ -69,7 +66,7 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             manager = IClashManager.Stub.asInterface(service) ?: return stopSelf()
 
-            manager?.registerLogListener(LOG_LISTENER_KEY, object: IStreamCallback.Stub() {
+            manager?.registerLogListener(LOG_LISTENER_KEY, object : IStreamCallback.Stub() {
                 override fun complete() {}
                 override fun completeExceptionally(reason: String?) {}
                 override fun send(data: ParcelableContainer?) {
@@ -183,8 +180,7 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
                         }
                     }
                 }
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 return@launch
             }
         }

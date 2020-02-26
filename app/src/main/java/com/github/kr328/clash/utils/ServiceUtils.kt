@@ -14,14 +14,13 @@ import com.github.kr328.clash.service.util.startForegroundServiceCompat
 fun Context.startClashService(): Intent? {
     val startTun = UiSettings(this).get(UiSettings.ENABLE_VPN)
 
-    if ( startTun ) {
+    if (startTun) {
         val vpnRequest = VpnService.prepare(this)
-        if ( vpnRequest != null )
+        if (vpnRequest != null)
             return vpnRequest
 
         startForegroundServiceCompat(TunService::class.intent)
-    }
-    else {
+    } else {
         startForegroundServiceCompat(ClashService::class.intent)
     }
 

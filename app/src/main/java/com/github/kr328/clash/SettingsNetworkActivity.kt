@@ -15,7 +15,7 @@ class SettingsNetworkActivity : BaseActivity() {
             .replace(R.id.fragment, NetworkFragment())
             .commit()
 
-        if ( clashRunning )
+        if (clashRunning)
             Snackbar.make(rootView, R.string.options_unavailable, Snackbar.LENGTH_INDEFINITE).show()
     }
 

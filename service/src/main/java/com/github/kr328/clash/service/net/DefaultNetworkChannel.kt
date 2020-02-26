@@ -40,7 +40,8 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
             val cap = capabilitiesCache[network]
 
             if (cap?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                != networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                != networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            ) {
                 sendDefaultNetwork(true)
             }
 
@@ -50,7 +51,7 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             val cache = dnsServerCache[network]
 
-            if ( cache != linkProperties.dnsServers ) {
+            if (cache != linkProperties.dnsServers) {
                 sendDefaultNetwork(false)
             }
 
@@ -74,7 +75,7 @@ class DefaultNetworkChannel(val context: Context, scope: CoroutineScope) :
             val network = detectDefaultNetwork()
             val link = network?.let(connectivity::getLinkProperties)
 
-            if ( ignoreSame && network == currentNetwork )
+            if (ignoreSame && network == currentNetwork)
                 return@launch sendLock.unlock()
 
             currentNetwork = network

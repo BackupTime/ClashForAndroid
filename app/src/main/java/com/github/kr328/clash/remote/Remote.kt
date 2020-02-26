@@ -25,7 +25,6 @@ import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.util.zip.ZipFile
-import kotlin.system.exitProcess
 
 object Remote {
     var clash = Channel<ClashClient>()
@@ -54,8 +53,10 @@ object Remote {
                 val attachmentLog = ErrorAttachmentLog
                     .attachmentWithText(log, "logcat.txt")
 
-                Crashes.trackError(RemoteException("Clash Service Crashed"),
-                    null, listOf(attachmentLog))
+                Crashes.trackError(
+                    RemoteException("Clash Service Crashed"),
+                    null, listOf(attachmentLog)
+                )
 
                 onServiceDisconnected(null)
             }, 0)
@@ -105,8 +106,10 @@ object Remote {
 
                 GlobalScope.launch {
                     if (!verifyApk(application)) {
-                        application.startActivity(ApkBrokenActivity::class.intent
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        application.startActivity(
+                            ApkBrokenActivity::class.intent
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
                         return@launch
                     }
 

@@ -58,7 +58,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
         Clash.initialize(this)
 
-        if ( ServiceStatusProvider.serviceRunning )
+        if (ServiceStatusProvider.serviceRunning)
             return stopSelf()
 
         clashCore = ClashCore(this)
@@ -141,8 +141,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
         // IPv6
         if (ipv6Support) {
-            if ( bypassPrivate )
-                // from https://github.com/shadowsocks/shadowsocks-android/commit/cc840c9fddb3f4f6677005de18f1fcb387b84064#diff-e089fe63dcb3674c0a1e459a95508e3e
+            if (bypassPrivate)
+            // from https://github.com/shadowsocks/shadowsocks-android/commit/cc840c9fddb3f4f6677005de18f1fcb387b84064#diff-e089fe63dcb3674c0a1e459a95508e3e
                 addRoute("2000::", 3)
             else
                 addRoute("::", 0)
@@ -189,7 +189,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     private fun Builder.addAddress(): Builder {
         addAddress(PRIVATE_VLAN4_CLIENT, PRIVATE_VLAN4_SUBNET)
 
-        if ( settings.get(ServiceSettings.IPV6_SUPPORT) )
+        if (settings.get(ServiceSettings.IPV6_SUPPORT))
             addRoute(PRIVATE_VLAN6_CLIENT, 126)
 
         return this

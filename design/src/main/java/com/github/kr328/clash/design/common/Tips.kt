@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.TextView
 import com.github.kr328.clash.design.R
 
-class Tips(screen: CommonUiScreen): Base(screen) {
+class Tips(screen: CommonUiScreen) : Base(screen) {
     override val view: View = LayoutInflater.from(context)
         .inflate(R.layout.view_setting_tip, screen.layout, false)
 
@@ -16,11 +16,15 @@ class Tips(screen: CommonUiScreen): Base(screen) {
 
     var icon: Drawable?
         get() = vIcon.background
-        set(value) { vIcon.background = value }
+        set(value) {
+            vIcon.background = value
+        }
 
     var title: CharSequence
         get() = vTitle.text
-        set(value) { vTitle.text = value }
+        set(value) {
+            vTitle.text = value
+        }
 
     override fun saveState(bundle: Bundle) {}
     override fun restoreState(bundle: Bundle) {}

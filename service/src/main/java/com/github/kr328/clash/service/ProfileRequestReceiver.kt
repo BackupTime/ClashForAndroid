@@ -13,7 +13,7 @@ class ProfileRequestReceiver : BroadcastReceiver() {
             return
 
         val id = intent.getLongExtra(Intents.INTENT_EXTRA_PROFILE_ID, -1)
-        if ( id < 0 )
+        if (id < 0)
             return
 
         val request = ProfileRequest()

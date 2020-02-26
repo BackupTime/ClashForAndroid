@@ -3,7 +3,7 @@ package com.github.kr328.clash
 import android.os.Bundle
 import com.github.kr328.clash.settings.InterfaceFragment
 
-class SettingsInterfaceActivity: BaseActivity() {
+class SettingsInterfaceActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

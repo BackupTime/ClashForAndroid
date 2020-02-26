@@ -34,14 +34,13 @@ class LiveLogAdapter(private val context: Context) : RecyclerView.Adapter<LogAda
     }
 
     fun insertItems(i: List<LogEvent>) {
-        val items = if ( i.size > MAX_LOG_ITEMS ) {
+        val items = if (i.size > MAX_LOG_ITEMS) {
             i.subList(i.size - MAX_LOG_ITEMS, i.size)
-        }
-        else i
+        } else i
 
         val predictSize = items.size + circularArray.size()
 
-        if ( predictSize > MAX_LOG_ITEMS ) {
+        if (predictSize > MAX_LOG_ITEMS) {
             val removeSize = predictSize - MAX_LOG_ITEMS
             notifyItemRangeRemoved(MAX_LOG_ITEMS - removeSize, removeSize)
             circularArray.removeFromEnd(removeSize)

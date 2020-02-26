@@ -10,7 +10,7 @@ data class LogEvent(
     val level: Level,
     val message: String,
     val time: Long = System.currentTimeMillis()
-): Event {
+) : Event {
     companion object {
         const val DEBUG_VALUE = "debug"
         const val INFO_VALUE = "info"

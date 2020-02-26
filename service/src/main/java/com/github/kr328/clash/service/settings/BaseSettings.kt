@@ -8,7 +8,7 @@ abstract class BaseSettings(private val preferences: SharedPreferences) {
         fun put(editor: SharedPreferences.Editor, value: T)
     }
 
-    class StringEntry(private val key: String, private val defaultValue: String): Entry<String> {
+    class StringEntry(private val key: String, private val defaultValue: String) : Entry<String> {
         override fun get(preferences: SharedPreferences): String {
             return preferences.getString(key, defaultValue)!!
         }
@@ -18,7 +18,8 @@ abstract class BaseSettings(private val preferences: SharedPreferences) {
         }
     }
 
-    class BooleanEntry(private val key: String, private val defaultValue: Boolean): Entry<Boolean> {
+    class BooleanEntry(private val key: String, private val defaultValue: Boolean) :
+        Entry<Boolean> {
         override fun get(preferences: SharedPreferences): Boolean {
             return preferences.getBoolean(key, defaultValue)
         }
@@ -28,7 +29,8 @@ abstract class BaseSettings(private val preferences: SharedPreferences) {
         }
     }
 
-    class StringSetEntry(private val key: String, private val defaultValue: Set<String>): Entry<Set<String>> {
+    class StringSetEntry(private val key: String, private val defaultValue: Set<String>) :
+        Entry<Set<String>> {
         override fun get(preferences: SharedPreferences): Set<String> {
             return preferences.getStringSet(key, defaultValue)!!
         }
@@ -39,12 +41,12 @@ abstract class BaseSettings(private val preferences: SharedPreferences) {
     }
 
     class Editor(private val editor: SharedPreferences.Editor) {
-        fun <T>put(entry: Entry<T>, value: T) {
+        fun <T> put(entry: Entry<T>, value: T) {
             entry.put(editor, value)
         }
     }
 
-    fun <T>get(entry: Entry<T>): T {
+    fun <T> get(entry: Entry<T>): T {
         return entry.get(preferences)
     }
 
@@ -53,7 +55,7 @@ abstract class BaseSettings(private val preferences: SharedPreferences) {
 
         Editor(editor).apply(block)
 
-        if ( async )
+        if (async)
             editor.apply()
         else
             editor.commit()
