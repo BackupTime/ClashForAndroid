@@ -109,7 +109,7 @@
 
     <string name="boot">Boot</string>
     <string name="start_on_boot">Start on Boot</string>
-    <string name="start_clash_on_system_boot">Start slash on system boot</string>
+    <string name="start_clash_on_system_boot">Start Clash on system boot</string>
 
     <string name="notification">Notification</string>
     <string name="show_traffic">Show Traffic</string>
