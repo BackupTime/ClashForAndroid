@@ -1,6 +1,7 @@
 package com.github.kr328.clash.core
 
 import android.content.Context
+import android.os.Messenger
 import bridge.Bridge
 import bridge.TunCallback
 import com.github.kr328.clash.core.event.EventStream
@@ -18,6 +19,8 @@ import java.io.File
 import java.io.InputStream
 
 object Clash {
+    private val logReceivers = mutableMapOf<String, (LogEvent) -> Unit>()
+
     private var initialized = false
 
     @Synchronized
@@ -33,8 +36,6 @@ object Clash {
         Bridge.setHome(context.cacheDir.absolutePath)
         Bridge.setApplicationVersion(BuildConfig.VERSION_NAME)
         Bridge.reset()
-
-        Log.d("MMDB loaded ${bytes.size}")
     }
 
     fun start() {
@@ -52,10 +53,11 @@ object Clash {
         onNewSocket: (Int) -> Boolean,
         onTunStop: () -> Unit
     ) {
-        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns, object: TunCallback {
+        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns, object : TunCallback {
             override fun onCreateSocket(fd: Long) {
                 onNewSocket(fd.toInt())
             }
+
             override fun onStop() {
                 onTunStop()
             }
@@ -143,14 +145,27 @@ object Clash {
         return Traffic(data.upload, data.download)
     }
 
-    fun openLogEvent(): EventStream<LogEvent> {
-        return object : EventStream<LogEvent>() {
-            val log = Bridge.pollLogs { level, payload ->
-                send(LogEvent(LogEvent.Level.fromString(level), payload))
-            }
+    fun registerLogReceiver(key: String, receiver: (LogEvent) -> Unit) {
+        synchronized(logReceivers) {
+            logReceivers[key] = receiver
 
-            override fun onClose() {
-                log.stop()
+            Bridge.setLogCallback(this::onLogEvent)
+        }
+    }
+
+    fun unregisterLogReceiver(key: String) {
+        synchronized(logReceivers) {
+            logReceivers.remove(key)
+
+            if ( logReceivers.isEmpty() )
+                Bridge.setLogCallback(null)
+        }
+    }
+
+    private fun onLogEvent(level: String, payload: String) {
+        synchronized(logReceivers) {
+            logReceivers.forEach {
+                it.value(LogEvent(LogEvent.Level.fromString(level), payload))
             }
         }
     }

@@ -2,7 +2,9 @@ package com.github.kr328.clash
 
 import android.app.Application
 import android.content.Context
+import android.os.DeadObjectException
 import com.github.kr328.clash.core.Global
+import com.github.kr328.clash.dump.LogcatDumper
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.remote.Remote
 import com.microsoft.appcenter.AppCenter
@@ -32,6 +34,21 @@ class MainApplication : Application() {
                 BuildConfig.APP_CENTER_KEY,
                 Analytics::class.java, Crashes::class.java
             )
+
+            Crashes.setListener(object: AbstractCrashesListener() {
+                override fun getErrorAttachments(report: ErrorReport?): MutableIterable<ErrorAttachmentLog> {
+                    report ?: return mutableListOf()
+
+                    if ( !report.stackTrace.contains("DeadObjectException") )
+                        return mutableListOf()
+
+                    val logcat = LogcatDumper.dump().joinToString(separator = "\n")
+
+                    return mutableListOf(
+                        ErrorAttachmentLog.attachmentWithText(logcat, "logcat.txt")
+                    )
+                }
+            })
         }
 
         Remote.init(this)

@@ -1,16 +1,21 @@
 package bridge
 
 import (
-	"github.com/Dreamacro/clash/log"
+	"sync"
+
 	"github.com/Dreamacro/clash/tunnel"
 )
 
 type EventPoll struct {
+	stop sync.Once
+
 	onStop func()
 }
 
 func (e *EventPoll) Stop() {
-	e.onStop()
+	e.stop.Do(func() {
+		e.onStop()
+	})
 }
 
 type Traffic struct {
@@ -38,37 +43,5 @@ func QueryTraffic() *Traffic {
 	return &Traffic{
 		Upload:   up,
 		Download: down,
-	}
-}
-
-func PollLogs(logs Logs) *EventPoll {
-	stopChannel := make(chan int, 1)
-	sub := log.Subscribe()
-
-	go func() {
-		defer log.UnSubscribe(sub)
-		defer close(stopChannel)
-		defer log.Infoln("Logs Poll Stopped")
-
-		for {
-			select {
-			case <-stopChannel:
-				return
-			case elm := <-sub:
-				l := elm.(*log.Event)
-
-				if l.LogLevel < log.Level() {
-					break
-				}
-
-				logs.OnEvent(l.Type(), l.Payload)
-			}
-		}
-	}()
-
-	return &EventPoll{
-		onStop: func() {
-			stopChannel <- 0
-		},
 	}
 }

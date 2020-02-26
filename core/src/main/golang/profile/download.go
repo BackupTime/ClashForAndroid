@@ -83,9 +83,13 @@ func ReadAndCheck(fd int, output, baseDir string) error {
 }
 
 func SaveAndCheck(data []byte, output, baseDir string) error {
-	_, err := parseConfig(data, baseDir)
+	cfg, err := parseConfig(data, baseDir)
 	if err != nil {
 		return err
+	}
+
+	for _, v := range cfg.Providers {
+		v.Destroy()
 	}
 
 	return ioutil.WriteFile(output, data, defaultFileMode)

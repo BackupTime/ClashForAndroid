@@ -107,7 +107,7 @@ func parseConfig(data []byte, baseDir string) (*config.Config, error) {
 	raw.Experimental.Interface = ""
 	raw.ExternalUI = ""
 	raw.ExternalController = ""
-	raw.Rule = append([]string{fmt.Sprintf("IP-CIDR,%s,REJECT", tunAddress)}, raw.Rule...)
+	raw.Rule = append([]string{fmt.Sprintf("IP-CIDR,%s,REJECT,no-resolve", tunAddress)}, raw.Rule...)
 
 	patchRawConfig(raw)
 

@@ -8,38 +8,26 @@ import kotlinx.coroutines.withContext
 
 class ProfileClient(private val service: IProfileService) {
     suspend fun queryProfiles(): Array<ClashProfileEntity> = withContext(Dispatchers.IO) {
-        Utils.callRemote {
-            service.queryProfiles()
-        }
+        service.queryProfiles()
     }
 
     suspend fun queryActiveProfile(): ClashProfileEntity? = withContext(Dispatchers.IO) {
-        Utils.callRemote {
-            service.queryActiveProfile()
-        }
+        service.queryActiveProfile()
     }
 
     suspend fun enqueueRequest(request: ProfileRequest) = withContext(Dispatchers.IO) {
-        Utils.callRemote {
-            service.enqueueRequest(request)
-        }
+        service.enqueueRequest(request)
     }
 
     suspend fun setActiveProfile(id: Long) = withContext(Dispatchers.IO) {
-        Utils.callRemote {
-            service.setActiveProfile(id)
-        }
+        service.setActiveProfile(id)
     }
 
     suspend fun requestProfileEditUri(id: Long): String? = withContext(Dispatchers.IO) {
-        Utils.callRemote {
-            service.requestProfileEditUri(id)
-        }
+        service.requestProfileEditUri(id)
     }
 
     suspend fun commitProfileEditUri(uri: String) = withContext(Dispatchers.IO) {
-        Utils.callRemote {
-            service.commitProfileEditUri(uri)
-        }
+        service.commitProfileEditUri(uri)
     }
 }

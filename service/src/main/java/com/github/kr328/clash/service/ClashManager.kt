@@ -1,16 +1,26 @@
 package com.github.kr328.clash.service
 
 import android.content.Context
+import android.os.ParcelFileDescriptor
 import androidx.core.content.edit
 import com.github.kr328.clash.core.Clash
+import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroupList
+import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.data.ClashProfileProxyEntity
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.toUtf8Bytes
+import java.io.DataOutputStream
+import java.lang.Exception
+import java.nio.channels.FileChannel
+import kotlin.concurrent.thread
 
 class ClashManager(context: Context, parent: CoroutineScope) :
     IClashManager.Stub(), CoroutineScope by parent {
@@ -42,35 +52,10 @@ class ClashManager(context: Context, parent: CoroutineScope) :
         return Clash.setSelectedProxy(proxy, selected)
     }
 
-    override fun putSetting(key: String?, value: String?): Boolean {
-        settings.edit(commit = false) {
-            putString(key, value)
-        }
-        return true
-    }
-
     override fun queryBandwidth(): Long {
         val data = Clash.queryBandwidth()
 
         return data.download + data.upload
-    }
-
-    override fun openLogEvent(callback: IStreamCallback?) {
-        require(callback != null)
-
-        Clash.openLogEvent().apply {
-            callback.asBinder()?.linkToDeath({
-                close()
-            }, 0)
-
-            onEvent {
-                try {
-                    callback.send(ParcelableContainer(it))
-                } catch (e: Exception) {
-                    close()
-                }
-            }
-        }
     }
 
     override fun startHealthCheck(group: String?, callback: IStreamCallback?) {
@@ -84,7 +69,27 @@ class ClashManager(context: Context, parent: CoroutineScope) :
         }
     }
 
-    override fun getSetting(key: String?): String? {
-        return settings.getString(key, null)
+    override fun registerLogListener(key: String?, callback: IStreamCallback?) {
+        requireNotNull(key)
+        requireNotNull(callback)
+
+        callback.asBinder().linkToDeath({
+            Clash.unregisterLogReceiver(key)
+        }, 0)
+
+        Clash.registerLogReceiver(key) {
+            try {
+                callback.send(ParcelableContainer(it))
+            }
+            catch (e: Exception) {
+                Clash.unregisterLogReceiver(key)
+            }
+        }
+    }
+
+    override fun unregisterLogListener(key: String?) {
+        requireNotNull(key)
+
+        Clash.unregisterLogReceiver(key)
     }
 }

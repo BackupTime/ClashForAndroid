@@ -31,9 +31,11 @@ import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
+import java.io.DataInputStream
 import java.io.FileWriter
 import java.io.IOException
 import java.util.*
+import kotlin.concurrent.thread
 import kotlin.math.max
 
 class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
@@ -41,6 +43,7 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
         private const val NOTIFICATION_CHANNEL_ID = "clash_logcat_channel"
         private const val NOTIFICATION_ID = 256
         private const val MAX_CACHE_COUNT = 200
+        private const val LOG_LISTENER_KEY = "logcat_service"
 
         private const val LOG_CONTENT_FORMAT = "%d %s %s"
 
@@ -57,39 +60,23 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
     private val entity = LogFile.generate()
 
     private val connection = object : ServiceConnection {
+        private var manager: IClashManager? = null
+
         override fun onServiceDisconnected(name: ComponentName?) {
-            val dump = LogcatDumper.dump()
-
-            logChannel.offer(LogEvent(LogEvent.Level.ERROR, "Clash Service Crashed"))
-
-            dump.forEach {
-                logChannel.offer(LogEvent(LogEvent.Level.ERROR, it))
-            }
-
-            val textLog = ErrorAttachmentLog
-                .attachmentWithText(dump.joinToString(separator = "\n"), "logcat.txt")
-
-            Crashes.trackError(RemoteException("Clash Service Crashed"),
-                null, listOf(textLog))
+            manager?.unregisterLogListener(LOG_LISTENER_KEY)
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val manager = IClashManager.Stub.asInterface(service) ?: return stopSelf()
+            manager = IClashManager.Stub.asInterface(service) ?: return stopSelf()
 
-            manager.openLogEvent(object : IStreamCallback.Stub() {
-                override fun complete() {
-                    stopSelf()
-                }
-
-                override fun completeExceptionally(reason: String?) {
-                    stopSelf()
-                }
-
+            manager?.registerLogListener(LOG_LISTENER_KEY, object: IStreamCallback.Stub() {
+                override fun complete() {}
+                override fun completeExceptionally(reason: String?) {}
                 override fun send(data: ParcelableContainer?) {
-                    val logEvent = (data?.data as LogEvent?) ?: return
+                    data ?: return
+                    data.data ?: return
 
-                    if (!logChannel.offer(logEvent))
-                        Log.w("Drop log $logEvent")
+                    logChannel.offer(data.data as LogEvent)
                 }
             })
         }
@@ -114,6 +101,8 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
         logChannel.close()
 
         cancel()
+
+        connection.onServiceDisconnected(null)
 
         stopForeground(true)
 

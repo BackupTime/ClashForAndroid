@@ -16,9 +16,6 @@ interface IClashManager {
     long queryBandwidth();
 
     // Events
-    void openLogEvent(IStreamCallback callback);
-
-    // Settings
-    boolean putSetting(String key, String value);
-    String getSetting(String key);
+    void registerLogListener(String key, IStreamCallback callback);
+    void unregisterLogListener(String key);
 }
