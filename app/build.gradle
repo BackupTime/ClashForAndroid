@@ -17,6 +17,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -26,6 +27,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+    splits {
+        abi {
+            enable true
+            universalApk true
+        }
     }
 }
 
