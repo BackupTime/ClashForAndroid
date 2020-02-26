@@ -153,16 +153,9 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
     private fun Builder.addBypassApplications(): Builder {
         when (settings.get(ServiceSettings.ACCESS_CONTROL_MODE)) {
-            ServiceSettings.ACCESS_CONTROL_MODE_ALL -> {
-                for (app in resources.getStringArray(R.array.default_disallow_application)) {
-                    runCatching {
-                        addDisallowedApplication(app)
-                    }
-                }
-            }
+            ServiceSettings.ACCESS_CONTROL_MODE_ALL -> {}
             ServiceSettings.ACCESS_CONTROL_MODE_WHITELIST -> {
-                for (app in settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toSet() -
-                        resources.getStringArray(R.array.default_disallow_application)) {
+                for (app in settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toSet()) {
                     runCatching {
                         addAllowedApplication(app)
                     }.onFailure {
@@ -171,8 +164,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 }
             }
             ServiceSettings.ACCESS_CONTROL_MODE_BLACKLIST -> {
-                for (app in settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toSet() +
-                        resources.getStringArray(R.array.default_disallow_application)) {
+                for (app in settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toSet()) {
                     runCatching {
                         addDisallowedApplication(app)
                     }.onFailure {

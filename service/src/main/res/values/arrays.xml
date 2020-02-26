@@ -68,8 +68,4 @@
         <item>255.255.255.254/32</item>
         <item>172.31.255.252/30</item> <!-- tun device address -->
     </string-array>
-
-    <string-array name="default_disallow_application">
-        <item>com.android.networkstack</item>
-    </string-array>
 </resources>
