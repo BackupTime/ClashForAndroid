@@ -103,7 +103,7 @@ open class GolangBindTask : DefaultTask() {
             .copyRecursively(goPath.resolve("src"), overwrite = true)
 
         "gomobile init".exec(goBuildPath)
-        "gomobile bind -target=android \"-gcflags=all=-trimpath=$goPath\" github.com/kr328/cfa/bridge".exec(goBuildPath)
+        "gomobile bind -target=android \"-gcflags=all=-trimpath=$goPath\" \"-ldflags=-w -s\" github.com/kr328/cfa/bridge".exec(goBuildPath)
 
         nativeOutput.deleteRecursively()
         javaOutput.deleteRecursively()
