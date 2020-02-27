@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.RemoteException
@@ -14,6 +15,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.github.kr328.clash.ApkBrokenActivity
 import com.github.kr328.clash.Constants
+import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.dump.LogcatDumper
 import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager
@@ -24,6 +26,8 @@ import com.microsoft.appcenter.crashes.Crashes
 import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import java.io.File
+import java.lang.Exception
 import java.util.zip.ZipFile
 
 object Remote {
@@ -149,14 +153,32 @@ object Remote {
         val sources =
             info.splitSourceDirs ?: arrayOf(info.sourceDir) ?: return@withContext false
 
-        for (apk in sources) {
-            if (ZipFile(apk).entries().asSequence().any { it.name.endsWith("libgojni.so") }) {
-                sp.edit {
-                    putLong(Constants.PREFERENCE_KEY_LAST_INSTALL, pkg.lastUpdateTime)
-                }
-                return@withContext true
-            }
+        val regexNativeLibrary = Regex("lib/(\\S+)/libgojni.so")
+        val availableAbi = Build.SUPPORTED_ABIS.toSet()
+        val apkAbi = try {
+            sources
+                .asSequence()
+                .filter { File(it).exists() }
+                .flatMap { ZipFile(it).entries().asSequence() }
+                .mapNotNull { regexNativeLibrary.matchEntire(it.name) }
+                .mapNotNull { it.groups[1]?.value }
+                .toSet()
         }
-        return@withContext false
+        catch (e: Exception) {
+            Crashes.trackError(e)
+
+            emptySet<String>()
+        }
+        
+        if (availableAbi.intersect(apkAbi).isNotEmpty()) {
+            sp.edit {
+                putLong(Constants.PREFERENCE_KEY_LAST_INSTALL, pkg.lastUpdateTime)
+            }
+
+            true
+        }
+        else {
+            false
+        }
     }
 }
