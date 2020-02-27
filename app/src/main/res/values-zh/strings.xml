@@ -130,4 +130,5 @@
     <string name="learn_more_about_split_apks">了解更多关于分包机制</string>
     <string name="reinstall_from_google_play">重新从 Google Play 安装</string>
     <string name="download_from_github_releases">从 Github Release 下载</string>
+    <string name="missing_vpn_component">系统 VPN 组件缺失</string>
 </resources>

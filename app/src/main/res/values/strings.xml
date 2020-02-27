@@ -172,4 +172,5 @@
     <string name="github_releases_url" translatable="false">https://github.com/Kr328/ClashForAndroid/releases</string>
 
     <string name="format_proxy_group_title" translatable="false">%s - %s</string>
+    <string name="missing_vpn_component">Missing VPN Components</string>
 </resources>

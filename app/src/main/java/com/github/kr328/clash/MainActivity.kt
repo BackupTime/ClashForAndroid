@@ -35,8 +35,15 @@ class MainActivity : BaseActivity() {
                 stopClashService()
             } else {
                 val vpnRequest = startClashService()
-                if (vpnRequest != null)
-                    startActivityForResult(vpnRequest, REQUEST_CODE)
+                if (vpnRequest != null) {
+                    val resolved = packageManager.resolveActivity(vpnRequest, 0)
+                    if ( resolved != null ) {
+                        startActivityForResult(vpnRequest, REQUEST_CODE)
+                    }
+                    else {
+                        makeSnackbarException(getString(R.string.missing_vpn_component), null)
+                    }
+                }
             }
         }
 
