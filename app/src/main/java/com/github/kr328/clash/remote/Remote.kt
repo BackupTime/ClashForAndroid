@@ -169,7 +169,7 @@ object Remote {
 
             emptySet<String>()
         }
-        
+
         if (availableAbi.intersect(apkAbi).isNotEmpty()) {
             sp.edit {
                 putLong(Constants.PREFERENCE_KEY_LAST_INSTALL, pkg.lastUpdateTime)
