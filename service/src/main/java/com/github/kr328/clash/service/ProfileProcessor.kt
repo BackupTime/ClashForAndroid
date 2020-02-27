@@ -64,7 +64,8 @@ class ProfileProcessor(private val context: Context) {
             target.parentFile?.mkdirs()
             baseDir.mkdirs()
 
-            if (source.scheme == "content" || source.scheme == "file") {
+            if (source.scheme.equals("content", ignoreCase = true)
+                || source.scheme.equals("file", ignoreCase = true)) {
                 val parcelFileDescriptor = context.contentResolver.openFileDescriptor(source, "r")
                     ?: throw FileNotFoundException("Unable to open file $source")
 

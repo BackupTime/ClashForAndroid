@@ -186,7 +186,7 @@ class ProfileService : BaseService() {
                     ClashProfileEntity(
                         requireNotNull(request.name),
                         requireNotNull(request.type),
-                        requireNotNull(request.url).toString().toLowerCase(Locale.getDefault()),
+                        requireNotNull(request.url).toString(),
                         request.source?.toString(),
                         false,
                         0,

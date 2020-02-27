@@ -149,7 +149,10 @@ class ProfileEditActivity : BaseActivity() {
                 }
 
                 if (url == null || url == Uri.EMPTY ||
-                    (url.scheme != "http" && url.scheme != "https" && url.scheme != "content")
+                    (!url.scheme.equals("http", ignoreCase = true)
+                            && !url.scheme.equals("https", ignoreCase = true)
+                            && !url.scheme.equals("content", ignoreCase = true)
+                            && !url.scheme.equals("file", ignoreCase = true))
                 ) {
                     Snackbar.make(rootView, R.string.invalid_url, Snackbar.LENGTH_LONG).show()
                     return@setOnClickListener
