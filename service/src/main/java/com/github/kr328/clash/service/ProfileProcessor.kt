@@ -22,7 +22,8 @@ class ProfileProcessor(private val context: Context) {
         downloadProfile(
             uri,
             resolveProfile(entity.id),
-            resolveBase(entity.id)
+            resolveBase(entity.id),
+            newRecord
         )
 
         val newEntity = if (entity.type == ClashProfileEntity.TYPE_FILE)
@@ -58,7 +59,7 @@ class ProfileProcessor(private val context: Context) {
         }
     }
 
-    private suspend fun downloadProfile(source: Uri, target: File, baseDir: File) {
+    private suspend fun downloadProfile(source: Uri, target: File, baseDir: File, newRecord: Boolean) {
         try {
             target.parentFile?.mkdirs()
             baseDir.mkdirs()
@@ -74,8 +75,10 @@ class ProfileProcessor(private val context: Context) {
                 Clash.downloadProfile(source.toString(), target, baseDir).await()
             }
         } catch (e: Exception) {
-            target.delete()
-            baseDir.deleteRecursively()
+            if ( newRecord ) {
+                target.delete()
+                baseDir.deleteRecursively()
+            }
             throw e
         }
     }

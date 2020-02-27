@@ -47,19 +47,7 @@ object Remote {
             if (service != null)
                 instance = ClashClient(IClashManager.Stub.asInterface(service))
 
-            service?.linkToDeath({
-                val log = LogcatDumper.dump().joinToString(separator = "\n")
-
-                val attachmentLog = ErrorAttachmentLog
-                    .attachmentWithText(log, "logcat.txt")
-
-                Crashes.trackError(
-                    RemoteException("Clash Service Crashed"),
-                    null, listOf(attachmentLog)
-                )
-
-                onServiceDisconnected(null)
-            }, 0)
+            service?.linkToDeath({ onServiceDisconnected(null) }, 0)
 
             sender = GlobalScope.launch {
                 while (isActive) {
@@ -84,9 +72,7 @@ object Remote {
             if (service != null)
                 instance = ProfileClient(IProfileService.Stub.asInterface(service))
 
-            service?.linkToDeath({
-                onServiceDisconnected(null)
-            }, 0)
+            service?.linkToDeath({ onServiceDisconnected(null) }, 0)
 
             sender = GlobalScope.launch {
                 while (isActive) {
@@ -149,30 +135,28 @@ object Remote {
         })
     }
 
-    private suspend fun verifyApk(application: Application): Boolean {
-        return withContext(Dispatchers.IO) {
-            val sp = application.getSharedPreferences(
-                Constants.PREFERENCE_NAME_APP,
-                Context.MODE_PRIVATE
-            )
-            val pkg = application.packageManager.getPackageInfo(application.packageName, 0)
+    private suspend fun verifyApk(application: Application) = withContext(Dispatchers.IO) {
+        val sp = application.getSharedPreferences(
+            Constants.PREFERENCE_NAME_APP,
+            Context.MODE_PRIVATE
+        )
+        val pkg = application.packageManager.getPackageInfo(application.packageName, 0)
 
-            if (sp.getLong(Constants.PREFERENCE_KEY_LAST_INSTALL, 0) == pkg.lastUpdateTime)
-                return@withContext true
+        if (sp.getLong(Constants.PREFERENCE_KEY_LAST_INSTALL, 0) == pkg.lastUpdateTime)
+            return@withContext true
 
-            val info = application.applicationInfo
-            val sources =
-                info.splitSourceDirs ?: arrayOf(info.sourceDir) ?: return@withContext false
+        val info = application.applicationInfo
+        val sources =
+            info.splitSourceDirs ?: arrayOf(info.sourceDir) ?: return@withContext false
 
-            for (apk in sources) {
-                if (ZipFile(apk).entries().asSequence().any { it.name.endsWith("libgojni.so") }) {
-                    sp.edit {
-                        putLong(Constants.PREFERENCE_KEY_LAST_INSTALL, pkg.lastUpdateTime)
-                    }
-                    return@withContext true
+        for (apk in sources) {
+            if (ZipFile(apk).entries().asSequence().any { it.name.endsWith("libgojni.so") }) {
+                sp.edit {
+                    putLong(Constants.PREFERENCE_KEY_LAST_INSTALL, pkg.lastUpdateTime)
                 }
+                return@withContext true
             }
-            return@withContext false
         }
+        return@withContext false
     }
 }

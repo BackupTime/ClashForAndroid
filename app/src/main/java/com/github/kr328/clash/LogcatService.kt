@@ -101,11 +101,13 @@ class LogcatService : Service(), CoroutineScope by MainScope(), IInterface {
 
         connection.onServiceDisconnected(null)
 
+        unbindService(connection)
+
         stopForeground(true)
 
-        super.onDestroy()
-
         isServiceRunning = false
+
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? {

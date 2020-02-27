@@ -206,10 +206,10 @@ class ProfileBackgroundService : BaseService() {
         val entity = profiles.queryProfileById(id) ?: return
 
         val notification = NotificationCompat.Builder(this, SERVICE_RESULT_CHANNEL)
-            .setContentTitle(getString(R.string.format_update_failure, entity.name, reason))
-            .setContentText(reason)
+            .setContentTitle(getString(R.string.format_update_failure, entity.name))
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(reason))
             .setOnlyAlertOnce(true)
             .setGroup(SERVICE_RESULT_CHANNEL)
             .build()
