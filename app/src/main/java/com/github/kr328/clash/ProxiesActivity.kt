@@ -268,7 +268,7 @@ class ProxiesActivity : BaseActivity(), ScrollBinding.Callback {
                 scrollBinding.scrollMaster(selected)
             }
 
-            delay(200)
+            delay(500)
 
             refreshMutex.unlock()
         }
