@@ -148,11 +148,11 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
 
         val editor = ProfileEditActivity::class.intent
             .putExtra("id", if (duplicate) -1L else entity.id)
-            .putExtra("type", type)
+            .putExtra("type", if (duplicate) Constants.URL_PROVIDER_TYPE_FILE else type)
             .putExtra("intent", intent)
             .putExtra("name", name)
             .putExtra("url", uri)
-            .putExtra("interval", interval)
+            .putExtra("interval", if (duplicate) "0" else interval)
 
         startActivity(editor)
     }
