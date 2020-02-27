@@ -19,6 +19,14 @@ class SettingsNetworkActivity : BaseActivity() {
             Snackbar.make(rootView, R.string.options_unavailable, Snackbar.LENGTH_INDEFINITE).show()
     }
 
+    override suspend fun onClashStopped(reason: String?) {
+        recreate()
+    }
+
+    override suspend fun onClashStarted() {
+        recreate()
+    }
+
     override val activityLabel: CharSequence?
         get() = getText(R.string.network)
 }
