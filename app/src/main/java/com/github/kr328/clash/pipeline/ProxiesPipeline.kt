@@ -72,8 +72,7 @@ suspend fun Pipeline<List<ProxyGroup>>.sort(): Pipeline<List<ProxyGroup>> {
 suspend fun Pipeline<List<ProxyGroup>>.toAdapterElement(
     prefixMerged: Map<ProxyEntry, ProxyMerged>,
     general: General
-):
-        List<ProxyAdapter.ProxyGroupInfo> {
+): List<ProxyAdapter.ProxyGroupInfo> {
     return input.map { group ->
         val proxies = group.proxies.map { proxy ->
             val merged = prefixMerged[ProxyEntry(group.name, proxy.name)]?.takeIf {
