@@ -19,8 +19,6 @@ val gVersionName: String by rootExtra
 
 val gKotlinVersion: String by rootExtra
 val gKotlinCoroutineVersion: String by rootExtra
-val gKotlinSerializationVersion: String by rootExtra
-val gRoomVersion: String by rootExtra
 val gAppCenterVersion: String by rootExtra
 val gAndroidKtxVersion: String by rootExtra
 val gLifecycleVersion: String by rootExtra

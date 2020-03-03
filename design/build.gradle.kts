@@ -16,17 +16,9 @@ val gVersionCode: Int by rootExtra
 val gVersionName: String by rootExtra
 
 val gKotlinVersion: String by rootExtra
-val gKotlinCoroutineVersion: String by rootExtra
-val gKotlinSerializationVersion: String by rootExtra
-val gRoomVersion: String by rootExtra
-val gAppCenterVersion: String by rootExtra
 val gAndroidKtxVersion: String by rootExtra
-val gLifecycleVersion: String by rootExtra
-val gRecyclerviewVersion: String by rootExtra
 val gAppCompatVersion: String by rootExtra
 val gMaterialDesignVersion: String by rootExtra
-val gShizukuPreferenceVersion: String by rootExtra
-val gMultiprocessPreferenceVersion: String by rootExtra
 
 android {
     compileSdkVersion(gCompileSdkVersion)
@@ -60,7 +52,7 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$gKotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion")
     implementation("androidx.appcompat:appcompat:$gAppCompatVersion")
     implementation("androidx.core:core-ktx:$gAndroidKtxVersion")
     implementation("com.google.android.material:material:$gMaterialDesignVersion")
