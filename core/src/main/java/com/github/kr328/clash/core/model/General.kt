@@ -7,7 +7,7 @@ import kotlinx.serialization.*
 
 @Serializable
 data class General(val mode: Mode, val http: Int, val socks: Int, val redirect: Int) : Parcelable {
-    @Serializable(with = ModeSerializer::class)
+    @Serializable
     enum class Mode {
         DIRECT, GLOBAL, RULE;
 
@@ -31,28 +31,6 @@ data class General(val mode: Mode, val http: Int, val socks: Int, val redirect: 
         }
     }
 
-    class ModeSerializer : KSerializer<Mode> {
-        override val descriptor: SerialDescriptor
-            get() = PrimitiveDescriptor("clashGeneralModeSerializer", PrimitiveKind.STRING)
-
-        override fun deserialize(decoder: Decoder): Mode {
-            return when (decoder.decodeInt()) {
-                MODE_DIRECT -> Mode.DIRECT
-                MODE_GLOBAL -> Mode.GLOBAL
-                MODE_RULE -> Mode.RULE
-                else -> throw IllegalArgumentException("Invalid mode")
-            }
-        }
-
-        override fun serialize(encoder: Encoder, value: Mode) {
-            when (value) {
-                Mode.DIRECT -> encoder.encodeInt(MODE_DIRECT)
-                Mode.GLOBAL -> encoder.encodeInt(MODE_GLOBAL)
-                Mode.RULE -> encoder.encodeInt(MODE_RULE)
-            }
-        }
-    }
-
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         Parcels.dump(serializer(), this, parcel)
     }
@@ -62,10 +40,6 @@ data class General(val mode: Mode, val http: Int, val socks: Int, val redirect: 
     }
 
     companion object {
-        const val MODE_DIRECT = 1
-        const val MODE_GLOBAL = 2
-        const val MODE_RULE = 3
-
         @JvmField
         val CREATOR = object : Parcelable.Creator<General> {
             override fun createFromParcel(parcel: Parcel): General {
