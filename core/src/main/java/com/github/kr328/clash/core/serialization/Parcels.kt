@@ -5,7 +5,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.modules.EmptyModule
 import kotlinx.serialization.modules.SerialModule
 
-object Parcels : AbstractSerialFormat(EmptyModule) {
+object Parcels : SerialFormat {
     fun <T> dump(serializer: SerializationStrategy<T>, obj: T, parcel: Parcel) {
         serializer.serialize(ParcelsEncoder(parcel), obj)
     }
@@ -20,64 +20,63 @@ object Parcels : AbstractSerialFormat(EmptyModule) {
             get() = EmptyModule
 
         override fun beginCollection(
-            desc: SerialDescriptor,
+            descriptor: SerialDescriptor,
             collectionSize: Int,
-            vararg typeParams: KSerializer<*>
+            vararg typeSerializers: KSerializer<*>
         ): CompositeEncoder {
             encodeInt(collectionSize)
-            return super.beginCollection(desc, collectionSize, *typeParams)
+            return super.beginCollection(descriptor, collectionSize, *typeSerializers)
         }
 
-        override fun encodeBooleanElement(desc: SerialDescriptor, index: Int, value: Boolean) =
+        override fun encodeBooleanElement(descriptor: SerialDescriptor, index: Int, value: Boolean) =
             encodeBoolean(value)
 
-        override fun encodeByteElement(desc: SerialDescriptor, index: Int, value: Byte) =
+        override fun encodeByteElement(descriptor: SerialDescriptor, index: Int, value: Byte) =
             encodeByte(value)
 
-        override fun encodeCharElement(desc: SerialDescriptor, index: Int, value: Char) =
+        override fun encodeCharElement(descriptor: SerialDescriptor, index: Int, value: Char) =
             encodeChar(value)
 
-        override fun encodeDoubleElement(desc: SerialDescriptor, index: Int, value: Double) =
+        override fun encodeDoubleElement(descriptor: SerialDescriptor, index: Int, value: Double) =
             encodeDouble(value)
 
-        override fun encodeFloatElement(desc: SerialDescriptor, index: Int, value: Float) =
+        override fun encodeFloatElement(descriptor: SerialDescriptor, index: Int, value: Float) =
             encodeFloat(value)
 
-        override fun encodeIntElement(desc: SerialDescriptor, index: Int, value: Int) =
+        override fun encodeIntElement(descriptor: SerialDescriptor, index: Int, value: Int) =
             encodeInt(value)
 
-        override fun encodeLongElement(desc: SerialDescriptor, index: Int, value: Long) =
+        override fun encodeLongElement(descriptor: SerialDescriptor, index: Int, value: Long) =
             encodeLong(value)
 
-        override fun encodeShortElement(desc: SerialDescriptor, index: Int, value: Short) =
+        override fun encodeShortElement(descriptor: SerialDescriptor, index: Int, value: Short) =
             encodeShort(value)
 
-        override fun encodeStringElement(desc: SerialDescriptor, index: Int, value: String) =
+        override fun encodeStringElement(descriptor: SerialDescriptor, index: Int, value: String) =
             encodeString(value)
 
-        override fun encodeUnitElement(desc: SerialDescriptor, index: Int) =
+        override fun encodeUnitElement(descriptor: SerialDescriptor, index: Int) =
             encodeUnit()
 
-        override fun encodeNonSerializableElement(desc: SerialDescriptor, index: Int, value: Any) =
-            throw IllegalArgumentException("Unsupported")
+        override fun endStructure(descriptor: SerialDescriptor) {}
 
         override fun <T : Any> encodeNullableSerializableElement(
-            desc: SerialDescriptor,
+            descriptor: SerialDescriptor,
             index: Int,
             serializer: SerializationStrategy<T>,
             value: T?
         ) = encodeNullableSerializableValue(serializer, value)
 
         override fun <T> encodeSerializableElement(
-            desc: SerialDescriptor,
+            descriptor: SerialDescriptor,
             index: Int,
             serializer: SerializationStrategy<T>,
             value: T
         ) = encodeSerializableValue(serializer, value)
 
         override fun beginStructure(
-            desc: SerialDescriptor,
-            vararg typeParams: KSerializer<*>
+            descriptor: SerialDescriptor,
+            vararg typeSerializers: KSerializer<*>
         ): CompositeEncoder = this
 
         override fun encodeBoolean(value: Boolean) =
@@ -92,8 +91,8 @@ object Parcels : AbstractSerialFormat(EmptyModule) {
         override fun encodeDouble(value: Double) =
             parcel.writeDouble(value)
 
-        override fun encodeEnum(enumDescription: SerialDescriptor, ordinal: Int) =
-            parcel.writeInt(ordinal)
+        override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) =
+            parcel.writeInt(index)
 
         override fun encodeFloat(value: Float) =
             parcel.writeFloat(value)
@@ -125,70 +124,75 @@ object Parcels : AbstractSerialFormat(EmptyModule) {
         override val updateMode: UpdateMode
             get() = UpdateMode.BANNED
 
-        override fun decodeElementIndex(desc: SerialDescriptor) =
-            CompositeDecoder.READ_ALL
+        override fun decodeSequentially() =
+            true
 
-        override fun decodeCollectionSize(desc: SerialDescriptor) =
+        override fun decodeElementIndex(descriptor: SerialDescriptor) =
+            CompositeDecoder.UNKNOWN_NAME
+
+        override fun decodeCollectionSize(descriptor: SerialDescriptor) =
             decodeInt()
 
-        override fun decodeBooleanElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeBooleanElement(descriptor: SerialDescriptor, index: Int) =
             decodeBoolean()
 
-        override fun decodeByteElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeByteElement(descriptor: SerialDescriptor, index: Int) =
             decodeByte()
 
-        override fun decodeCharElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeCharElement(descriptor: SerialDescriptor, index: Int) =
             decodeChar()
 
-        override fun decodeDoubleElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeDoubleElement(descriptor: SerialDescriptor, index: Int) =
             decodeDouble()
 
-        override fun decodeFloatElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeFloatElement(descriptor: SerialDescriptor, index: Int) =
             decodeFloat()
 
-        override fun decodeIntElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeIntElement(descriptor: SerialDescriptor, index: Int) =
             decodeInt()
 
-        override fun decodeShortElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeShortElement(descriptor: SerialDescriptor, index: Int) =
             decodeShort()
 
-        override fun decodeLongElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeLongElement(descriptor: SerialDescriptor, index: Int) =
             decodeLong()
 
-        override fun decodeStringElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeStringElement(descriptor: SerialDescriptor, index: Int) =
             decodeString()
 
-        override fun decodeUnitElement(desc: SerialDescriptor, index: Int) =
+        override fun decodeUnitElement(descriptor: SerialDescriptor, index: Int) =
             decodeUnit()
 
+        override fun endStructure(descriptor: SerialDescriptor) {}
+
         override fun <T : Any> decodeNullableSerializableElement(
-            desc: SerialDescriptor,
+            descriptor: SerialDescriptor,
             index: Int,
             deserializer: DeserializationStrategy<T?>
         ) = decodeNullableSerializableValue(deserializer)
 
         override fun <T> decodeSerializableElement(
-            desc: SerialDescriptor,
+            descriptor: SerialDescriptor,
             index: Int,
             deserializer: DeserializationStrategy<T>
         ) = decodeSerializableValue(deserializer)
 
         override fun <T : Any> updateNullableSerializableElement(
-            desc: SerialDescriptor,
+            descriptor: SerialDescriptor,
             index: Int,
             deserializer: DeserializationStrategy<T?>,
             old: T?
         ) = updateNullableSerializableValue(deserializer, old)
 
         override fun <T> updateSerializableElement(
-            desc: SerialDescriptor,
+            descriptor: SerialDescriptor,
             index: Int,
             deserializer: DeserializationStrategy<T>,
             old: T
         ) = updateSerializableValue(deserializer, old)
 
         override fun beginStructure(
-            desc: SerialDescriptor,
+            descriptor: SerialDescriptor,
             vararg typeParams: KSerializer<*>
         ): CompositeDecoder = this
 
@@ -204,7 +208,7 @@ object Parcels : AbstractSerialFormat(EmptyModule) {
         override fun decodeDouble() =
             parcel.readDouble()
 
-        override fun decodeEnum(enumDescription: SerialDescriptor) =
+        override fun decodeEnum(enumDescriptor: SerialDescriptor) =
             parcel.readInt()
 
         override fun decodeFloat() =
@@ -230,6 +234,8 @@ object Parcels : AbstractSerialFormat(EmptyModule) {
 
         override fun decodeUnit() {}
     }
+
+    override val context: SerialModule = EmptyModule
 }
 
 

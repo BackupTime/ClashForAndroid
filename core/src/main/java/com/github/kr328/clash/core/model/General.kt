@@ -4,7 +4,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.github.kr328.clash.core.serialization.Parcels
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.StringDescriptor
 
 @Serializable
 data class General(val mode: Mode, val http: Int, val socks: Int, val redirect: Int) : Parcelable {
@@ -34,7 +33,7 @@ data class General(val mode: Mode, val http: Int, val socks: Int, val redirect: 
 
     class ModeSerializer : KSerializer<Mode> {
         override val descriptor: SerialDescriptor
-            get() = StringDescriptor
+            get() = PrimitiveDescriptor("clashGeneralModeSerializer", PrimitiveKind.STRING)
 
         override fun deserialize(decoder: Decoder): Mode {
             return when (decoder.decodeInt()) {
@@ -45,8 +44,8 @@ data class General(val mode: Mode, val http: Int, val socks: Int, val redirect: 
             }
         }
 
-        override fun serialize(encoder: Encoder, obj: Mode) {
-            when (obj) {
+        override fun serialize(encoder: Encoder, value: Mode) {
+            when (value) {
                 Mode.DIRECT -> encoder.encodeInt(MODE_DIRECT)
                 Mode.GLOBAL -> encoder.encodeInt(MODE_GLOBAL)
                 Mode.RULE -> encoder.encodeInt(MODE_RULE)
