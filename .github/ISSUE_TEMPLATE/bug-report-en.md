@@ -24,10 +24,17 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Device Info (please complete the following information):**
+
  - Device: [e.g. Pixel 4]
  - ROM: [e.g: AOSP]
  - ROM Version:
  - Android Version [e.g. Oreo]
+
+**Application Info (please complete the following information):**
+
+ - Version: [e.g. 1.1.10]
+ - Apk File Name: [e.g. app-release-arm64-v8a.apk]
+ - Distribution Channel: [e.g. Google Play]
 
 **Additional context**
 Add any other context about the problem here.
