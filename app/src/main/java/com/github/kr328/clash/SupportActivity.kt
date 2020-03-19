@@ -10,9 +10,6 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_support.*
 
 class SupportActivity : BaseActivity() {
-    override val activityLabel: CharSequence?
-        get() = getText(R.string.support)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

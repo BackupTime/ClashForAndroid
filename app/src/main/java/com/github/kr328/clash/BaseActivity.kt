@@ -109,6 +109,8 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         resetDarkMode()
 
         resetLightNavigationBar()
+
+        title = resolveActivityTitle()
     }
 
     override fun onStart() {
@@ -148,18 +150,12 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
 
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(shouldDisplayHomeAsUpEnabled())
-
-            activityLabel?.let {
-                title = it
-            }
         }
     }
 
     open fun shouldDisplayHomeAsUpEnabled(): Boolean {
         return true
     }
-
-    abstract val activityLabel: CharSequence?
 
     override fun onSupportNavigateUp(): Boolean {
         this.onBackPressed()
@@ -212,5 +208,14 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         }
 
         window.navigationBarColor = getColor(R.color.backgroundColor)
+    }
+
+    private fun resolveActivityTitle(): CharSequence {
+        val info = packageManager.getActivityInfo(componentName, 0)
+
+        if ( info.labelRes <= 0 )
+            return title
+
+        return resources.getText(info.labelRes)
     }
 }

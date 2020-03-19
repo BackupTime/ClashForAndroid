@@ -43,7 +43,4 @@ class SettingsActivity : BaseActivity() {
             }
         }
     }
-
-    override val activityLabel: CharSequence?
-        get() = getText(R.string.settings)
 }

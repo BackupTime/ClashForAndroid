@@ -66,9 +66,6 @@ class CreateProfileActivity : BaseActivity() {
         }
     }
 
-    override val activityLabel: CharSequence
-        get() = getText(R.string.create_profile)
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK)
             return finish()

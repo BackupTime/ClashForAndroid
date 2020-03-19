@@ -178,8 +178,6 @@ class ProfileEditActivity : BaseActivity() {
         }
     }
 
-    override val activityLabel: CharSequence? = null
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK || data == null)

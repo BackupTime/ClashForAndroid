@@ -92,9 +92,6 @@ class LogsActivity : BaseActivity() {
         refreshList()
     }
 
-    override val activityLabel: CharSequence
-        get() = getText(R.string.logs)
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
