@@ -23,6 +23,9 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Logs**
+if applicable, add logs to help detect problem
+
 **Device Info (please complete the following information):**
 
  - Device: [e.g. Pixel 4]
