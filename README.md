@@ -2,9 +2,7 @@
 
 A GUI for [clash](https://github.com/Dreamacro/clash) on Android
 
-> NOTICE: Early testing currently
-
-
+<a href="https://play.google.com/store/apps/details?id=com.github.kr328.clash&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"><img width="200px" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"/></a> or [Releases](https://github.com/Kr328/ClashForAndroid/releases)
 
 ### Feature
 
@@ -15,9 +13,7 @@ Fully feature of [clash](https://github.com/Dreamacro/clash) ~~(Exclude `externa
 ### Requirement
 
 * Android 7.0+
-* `arm64` or `x86_64` architecture
-
-
+* `armeabi-v7a` , `arm64-v8a`, `x86` or `x86_64` Architecture
 
 ### License
 
@@ -39,7 +35,7 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
    git submodule update --init --recursive
    ```
 
-2. Install `Android SDK (include JDK)` ,`Android NDK` and `Golang`
+2. Install `JDK 1.8`, `Android SDK` ,`Android NDK` and `Golang`
 
 3. Configure `local.properties` 
 
