@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    val kotlinVersion = "1.3.70"
+    val kotlinVersion = "1.3.71"
 
     rootProject.extra.apply {
         this["gBuildToolsVersion"] = "29.0.3"
@@ -31,7 +31,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.0-beta02")
+        classpath("com.android.tools.build:gradle:4.0.0-beta03")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
     }
