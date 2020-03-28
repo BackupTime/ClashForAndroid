@@ -53,25 +53,17 @@ func StartUrlTest(group string, callback DoneCallback) {
 
 		p := tunnel.Proxies()[group]
 
-		pa, ok := p.(*outbound.Proxy)
+		pi, ok := p.(*outbound.Proxy)
 		if !ok {
 			return
 		}
 
-		var providers []provider.ProxyProvider
-
-		switch group := pa.ProxyAdapter.(type) {
-		case *outboundgroup.Fallback:
-			providers = group.GetProviders()
-		case *outboundgroup.URLTest:
-			providers = group.GetProviders()
-		case *outboundgroup.LoadBalance:
-			providers = group.GetProviders()
-		case *outboundgroup.Selector:
-			providers = group.GetProviders()
-		default:
+		group, ok := pi.ProxyAdapter.(outboundgroup.ProxyGroup)
+		if !ok {
 			return
 		}
+
+		providers := group.GetProxyProviders()
 
 		wg := &sync.WaitGroup{}
 		wg.Add(len(providers))
@@ -91,55 +83,23 @@ func QueryAllProxyGroups(collection ProxyGroupCollection) {
 	ps := tunnel.Proxies()
 
 	for _, p := range ps {
-		pa, ok := p.(*outbound.Proxy)
+		pi, ok := p.(*outbound.Proxy)
 		if !ok {
 			continue
 		}
 
-		switch group := pa.ProxyAdapter.(type) {
-		case *outboundgroup.Fallback:
-			collection.Add(
-				&ProxyGroupItem{
-					Name:      group.Name(),
-					Type:      group.Type().String(),
-					Current:   group.Now(),
-					Delay:     int(p.LastDelay()),
-					providers: group.GetProviders(),
-				},
-			)
-		case *outboundgroup.URLTest:
-			collection.Add(
-				&ProxyGroupItem{
-					Name:      group.Name(),
-					Type:      group.Type().String(),
-					Current:   group.Now(),
-					Delay:     int(p.LastDelay()),
-					providers: group.GetProviders(),
-				},
-			)
-		case *outboundgroup.LoadBalance:
-			collection.Add(
-				&ProxyGroupItem{
-					Name:      group.Name(),
-					Type:      group.Type().String(),
-					Current:   "",
-					Delay:     int(p.LastDelay()),
-					providers: group.GetProviders(),
-				},
-			)
-		case *outboundgroup.Selector:
-			collection.Add(
-				&ProxyGroupItem{
-					Name:      group.Name(),
-					Type:      group.Type().String(),
-					Current:   group.Now(),
-					Delay:     int(p.LastDelay()),
-					providers: group.GetProviders(),
-				},
-			)
-		default:
+		group, ok := pi.ProxyAdapter.(outboundgroup.ProxyGroup)
+		if !ok {
 			continue
 		}
+
+		collection.Add(&ProxyGroupItem{
+			Name:      group.Name(),
+			Type:      group.Type().String(),
+			Current:   group.Now(),
+			Delay:     0,
+			providers: group.GetProxyProviders(),
+		})
 	}
 }
 

@@ -4,8 +4,7 @@ go 1.13
 
 require (
 	github.com/Dreamacro/clash v0.0.0 // local
-)	
+	github.com/kr328/tun2socket v0.0.0-20200327164759-45012c372532 // indirect
+)
 
 replace github.com/Dreamacro/clash => ./clash
-
-replace github.com/google/netstack => github.com/comzyh/netstack v0.0.0-20191217044024-67c27819ada4

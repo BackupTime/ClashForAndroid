@@ -1,7 +1,7 @@
-package profile
+package config
 
 import (
-	"fmt"
+	"errors"
 	"io/ioutil"
 
 	"github.com/Dreamacro/clash/config"
@@ -70,7 +70,7 @@ func LoadDefault() {
 
 	executor.ApplyConfig(defaultC, true)
 
-	tun.ResetDnsRedirect()
+	tun.InitialResolver()
 }
 
 // LoadFromFile - load file
@@ -91,7 +91,7 @@ func LoadFromFile(path, baseDir string) error {
 
 	executor.ApplyConfig(cfg, true)
 
-	tun.ResetDnsRedirect()
+	tun.InitialResolver()
 
 	log.Infoln("Profile " + path + " loaded")
 
@@ -104,12 +104,12 @@ func parseConfig(data []byte, baseDir string) (*config.Config, error) {
 		return nil, err
 	}
 
-	raw.Experimental.Interface = ""
-	raw.ExternalUI = ""
-	raw.ExternalController = ""
-	raw.Rule = append([]string{fmt.Sprintf("IP-CIDR,%s,REJECT,no-resolve", tunAddress)}, raw.Rule...)
-
 	patchRawConfig(raw)
+
+	if len(raw.Proxy) == 0 && len(raw.ProxyProvider) == 0 &&
+		len(raw.ProxyOld) == 0 && len(raw.ProxyProviderOld) == 0 {
+		return nil, errors.New("Empty Profile")
+	}
 
 	cfg, err := config.ParseRawConfig(raw, baseDir)
 	if err != nil {

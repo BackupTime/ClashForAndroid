@@ -46,11 +46,13 @@ object Clash {
     fun startTunDevice(
         fd: Int,
         mtu: Int,
+        gateway: String,
+        mirror: String,
         dns: String,
         onNewSocket: (Int) -> Boolean,
         onTunStop: () -> Unit
     ) {
-        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), dns, object : TunCallback {
+        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), gateway, mirror, dns, object : TunCallback {
             override fun onCreateSocket(fd: Long) {
                 onNewSocket(fd.toInt())
             }

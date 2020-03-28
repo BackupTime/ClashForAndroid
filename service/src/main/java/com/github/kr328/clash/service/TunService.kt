@@ -15,9 +15,12 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
         private const val VPN_MTU = 1500
         private const val PRIVATE_VLAN4_SUBNET = 30
+        private const val PRIVATE_VLAN6_SUBNET = 126
         private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
         private const val PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1"
-        private const val PRIVATE_VLAN_DNS = "172.31.255.254"
+        private const val PRIVATE_VLAN4_MIRROR = "172.31.255.254"
+        private const val PRIVATE_VLAN6_MIRROR = "fdfe:dcba:9876::2"
+        private const val PRIVATE_VLAN_DNS = "198.18.0.1"
         private const val VLAN4_ANY = "0.0.0.0"
     }
 
@@ -38,17 +41,16 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             .establish()
             ?: throw NullPointerException("Unable to create VPN Service")
 
-        val dnsAddress =
-            if (settings.get(ServiceSettings.DNS_HIJACKING))
-                "$VLAN4_ANY:53"
-            else
-                "$PRIVATE_VLAN_DNS:53"
+        val dnsAddress = if (settings.get(ServiceSettings.DNS_HIJACKING)) VLAN4_ANY else PRIVATE_VLAN_DNS
 
         Log.i("TunService.startTun ${fd.fd}")
 
         Clash.setDnsOverrideEnabled(settings.get(ServiceSettings.OVERRIDE_DNS))
 
-        Clash.startTunDevice(fd.fd, VPN_MTU, dnsAddress, this::protect, this::stopSelf)
+        Clash.startTunDevice(fd.detachFd(), VPN_MTU,
+            PRIVATE_VLAN4_CLIENT, PRIVATE_VLAN4_MIRROR,
+            dnsAddress,
+            this::protect, this::stopSelf)
 
         fd.close()
     }
@@ -182,7 +184,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         addAddress(PRIVATE_VLAN4_CLIENT, PRIVATE_VLAN4_SUBNET)
 
         if (settings.get(ServiceSettings.IPV6_SUPPORT))
-            addAddress(PRIVATE_VLAN6_CLIENT, 126)
+            addAddress(PRIVATE_VLAN6_CLIENT, PRIVATE_VLAN6_SUBNET)
 
         return this
     }

@@ -7,7 +7,7 @@ import (
 	C "github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/tunnel"
-	"github.com/kr328/cfa/profile"
+	"github.com/kr328/cfa/config"
 )
 
 var (
@@ -31,12 +31,12 @@ func SetHome(homeDir string) {
 }
 
 func Reset() {
-	profile.LoadDefault()
+	config.LoadDefault()
 	tunnel.DefaultManager.ResetStatistic()
 }
 
 func SetApplicationVersion(version string) {
-	profile.ApplicationVersion = version
+	config.ApplicationVersion = version
 }
 
 func SetLogCallback(callback LogCallback) {

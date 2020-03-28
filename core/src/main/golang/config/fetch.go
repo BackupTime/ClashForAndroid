@@ -1,8 +1,9 @@
-package profile
+package config
 
 import (
 	"context"
 	"errors"
+	"github.com/kr328/cfa/utils"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -37,8 +38,8 @@ var client = &http.Client{
 
 				<-ctx.Done()
 
-				client.Close()
-				server.Close()
+				_ = client.Close()
+				_ = server.Close()
 			}()
 
 			return client, nil
@@ -46,50 +47,64 @@ var client = &http.Client{
 	},
 }
 
-func DownloadAndCheck(url, output, baseDir string) error {
+func fetchRemote(url string) ([]byte, error) {
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	request.Header.Set("User-Agent", "ClashForAndroid/"+ApplicationVersion)
 
 	response, err := client.Do(request)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	defer response.Body.Close()
+	defer utils.CloseSilent(response.Body)
+
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return SaveAndCheck(data, output, baseDir)
+	return data, nil
 }
 
-func ReadAndCheck(fd int, output, baseDir string) error {
-	syscall.SetNonblock(fd, true)
+func fetchLocal(fd int) ([]byte, error) {
+	_ = syscall.SetNonblock(fd, true)
 
 	file := os.NewFile(uintptr(fd), "/dev/null")
-	defer file.Close()
+	defer utils.CloseSilent(file)
 
-	data, err := ioutil.ReadAll(file)
+	return ioutil.ReadAll(file)
+}
+
+func DownloadRemote(url, output, baseDir string) error {
+	data, err := fetchRemote(url)
 	if err != nil {
 		return err
 	}
 
-	return SaveAndCheck(data, output, baseDir)
+	return save(data, output, baseDir)
 }
 
-func SaveAndCheck(data []byte, output, baseDir string) error {
+func DownloadLocal(fd int, output, baseDir string) error {
+	data, err := fetchLocal(fd)
+	if err != nil {
+		return err
+	}
+
+	return save(data, output, baseDir)
+}
+
+func save(data []byte, output, baseDir string) error {
 	cfg, err := parseConfig(data, baseDir)
 	if err != nil {
 		return err
 	}
 
 	for _, v := range cfg.Providers {
-		v.Destroy()
+		_ = v.Destroy()
 	}
 
 	return ioutil.WriteFile(output, data, defaultFileMode)

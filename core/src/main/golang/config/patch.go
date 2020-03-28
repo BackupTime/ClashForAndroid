@@ -1,6 +1,7 @@
-package profile
+package config
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/Dreamacro/clash/component/fakeip"
@@ -16,6 +17,12 @@ var (
 )
 
 func patchRawConfig(rawConfig *config.RawConfig) {
+	rawConfig.DNS.FakeIPRange = "198.18.0.0/16"
+	rawConfig.Experimental.Interface = ""
+	rawConfig.ExternalUI = ""
+	rawConfig.ExternalController = ""
+	rawConfig.Rule = append([]string{fmt.Sprintf("IP-CIDR,%s,REJECT,no-resolve", tunAddress)}, rawConfig.Rule...)
+
 	if d := DnsPatch; d != nil {
 		rawConfig.DNS = *d
 	} else if d := OptionalDnsPatch; d != nil {
@@ -24,13 +31,13 @@ func patchRawConfig(rawConfig *config.RawConfig) {
 		}
 	}
 
-	if append := NameServersAppend; len(append) > 0 {
+	if nameServersAppend := NameServersAppend; len(nameServersAppend) > 0 {
 		d := &rawConfig.DNS
-		nameservers := make([]string, len(append)+len(d.NameServer))
-		copy(nameservers, append)
-		copy(nameservers[len(append):], d.NameServer)
+		nameServers := make([]string, len(nameServersAppend)+len(d.NameServer))
+		copy(nameServers, nameServersAppend)
+		copy(nameServers[len(nameServersAppend):], d.NameServer)
 
-		d.NameServer = nameservers
+		d.NameServer = nameServers
 	}
 
 	providers := rawConfig.ProxyProvider
