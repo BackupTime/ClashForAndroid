@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
-        private const val VPN_MTU = 1500
+        private const val VPN_MTU = 9000
         private const val PRIVATE_VLAN4_SUBNET = 30
         private const val PRIVATE_VLAN6_SUBNET = 126
         private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
@@ -22,7 +22,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         private const val PRIVATE_VLAN6_MIRROR = "fdfe:dcba:9876::2"
         private const val PRIVATE_VLAN_DNS = "198.18.0.1"
         private const val VLAN4_ANY = "0.0.0.0"
-    }
+}
 
     private var clashCore: ClashCore? = null
 

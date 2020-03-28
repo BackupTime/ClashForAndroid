@@ -11,6 +11,8 @@ github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxv
 github.com/kr328/tun2socket v0.0.0-20200327111356-c3122f7f9742/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
 github.com/kr328/tun2socket v0.0.0-20200327164759-45012c372532 h1:IfYT+yTTvdxweErpymqCmjd3XKHgcyIIcQ+sftmZuuY=
 github.com/kr328/tun2socket v0.0.0-20200327164759-45012c372532/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
+github.com/kr328/tun2socket v0.0.0-20200328151952-35732a824000 h1:/RyV+MqKGuZiRVXUQVt1Es9yitPYi4hZM4V/hd3Fo6Q=
+github.com/kr328/tun2socket v0.0.0-20200328151952-35732a824000/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
 github.com/miekg/dns v1.1.29/go.mod h1:KNUDUusw/aVsxyTYZM1oqvCicbwhgbNgztCETuNZ7xM=
 github.com/oschwald/geoip2-golang v1.4.0/go.mod h1:8QwxJvRImBH+Zl6Aa6MaIcs5YdlZSTKtzmPGzQqi9ng=
 github.com/oschwald/maxminddb-golang v1.6.0/go.mod h1:DUJFucBg2cvqx42YmDa/+xHvb0elJtOm3o4aFQ/nb/w=
