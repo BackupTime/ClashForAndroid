@@ -52,7 +52,7 @@ object Clash {
         onNewSocket: (Int) -> Boolean,
         onTunStop: () -> Unit
     ) {
-        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), gateway, mirror, dns, object : TunCallback {
+        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), gateway, mirror, dns, object: TunCallback {
             override fun onCreateSocket(fd: Long) {
                 onNewSocket(fd.toInt())
             }
