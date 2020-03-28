@@ -172,7 +172,10 @@ task("extractSources", type = Copy::class) {
     dependsOn(tasks["bindClashCore"])
 
     doFirst {
-        buildDir.resolve(Constants.OUTPUT_PATH).deleteRecursively()
+        buildDir.resolve(Constants.OUTPUT_PATH).apply {
+            resolve("jniLibs").deleteRecursively()
+            resolve("classes").deleteRecursively()
+        }
     }
     from(zipTree(buildDir.resolve(Constants.GOLANG_OUTPUT))) {
         include("**/*.so")
