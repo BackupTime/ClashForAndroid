@@ -64,6 +64,7 @@ func patchConfig(config *config.Config) {
 	if config.DNS.FakeIPRange != nil {
 		if c := cachedPool; c != nil {
 			if config.DNS.FakeIPRange.Gateway().String() == c.Gateway().String() {
+				c.OverrideHostFrom(config.DNS.FakeIPRange)
 				config.DNS.FakeIPRange = c
 			}
 		} else {

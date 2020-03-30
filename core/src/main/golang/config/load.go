@@ -59,14 +59,14 @@ func init() {
 
 // LoadDefault - load default configure
 func LoadDefault() {
+	DnsPatch = nil
+	NameServersAppend = make([]string, 0)
+
 	defaultC, err := parseConfig([]byte(defaultConfig), constant.Path.HomeDir())
 	if err != nil {
 		log.Warnln("Load Default Failure " + err.Error())
 		return
 	}
-
-	DnsPatch = nil
-	NameServersAppend = make([]string, 0)
 
 	executor.ApplyConfig(defaultC, true)
 
