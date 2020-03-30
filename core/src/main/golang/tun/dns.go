@@ -74,7 +74,12 @@ func hijackTCPDNS(conn net.Conn, endpoint *binding.Endpoint) bool {
 			data := make([]byte, length)
 			msg := &D.Msg{}
 
-			if err := msg.Unpack(data); err != nil {
+			_, err := io.ReadFull(conn, data)
+			if err != nil {
+				return
+			}
+
+			if err := msg.Unpack(data); err != nil || len(msg.Question) == 0 {
 				return
 			}
 
