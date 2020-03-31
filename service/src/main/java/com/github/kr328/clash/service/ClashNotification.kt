@@ -66,7 +66,7 @@ class ClashNotification(
         context.startForeground(CLASH_STATUS_NOTIFICATION_ID, notification)
     }
 
-    private fun updateBase() {
+    fun updateBase() {
         val notification = baseBuilder
             .setContentTitle(currentProfile)
             .setContentText(context.getText(R.string.running))

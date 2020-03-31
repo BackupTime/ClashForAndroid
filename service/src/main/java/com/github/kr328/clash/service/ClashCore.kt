@@ -143,6 +143,9 @@ class ClashCore(private val service: Service) : CoroutineScope by MainScope() {
 
             notification.setProfile(active.name)
 
+            if (!settings.get(ServiceSettings.NOTIFICATION_REFRESH))
+                notification.updateBase()
+
             broadcastProfileLoaded(service)
         } catch (e: Exception) {
             stopSelf(e.message ?: "Unknown")
