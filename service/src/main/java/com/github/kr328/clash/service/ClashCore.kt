@@ -17,6 +17,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
 
 class ClashCore(private val service: Service) : CoroutineScope by MainScope() {
+    companion object {
+        private const val CALL_GC_PERIOD = 300
+    }
+
     private var stopReason: String? = null
     private val settings = ServiceSettings(service)
     private val database = ClashDatabase.getInstance(service)
@@ -68,6 +72,7 @@ class ClashCore(private val service: Service) : CoroutineScope by MainScope() {
 
         launch {
             val ticker = Channel<Unit>()
+            var refreshCount = 0
             var enableRefresh = settings.get(ServiceSettings.NOTIFICATION_REFRESH)
                     && service.getSystemService<PowerManager>()!!.isInteractive
 
@@ -92,6 +97,13 @@ class ClashCore(private val service: Service) : CoroutineScope by MainScope() {
                     if (enableRefresh) {
                         ticker.onReceive {
                             notification.update()
+
+                            refreshCount++
+
+                            if ( refreshCount > CALL_GC_PERIOD ) {
+                                refreshCount = 0
+                                System.gc()
+                            }
                         }
                     }
                 }
