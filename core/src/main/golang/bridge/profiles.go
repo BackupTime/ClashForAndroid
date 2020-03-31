@@ -30,13 +30,13 @@ func LoadProfileFile(path, baseDir string, callback DoneCallback) {
 
 func DownloadProfileAndCheck(url, output, baseDir string, callback DoneCallback) {
 	go func() {
-		call(config.DownloadRemote(url, output, baseDir), callback)
+		call(config.PullRemote(url, output, baseDir), callback)
 	}()
 }
 
 func ReadProfileAndCheck(fd int, output, baseDir string, callback DoneCallback) {
 	go func() {
-		call(config.DownloadLocal(fd, output, baseDir), callback)
+		call(config.PullLocal(fd, output, baseDir), callback)
 	}()
 }
 

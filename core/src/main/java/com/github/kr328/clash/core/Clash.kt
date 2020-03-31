@@ -29,9 +29,7 @@ object Clash {
         val bytes = context.assets.open("Country.mmdb")
             .use(InputStream::readBytes)
 
-        Bridge.loadMMDB(bytes)
-        Bridge.setHome(context.cacheDir.absolutePath)
-        Bridge.setApplicationVersion(BuildConfig.VERSION_NAME)
+        Bridge.initCore(bytes, context.cacheDir.absolutePath, BuildConfig.VERSION_NAME)
         Bridge.reset()
     }
 

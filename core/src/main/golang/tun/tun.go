@@ -1,6 +1,7 @@
 package tun
 
 import (
+	"errors"
 	adapters "github.com/Dreamacro/clash/adapters/inbound"
 	"github.com/Dreamacro/clash/component/socks5"
 	C "github.com/Dreamacro/clash/constant"
@@ -16,6 +17,10 @@ import (
 	"github.com/Dreamacro/clash/log"
 )
 
+const (
+	maxUdpPacketSize = 65535
+)
+
 var adapter *tun2socket.Tun2Socket
 var mutex sync.Mutex
 
@@ -26,14 +31,42 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string) error {
 	if adapter != nil {
 		adapter.Close()
 		adapter = nil
+
+		log.Infoln("Android tun stopped")
+	}
+
+	gatewayIP, gatewayNet, err := net.ParseCIDR(gateway)
+	mirrorIP := net.ParseIP(mirror)
+
+	if err != nil || mirrorIP == nil || !gatewayNet.Contains(mirrorIP) {
+		return errors.New("invalid gateway or mirror")
+	}
+
+	udpPool := sync.Pool{New: func() interface{} {
+		return make([]byte, maxUdpPacketSize)
+	}}
+	udpRecycle := func(bytes []byte) {
+		if cap(bytes) == maxUdpPacketSize {
+			udpPool.Put(bytes[:maxUdpPacketSize])
+		}
 	}
 
 	file := os.NewFile(uintptr(fd), "/dev/tun")
 	_ = syscall.SetNonblock(fd, true)
 
-	adapter = tun2socket.NewTun2Socket(file, mtu, net.ParseIP(gateway).To4(), net.ParseIP(mirror).To4())
+	adapter = tun2socket.NewTun2Socket(file, mtu, gatewayIP, mirrorIP.To4())
 
+	adapter.SetAllocator(func(length int) []byte {
+		if length <= maxUdpPacketSize {
+			return udpPool.Get().([]byte)[:length]
+		}
+		return make([]byte, length)
+	})
 	adapter.SetTCPHandler(func(conn net.Conn, endpoint *binding.Endpoint) {
+		if gatewayNet.Contains(endpoint.Target.IP) {
+			return
+		}
+
 		if hijackTCPDNS(conn, endpoint) {
 			return
 		}
@@ -47,7 +80,12 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string) error {
 		tunnel.Add(adapters.NewSocket(addr, conn, C.SOCKS, C.TCP))
 	})
 	adapter.SetUDPHandler(func(payload []byte, endpoint *binding.Endpoint, sender redirect.UDPSender) {
-		if hijackDNS(payload, endpoint, sender) {
+		if gatewayNet.Contains(endpoint.Target.IP) {
+			udpRecycle(payload)
+			return
+		}
+
+		if hijackDNS(payload, endpoint, sender, udpRecycle) {
 			return
 		}
 
@@ -82,7 +120,7 @@ func StopTunDevice() {
 	if adapter != nil {
 		adapter.Close()
 		adapter = nil
-	}
 
-	log.Infoln("Android tun stopped")
+		log.Infoln("Android tun stopped")
+	}
 }

@@ -98,7 +98,7 @@ func hijackTCPDNS(conn net.Conn, endpoint *binding.Endpoint) bool {
 	return true
 }
 
-func hijackDNS(payload []byte, endpoint *binding.Endpoint, sender redirect.UDPSender) bool {
+func hijackDNS(payload []byte, endpoint *binding.Endpoint, sender redirect.UDPSender, recycle func([]byte)) bool {
 	if endpoint.Target.Port != 53 {
 		return false
 	}
@@ -118,6 +118,8 @@ func hijackDNS(payload []byte, endpoint *binding.Endpoint, sender redirect.UDPSe
 			endpoint: endpoint,
 			sender:   sender,
 		}, msg)
+
+		recycle(payload)
 	}()
 
 	return true

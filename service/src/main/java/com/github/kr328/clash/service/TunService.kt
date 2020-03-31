@@ -9,6 +9,7 @@ import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.asSocketAddressText
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
 import kotlinx.coroutines.*
+import kotlin.time.Duration
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
@@ -48,7 +49,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         Clash.setDnsOverrideEnabled(settings.get(ServiceSettings.OVERRIDE_DNS))
 
         Clash.startTunDevice(fd.detachFd(), VPN_MTU,
-            PRIVATE_VLAN4_CLIENT, PRIVATE_VLAN4_MIRROR,
+            "$PRIVATE_VLAN4_CLIENT/$PRIVATE_VLAN4_SUBNET", PRIVATE_VLAN4_MIRROR,
             dnsAddress,
             this::protect, this::stopSelf)
 

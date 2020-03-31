@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/Dreamacro/clash/component/fakeip"
 	"github.com/Dreamacro/clash/config"
 	"net/url"
@@ -20,12 +19,6 @@ func patchRawConfig(rawConfig *config.RawConfig) {
 	rawConfig.Experimental.Interface = ""
 	rawConfig.ExternalUI = ""
 	rawConfig.ExternalController = ""
-
-	if len(rawConfig.Rule) != 0 {
-		rawConfig.Rule = append([]string{fmt.Sprintf("IP-CIDR,%s,REJECT,no-resolve", tunAddress)}, rawConfig.Rule...)
-	} else {
-		rawConfig.RuleOld = append([]string{fmt.Sprintf("IP-CIDR,%s,REJECT,no-resolve", tunAddress)}, rawConfig.RuleOld...)
-	}
 
 	if d := DnsPatch; d != nil {
 		rawConfig.DNS = *d
