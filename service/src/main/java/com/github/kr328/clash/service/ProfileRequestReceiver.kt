@@ -3,6 +3,7 @@ package com.github.kr328.clash.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.github.kr328.clash.component.ids.Intents
 import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.componentName
 import com.github.kr328.clash.service.util.startForegroundServiceCompat

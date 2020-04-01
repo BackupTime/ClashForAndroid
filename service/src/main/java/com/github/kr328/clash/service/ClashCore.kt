@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
 import androidx.core.content.getSystemService
+import com.github.kr328.clash.component.ids.Intents
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.data.ClashDatabase

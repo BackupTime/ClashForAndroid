@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import androidx.core.content.FileProvider
+import com.github.kr328.clash.component.ids.Intents
 import com.github.kr328.clash.core.Global
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.data.ClashDatabase

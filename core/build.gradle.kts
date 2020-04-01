@@ -65,6 +65,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":component"))
     implementation("androidx.core:core-ktx:$gAndroidKtxVersion")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$gKotlinCoroutineVersion")

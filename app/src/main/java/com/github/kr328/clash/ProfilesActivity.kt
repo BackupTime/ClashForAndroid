@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.ProfileAdapter
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.service.Intents
+import com.github.kr328.clash.component.ids.Intents
 import com.github.kr328.clash.service.ProfileBackgroundService
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import com.github.kr328.clash.service.transact.ProfileRequest
