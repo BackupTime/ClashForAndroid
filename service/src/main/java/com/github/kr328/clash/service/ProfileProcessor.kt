@@ -59,13 +59,19 @@ class ProfileProcessor(private val context: Context) {
         }
     }
 
-    private suspend fun downloadProfile(source: Uri, target: File, baseDir: File, newRecord: Boolean) {
+    private suspend fun downloadProfile(
+        source: Uri,
+        target: File,
+        baseDir: File,
+        newRecord: Boolean
+    ) {
         try {
             target.parentFile?.mkdirs()
             baseDir.mkdirs()
 
             if (source.scheme.equals("content", ignoreCase = true)
-                || source.scheme.equals("file", ignoreCase = true)) {
+                || source.scheme.equals("file", ignoreCase = true)
+            ) {
                 val parcelFileDescriptor = context.contentResolver.openFileDescriptor(source, "r")
                     ?: throw FileNotFoundException("Unable to open file $source")
 
@@ -76,7 +82,7 @@ class ProfileProcessor(private val context: Context) {
                 Clash.downloadProfile(source.toString(), target, baseDir).await()
             }
         } catch (e: Exception) {
-            if ( newRecord ) {
+            if (newRecord) {
                 target.delete()
                 baseDir.deleteRecursively()
             }

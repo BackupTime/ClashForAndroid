@@ -100,7 +100,7 @@ class ClashCore(private val service: Service) : CoroutineScope by MainScope() {
 
                             refreshCount++
 
-                            if ( refreshCount > CALL_GC_PERIOD ) {
+                            if (refreshCount > CALL_GC_PERIOD) {
                                 refreshCount = 0
                                 System.gc()
                             }

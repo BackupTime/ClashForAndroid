@@ -39,7 +39,6 @@ class ClashNotification(
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
         )
-
     private var currentProfile = "None"
 
     init {

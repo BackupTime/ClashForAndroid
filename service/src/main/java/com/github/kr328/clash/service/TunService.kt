@@ -9,7 +9,6 @@ import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.asSocketAddressText
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
 import kotlinx.coroutines.*
-import kotlin.time.Duration
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
@@ -23,7 +22,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         private const val PRIVATE_VLAN6_MIRROR = "fdfe:dcba:9876::2"
         private const val PRIVATE_VLAN_DNS = "198.18.0.1"
         private const val VLAN4_ANY = "0.0.0.0"
-}
+    }
 
     private var clashCore: ClashCore? = null
 
@@ -42,16 +41,19 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             .establish()
             ?: throw NullPointerException("Unable to create VPN Service")
 
-        val dnsAddress = if (settings.get(ServiceSettings.DNS_HIJACKING)) VLAN4_ANY else PRIVATE_VLAN_DNS
+        val dnsAddress =
+            if (settings.get(ServiceSettings.DNS_HIJACKING)) VLAN4_ANY else PRIVATE_VLAN_DNS
 
         Log.i("TunService.startTun ${fd.fd}")
 
         Clash.setDnsOverrideEnabled(settings.get(ServiceSettings.OVERRIDE_DNS))
 
-        Clash.startTunDevice(fd.detachFd(), VPN_MTU,
+        Clash.startTunDevice(
+            fd.detachFd(), VPN_MTU,
             "$PRIVATE_VLAN4_CLIENT/$PRIVATE_VLAN4_SUBNET", PRIVATE_VLAN4_MIRROR,
             dnsAddress,
-            this::protect, this::stopSelf)
+            this::protect, this::stopSelf
+        )
 
         fd.close()
     }
@@ -156,7 +158,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
     private fun Builder.addBypassApplications(): Builder {
         when (settings.get(ServiceSettings.ACCESS_CONTROL_MODE)) {
-            ServiceSettings.ACCESS_CONTROL_MODE_ALL -> {}
+            ServiceSettings.ACCESS_CONTROL_MODE_ALL -> {
+            }
             ServiceSettings.ACCESS_CONTROL_MODE_WHITELIST -> {
                 for (app in settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toSet()) {
                     runCatching {

@@ -12,8 +12,8 @@
         <service
             android:name="TunService"
             android:exported="false"
-            android:process=":background"
-            android:permission="android.permission.BIND_VPN_SERVICE">
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:process=":background">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
@@ -37,8 +37,8 @@
             android:process=":background" />
 
         <provider
-            android:authorities="${applicationId}.profiles"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.profiles"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -46,14 +46,14 @@
                 android:resource="@xml/profile_provider" />
         </provider>
         <provider
-            android:authorities="${applicationId}.status"
             android:name=".ServiceStatusProvider"
+            android:authorities="${applicationId}.status"
             android:exported="false"
-            android:process=":background"/>
+            android:process=":background" />
         <provider
-            android:authorities="${applicationId}.settings"
             android:name=".ServiceSettingsProvider"
+            android:authorities="${applicationId}.settings"
             android:exported="false"
-            android:process=":background"/>
+            android:process=":background" />
     </application>
 </manifest>
