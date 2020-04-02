@@ -15,11 +15,14 @@ import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.data.ClashDatabase
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 
-class DynamicNotificationModule(private val service: Service) : NotificationModule {
+class DynamicNotificationModule(private val service: Service) : Module {
     private val contentIntent = Intent(Intent.ACTION_MAIN)
         .addCategory(Intent.CATEGORY_DEFAULT)
         .addCategory(Intent.CATEGORY_LAUNCHER)
@@ -58,36 +61,34 @@ class DynamicNotificationModule(private val service: Service) : NotificationModu
     private var currentProfile = "Not selected"
 
     override suspend fun onCreate() {
-        withContext(Dispatchers.Unconfined) {
-            val database = ClashDatabase.getInstance(service).openClashProfileDao()
-            val tickerChannel = Channel<Unit>()
+        val database = ClashDatabase.getInstance(service).openClashProfileDao()
+        val tickerChannel = Channel<Unit>()
 
-            backgroundJob = launch {
-                launch {
-                    while (isActive) {
-                        tickerChannel.send(Unit)
-                        delay(1000)
-                    }
-                }
-
-                var refreshEnabled =
-                    service.getSystemService(PowerManager::class.java).isInteractive
-
+        backgroundJob = launch {
+            launch {
                 while (isActive) {
-                    select<Unit> {
-                        reloadChannel.onReceive {
-                            currentProfile = database.queryActiveProfile()?.name ?: "Not selected"
-                        }
-                        screenChannel.onReceive {
-                            refreshEnabled = it
-                        }
-                        if (refreshEnabled) {
-                            tickerChannel.onReceive {
-                                update()
-                            }
-                        }
+                    tickerChannel.send(Unit)
+                    delay(1000)
+                }
+            }
+
+            var refreshEnabled =
+                service.getSystemService(PowerManager::class.java).isInteractive
+
+            while (isActive) {
+                select<Unit> {
+                    reloadChannel.onReceive {
+                        currentProfile = database.queryActiveProfile()?.name ?: "Not selected"
+                    }
+                    screenChannel.onReceive {
+                        refreshEnabled = it
+                    }
+                    if (refreshEnabled) {
+                        tickerChannel.onReceive
                     }
                 }
+
+                update()
             }
         }
     }
@@ -104,13 +105,14 @@ class DynamicNotificationModule(private val service: Service) : NotificationModu
 
     override suspend fun onStop() {
         service.unregisterReceiver(receiver)
+        service.stopForeground(true)
     }
 
     override suspend fun onDestroy() {
         backgroundJob.cancel()
     }
 
-    override fun update() {
+    private fun update() {
         val traffic = Clash.queryTraffic()
         val bandwidth = Clash.queryBandwidth()
 

@@ -47,7 +47,7 @@ class ProfileService : BaseService() {
                 launch {
                     profiles.setActiveProfile(id)
 
-                    broadcastProfileChanged(service)
+                    broadcastProfileChanged()
                 }
             }
 
@@ -169,7 +169,7 @@ class ProfileService : BaseService() {
 
             request.callback?.complete()
 
-            broadcastProfileChanged(this)
+            broadcastProfileChanged()
         } catch (e: Exception) {
             Log.w("handleRequest", e)
             request.callback?.completeExceptionally(e.message)

@@ -9,8 +9,10 @@ import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.util.resolveBase
 import com.github.kr328.clash.service.util.resolveProfile
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class ReloadModule(private val context: Context) : Module {
     private lateinit var backgroundJob: Job
@@ -23,19 +25,19 @@ class ReloadModule(private val context: Context) : Module {
     }
 
     override suspend fun onCreate() {
-        backgroundJob = withContext(Dispatchers.Unconfined) {
-            launch {
-                val database = ClashDatabase.getInstance(context).openClashProfileDao()
+        backgroundJob = launch {
+            val database = ClashDatabase.getInstance(context).openClashProfileDao()
 
-                while (isActive) {
-                    val id = database.queryActiveProfile()?.id
-                    if (id == null) {
-                        emptyProfileCallback()
-                        continue
-                    }
+            while (isActive) {
+                reloadChannel.receive()
 
-                    Clash.loadProfile(resolveProfile(id), resolveBase(id))
+                val id = database.queryActiveProfile()?.id
+                if (id == null) {
+                    emptyProfileCallback()
+                    continue
                 }
+
+                Clash.loadProfile(resolveProfile(id), resolveBase(id))
             }
         }
     }
@@ -43,8 +45,13 @@ class ReloadModule(private val context: Context) : Module {
     override suspend fun onStart() {
         context.registerReceiver(
             reloadBroadcastReceiver,
-            IntentFilter(Intents.INTENT_ACTION_PROFILE_CHANGED)
+            IntentFilter().apply {
+                addAction(Intents.INTENT_ACTION_PROFILE_CHANGED)
+                addAction(Intents.INTENT_ACTION_NETWORK_CHANGED)
+            }
         )
+
+        reloadChannel.offer(Unit)
     }
 
     override suspend fun onStop() {

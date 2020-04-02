@@ -1,12 +1,13 @@
 package com.github.kr328.clash.service.clash
 
+import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.clash.module.Module
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class ClashRuntime {
     companion object {
-        private val GIL = Mutex()
+        private val GIL = Mutex() // :)
     }
 
     private val modules: MutableList<Module> = mutableListOf()
@@ -23,6 +24,8 @@ class ClashRuntime {
 
         started = true
 
+        Clash.start()
+
         modules.forEach {
             it.onStart()
         }
@@ -36,6 +39,8 @@ class ClashRuntime {
             it.onStop()
             it.onDestroy()
         }
+
+        Clash.stop()
 
         GIL.unlock()
     }
