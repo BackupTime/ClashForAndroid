@@ -11,6 +11,7 @@ import com.github.kr328.clash.service.clash.module.StaticNotificationModule
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.broadcastClashStarted
 import com.github.kr328.clash.service.util.broadcastClashStopped
+import com.github.kr328.clash.service.util.broadcastProfileLoaded
 import kotlinx.coroutines.launch
 
 class ClashService : BaseService() {
@@ -33,6 +34,16 @@ class ClashService : BaseService() {
             val settings = ServiceSettings(service)
 
             runtime.install(ReloadModule(service)) {
+                onLoaded {
+                    if ( it != null ) {
+                        reason = it.message
+
+                        stopSelf()
+                    }
+                    else {
+                        broadcastProfileLoaded()
+                    }
+                }
                 onEmpty {
                     reason = "No profile selected"
 

@@ -8,12 +8,14 @@ import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.util.resolveBase
 import com.github.kr328.clash.service.util.resolveProfile
 import kotlinx.coroutines.sync.Mutex
+import java.lang.Exception
 
 class ReloadModule(private val context: Context) : Module() {
     override val receiveBroadcasts: Set<String>
         get() = setOf(Intents.INTENT_ACTION_NETWORK_CHANGED, Intents.INTENT_ACTION_PROFILE_CHANGED)
     private val reloadMutex = Mutex()
     private var emptyCallback: () -> Unit = {}
+    private var loadedCallback: (Exception?) -> Unit = {}
 
     override suspend fun onStart() {
         reload()
@@ -36,6 +38,10 @@ class ReloadModule(private val context: Context) : Module() {
         emptyCallback = callback
     }
 
+    fun onLoaded(callback: (Exception?) -> Unit) {
+        loadedCallback = callback
+    }
+
     private suspend fun reload() {
         val database = ClashDatabase.getInstance(context).openClashProfileDao()
 
@@ -46,6 +52,12 @@ class ReloadModule(private val context: Context) : Module() {
             return
         }
 
-        Clash.loadProfile(resolveProfile(id), resolveBase(id))
+        try {
+            Clash.loadProfile(resolveProfile(id), resolveBase(id))
+            loadedCallback(null)
+        }
+        catch (e: Exception) {
+            loadedCallback(e)
+        }
     }
 }

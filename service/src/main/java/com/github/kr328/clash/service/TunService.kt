@@ -6,10 +6,7 @@ import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.clash.ClashRuntime
 import com.github.kr328.clash.service.clash.module.*
 import com.github.kr328.clash.service.settings.ServiceSettings
-import com.github.kr328.clash.service.util.asSocketAddressText
-import com.github.kr328.clash.service.util.broadcastClashStarted
-import com.github.kr328.clash.service.util.broadcastClashStopped
-import com.github.kr328.clash.service.util.broadcastNetworkChanged
+import com.github.kr328.clash.service.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -50,6 +47,18 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             val dnsInject = DnsInjectModule()
 
             runtime.install(ReloadModule(service)) {
+                onLoaded {
+                    if ( it != null ) {
+                        reason = it.message
+
+                        stopSelf()
+
+                        TunModule.requestStop()
+                    }
+                    else {
+                        broadcastProfileLoaded()
+                    }
+                }
                 onEmpty {
                     launch {
                         reason = "No selected profile"

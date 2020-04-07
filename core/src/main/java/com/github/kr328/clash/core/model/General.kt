@@ -8,23 +8,19 @@ import kotlinx.serialization.*
 @Serializable
 data class General(val mode: Mode, val http: Int, val socks: Int, val redirect: Int) : Parcelable {
     @Serializable
-    enum class Mode {
-        DIRECT, GLOBAL, RULE;
+    enum class Mode(val string: String) {
+        DIRECT("Direct"), GLOBAL("Global"), RULE("Rule");
 
         override fun toString(): String {
-            return when (this) {
-                DIRECT -> "Direct"
-                GLOBAL -> "Global"
-                RULE -> "Rule"
-            }
+            return string
         }
 
         companion object {
             fun fromString(mode: String): Mode {
                 return when (mode) {
-                    "Direct" -> DIRECT
-                    "Global" -> GLOBAL
-                    "Rule" -> RULE
+                    DIRECT.string -> DIRECT
+                    GLOBAL.string -> GLOBAL
+                    RULE.string -> RULE
                     else -> throw IllegalArgumentException("Invalid mode $mode")
                 }
             }
