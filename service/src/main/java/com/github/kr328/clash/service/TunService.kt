@@ -3,7 +3,6 @@ package com.github.kr328.clash.service
 import android.content.Intent
 import android.net.VpnService
 import com.github.kr328.clash.core.Clash
-import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.clash.ClashRuntime
 import com.github.kr328.clash.service.clash.module.*
 import com.github.kr328.clash.service.settings.ServiceSettings
@@ -11,7 +10,10 @@ import com.github.kr328.clash.service.util.asSocketAddressText
 import com.github.kr328.clash.service.util.broadcastClashStarted
 import com.github.kr328.clash.service.util.broadcastClashStopped
 import com.github.kr328.clash.service.util.broadcastNetworkChanged
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {

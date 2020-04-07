@@ -9,7 +9,6 @@ import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.core.Clash
-import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.data.ClashDatabase
