@@ -62,7 +62,7 @@ dependencies {
     kapt("androidx.room:room-compiler:$gRoomVersion")
 
     implementation(project(":core"))
-    implementation(project(":component"))
+    implementation(project(":common"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$gKotlinSerializationVersion")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$gKotlinCoroutineVersion")

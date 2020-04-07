@@ -1,4 +1,4 @@
-package com.github.kr328.clash.component.time
+package com.github.kr328.clash.common.time
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel

@@ -1,6 +1,6 @@
-package com.github.kr328.clash.component.ids
+package com.github.kr328.clash.common.ids
 
-import com.github.kr328.clash.component.BuildConfig
+import com.github.kr328.clash.common.BuildConfig
 
 object Intents {
     const val INTENT_ACTION_CLASH_STARTED =

@@ -8,7 +8,7 @@ import android.content.IntentFilter
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.github.kr328.clash.component.ids.Intents
+import com.github.kr328.clash.common.ids.Intents
 
 object Broadcasts {
     interface Receiver {

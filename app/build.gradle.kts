@@ -71,7 +71,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":service"))
     implementation(project(":design"))
-    implementation(project(":component"))
+    implementation(project(":common"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$gKotlinCoroutineVersion")
     implementation("androidx.lifecycle:lifecycle-extensions:$gLifecycleVersion")

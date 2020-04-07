@@ -8,7 +8,7 @@ import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.github.kr328.clash.remote.RemoteUtils
-import com.github.kr328.clash.component.ids.Intents
+import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.utils.startClashService
 import com.github.kr328.clash.utils.stopClashService
 

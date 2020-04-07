@@ -52,7 +52,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":component"))
+    implementation(project(":common"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion")
     implementation("androidx.appcompat:appcompat:$gAppCompatVersion")
     implementation("androidx.core:core-ktx:$gAndroidKtxVersion")

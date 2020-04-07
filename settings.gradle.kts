@@ -2,6 +2,6 @@ include(":app")
 include(":core")
 include(":service")
 include(":design")
-include(":component")
+include(":common")
 
 rootProject.name = "ClashForAndroid"
