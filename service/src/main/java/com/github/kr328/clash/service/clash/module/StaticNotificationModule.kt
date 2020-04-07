@@ -12,6 +12,7 @@ import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.service.R
+import com.github.kr328.clash.service.ServiceStatusProvider
 import com.github.kr328.clash.service.data.ClashDatabase
 
 class StaticNotificationModule(private val service: Service) : Module() {
@@ -51,9 +52,7 @@ class StaticNotificationModule(private val service: Service) : Module() {
     }
 
     private suspend fun update() {
-        val database = ClashDatabase.getInstance(service).openClashProfileDao()
-
-        val profileName = database.queryActiveProfile()?.name ?: "Not selected"
+        val profileName = ServiceStatusProvider.currentProfile ?: "Not selected"
 
         val notification = builder
             .setContentTitle(profileName)

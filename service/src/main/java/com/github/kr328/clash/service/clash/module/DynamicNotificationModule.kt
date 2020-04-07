@@ -11,6 +11,7 @@ import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.service.R
+import com.github.kr328.clash.service.ServiceStatusProvider
 import com.github.kr328.clash.service.data.ClashDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -93,9 +94,7 @@ class DynamicNotificationModule(private val service: Service) : Module() {
         }
     }
 
-    private suspend fun reload() {
-        val active =
-            ClashDatabase.getInstance(service).openClashProfileDao().queryActiveProfile()
-        currentProfile = active?.name ?: "Not selected"
+    private fun reload() {
+        currentProfile = ServiceStatusProvider.currentProfile ?: "Not selected"
     }
 }
