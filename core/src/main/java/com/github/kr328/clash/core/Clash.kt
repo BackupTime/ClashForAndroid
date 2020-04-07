@@ -11,6 +11,7 @@ import com.github.kr328.clash.core.model.Traffic
 import com.github.kr328.clash.core.transact.DoneCallbackImpl
 import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
+import com.github.kr328.clash.core.utils.Log
 import kotlinx.coroutines.CompletableDeferred
 import java.io.File
 import java.io.InputStream
@@ -50,6 +51,8 @@ object Clash {
         onNewSocket: (Int) -> Boolean,
         onTunStop: () -> Unit
     ) {
+        Log.d("$gateway $mirror $dns")
+
         Bridge.startTunDevice(fd.toLong(), mtu.toLong(), gateway, mirror, dns, object: TunCallback {
             override fun onCreateSocket(fd: Long) {
                 onNewSocket(fd.toInt())

@@ -84,7 +84,7 @@ class TunModule(private val service: VpnService) : Module() {
                     c.mtu,
                     c.gateway4,
                     c.mirror4,
-                    "0.0.0.0:53",
+                    IPV4_ANY,
                     service::protect,
                     service::stopSelf
                 )
@@ -94,7 +94,7 @@ class TunModule(private val service: VpnService) : Module() {
                     c.mtu,
                     c.gateway4,
                     c.mirror4,
-                    "${c.dnsAddress}:53",
+                    c.dnsAddress,
                     service::protect,
                     service::stopSelf
                 )
@@ -107,6 +107,8 @@ class TunModule(private val service: VpnService) : Module() {
     }
 
     companion object {
+        private const val IPV4_ANY = "0.0.0.0"
+
         fun requestStop() {
             Clash.stopTunDevice()
         }
