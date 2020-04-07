@@ -44,11 +44,6 @@ class ClashService : BaseService() {
                         broadcastProfileLoaded()
                     }
                 }
-                onEmpty {
-                    reason = "No profile selected"
-
-                    stopSelf()
-                }
             }
             runtime.install(CloseModule()) {
                 onClose {

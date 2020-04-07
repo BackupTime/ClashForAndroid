@@ -59,15 +59,6 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                         broadcastProfileLoaded()
                     }
                 }
-                onEmpty {
-                    launch {
-                        reason = "No selected profile"
-
-                        stopSelf()
-
-                        TunModule.requestStop()
-                    }
-                }
             }
             runtime.install(CloseModule()) {
                 onClose {

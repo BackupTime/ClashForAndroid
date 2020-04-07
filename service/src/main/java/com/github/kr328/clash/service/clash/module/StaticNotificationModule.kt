@@ -16,7 +16,7 @@ import com.github.kr328.clash.service.data.ClashDatabase
 
 class StaticNotificationModule(private val service: Service) : Module() {
     override val receiveBroadcasts: Set<String>
-        get() = setOf(Intents.INTENT_ACTION_PROFILE_CHANGED)
+        get() = setOf(Intents.INTENT_ACTION_PROFILE_LOADED)
     private val contentIntent = Intent(Intent.ACTION_MAIN)
         .addCategory(Intent.CATEGORY_DEFAULT)
         .addCategory(Intent.CATEGORY_LAUNCHER)
@@ -40,14 +40,10 @@ class StaticNotificationModule(private val service: Service) : Module() {
 
     override suspend fun onBroadcastReceived(intent: Intent) {
         when (intent.action) {
-            Intents.INTENT_ACTION_PROFILE_CHANGED -> {
+            Intents.INTENT_ACTION_PROFILE_LOADED -> {
                 update()
             }
         }
-    }
-
-    override suspend fun onStart() {
-        update()
     }
 
     override suspend fun onStop() {

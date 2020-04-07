@@ -20,7 +20,7 @@ class DynamicNotificationModule(private val service: Service) : Module() {
         get() = setOf(
             Intent.ACTION_SCREEN_ON,
             Intent.ACTION_SCREEN_OFF,
-            Intents.INTENT_ACTION_PROFILE_CHANGED
+            Intents.INTENT_ACTION_PROFILE_LOADED
         )
     private val contentIntent = Intent(Intent.ACTION_MAIN)
         .addCategory(Intent.CATEGORY_DEFAULT)
@@ -50,15 +50,13 @@ class DynamicNotificationModule(private val service: Service) : Module() {
                 enableTicker = true
             Intent.ACTION_SCREEN_OFF ->
                 enableTicker = false
-            Intents.INTENT_ACTION_PROFILE_CHANGED ->
+            Intents.INTENT_ACTION_PROFILE_LOADED ->
                 reload()
         }
     }
 
     override suspend fun onStart() {
         enableTicker = service.getSystemService(PowerManager::class.java).isInteractive
-
-        reload()
     }
 
     override suspend fun onStop() {

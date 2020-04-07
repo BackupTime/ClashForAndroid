@@ -14,5 +14,5 @@ interface ClashProfileProxyDao {
     suspend fun querySelectedForProfile(id: Long): List<ClashProfileProxyEntity>
 
     @Query("DELETE FROM profile_select_proxies WHERE profile_id = :id AND proxy in (:selected)")
-    suspend fun removeSelectedForProfile(id: Int, selected: List<String>)
+    suspend fun removeSelectedForProfile(id: Long, selected: List<String>)
 }
