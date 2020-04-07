@@ -4,24 +4,19 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.github.kr328.clash.component.ids.Intents
-import com.github.kr328.clash.component.ids.NotificationChannels
-import com.github.kr328.clash.component.ids.NotificationIds
+import com.github.kr328.clash.common.ids.Intents
+import com.github.kr328.clash.common.ids.NotificationChannels
+import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.data.ClashDatabase
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 
-class StaticNotificationModule(private val service: Service) : Module {
+class StaticNotificationModule(private val service: Service) : Module() {
+    override val receiveBroadcasts: Set<String>
+        get() = setOf(Intents.INTENT_ACTION_PROFILE_CHANGED)
     private val contentIntent = Intent(Intent.ACTION_MAIN)
         .addCategory(Intent.CATEGORY_DEFAULT)
         .addCategory(Intent.CATEGORY_LAUNCHER)
@@ -42,50 +37,30 @@ class StaticNotificationModule(private val service: Service) : Module {
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
         )
-    private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.action) {
-                Intents.INTENT_ACTION_PROFILE_CHANGED ->
-                    reloadChannel.offer(Unit)
-            }
-        }
-    }
-    private var currentProfile: String = "Not selected"
-    private lateinit var backgroundJob: Job
 
-    override suspend fun onCreate() {
-        val database = ClashDatabase.getInstance(service).openClashProfileDao()
-
-        backgroundJob = launch {
-            while (isActive) {
-                reloadChannel.receive()
-
-                currentProfile = database.queryActiveProfile()?.name ?: "Not selected"
-
+    override suspend fun onBroadcastReceived(intent: Intent) {
+        when (intent.action) {
+            Intents.INTENT_ACTION_PROFILE_CHANGED -> {
                 update()
             }
         }
     }
 
     override suspend fun onStart() {
-        service.registerReceiver(receiver, IntentFilter(Intents.INTENT_ACTION_PROFILE_CHANGED))
-
-        reloadChannel.offer(Unit)
+        update()
     }
 
     override suspend fun onStop() {
-        service.unregisterReceiver(receiver)
         service.stopForeground(true)
     }
 
-    override suspend fun onDestroy() {
-        backgroundJob.cancel()
-    }
+    private suspend fun update() {
+        val database = ClashDatabase.getInstance(service).openClashProfileDao()
 
-    private fun update() {
+        val profileName = database.queryActiveProfile()?.name ?: "Not selected"
+
         val notification = builder
-            .setContentTitle(currentProfile)
+            .setContentTitle(profileName)
             .setContentText(service.getText(R.string.running))
             .build()
 

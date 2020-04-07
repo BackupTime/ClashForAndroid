@@ -2,7 +2,7 @@ package com.github.kr328.clash.service.clash.module
 
 import com.github.kr328.clash.core.Clash
 
-class DnsInjectModule : Module {
+class DnsInjectModule : Module() {
     var dnsOverride: Boolean = false
         set(value) {
             Clash.setDnsOverrideEnabled(value)
@@ -14,10 +14,6 @@ class DnsInjectModule : Module {
             field = value
         }
 
-    override suspend fun onCreate() {
-
-    }
-
     override suspend fun onStart() {
         Clash.setDnsOverrideEnabled(dnsOverride)
         Clash.appendDns(appendDns)
@@ -28,7 +24,4 @@ class DnsInjectModule : Module {
         Clash.appendDns(emptyList())
     }
 
-    override suspend fun onDestroy() {
-
-    }
 }

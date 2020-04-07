@@ -1,62 +1,97 @@
 package com.github.kr328.clash.service.clash
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.clash.module.Module
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class ClashRuntime {
+class ClashRuntime(private val context: Context) {
     companion object {
         private val GIL = Mutex() // :)
     }
 
     private val modules: MutableList<Module> = mutableListOf()
     private val mutex = Mutex()
-    private var started = false
-    private var stopped = false
-
-    suspend fun start() = mutex.withLock {
-        if (!GIL.tryLock())
-            throw IllegalStateException("ClashRuntime running")
-
-        if (started || stopped)
-            return
-
-        started = true
-
-        Clash.start()
-
-        modules.forEach {
-            it.onStart()
-        }
-    }
-
-    suspend fun stop() = mutex.withLock {
-        if (!started || stopped)
-            return
-
-        modules.forEach {
-            it.onStop()
-            it.onDestroy()
-        }
-
-        Clash.stop()
-
-        GIL.unlock()
-    }
 
     suspend fun <T : Module> install(module: T, configure: T.() -> Unit = {}) = mutex.withLock {
-        if (stopped)
-            return
-
-        stopped = true
-
         modules.add(module)
 
         module.onCreate()
         module.configure()
+    }
 
-        if (started)
-            module.onStart()
+    suspend fun exec() {
+        GIL.withLock {
+            execLocked()
+        }
+    }
+
+    private suspend fun execLocked() {
+        val broadcastChannel = Channel<Intent>(Channel.UNLIMITED)
+        val tickerChannel = Channel<Unit>()
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                broadcastChannel.offer(intent ?: return)
+            }
+        }
+        var tickerEnabled: Boolean
+
+        coroutineScope {
+            launch {
+                while (isActive) {
+                    tickerChannel.offer(Unit)
+                    delay(1000)
+                }
+            }
+
+            try {
+                Clash.start()
+
+                modules.forEach {
+                    it.onStart()
+                }
+
+                context.registerReceiver(receiver, IntentFilter().apply {
+                    modules.flatMap { it.receiveBroadcasts }.distinct().forEach {
+                        addAction(it)
+                    }
+                })
+
+                while (isActive) {
+                    tickerEnabled = modules.any { it.enableTicker }
+
+                    select<Unit> {
+                        broadcastChannel.onReceive { intent ->
+                            modules.forEach {
+                                it.onBroadcastReceived(intent)
+                            }
+                        }
+                        if (tickerEnabled) {
+                            tickerChannel.onReceive {
+                                modules.forEach {
+                                    it.onTick()
+                                }
+                            }
+                        }
+                    }
+                }
+            } finally {
+                modules.reversed().forEach {
+                    it.onStop()
+                }
+
+                Clash.stop()
+            }
+        }
     }
 }

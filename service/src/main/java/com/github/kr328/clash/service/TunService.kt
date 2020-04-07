@@ -1,14 +1,11 @@
 package com.github.kr328.clash.service
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.service.clash.ClashRuntime
 import com.github.kr328.clash.service.clash.module.*
-import com.github.kr328.clash.service.net.DefaultNetworkChannel
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.asSocketAddressText
 import com.github.kr328.clash.service.util.broadcastClashStarted
@@ -30,7 +27,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private val service = this
-    private val runtime = ClashRuntime()
+    private val runtime = ClashRuntime(this)
     private var reason: String? = null
 
     override fun onCreate() {
@@ -51,20 +48,24 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             val dnsInject = DnsInjectModule()
 
             runtime.install(ReloadModule(service)) {
-                onEmptyProfile {
+                onEmpty {
                     launch {
                         reason = "No selected profile"
+
                         stopSelf()
-                        runtime.stop()
+
+                        TunModule.requestStop()
                     }
                 }
             }
-            runtime.install(CloseModule(service)) {
+            runtime.install(CloseModule()) {
                 onClose {
                     launch {
                         reason = null
+
                         stopSelf()
-                        runtime.stop()
+
+                        TunModule.requestStop()
                     }
                 }
             }
@@ -82,41 +83,23 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 dnsOverride = settings.get(ServiceSettings.OVERRIDE_DNS)
             }
 
-            runtime.start()
-
-            val defaultNetworkChannel = DefaultNetworkChannel(service, this)
-
-            try {
-                defaultNetworkChannel.register()
-
-                while (isActive) {
-                    val d = defaultNetworkChannel.receive()
-
-                    if (d == null) {
-                        setUnderlyingNetworks(null)
-                        continue
-                    }
-
-                    setUnderlyingNetworks(arrayOf(d.first))
+            runtime.install(NetworkObserveModule(service)) {
+                onNetworkChanged { network, dnsServers ->
+                    setUnderlyingNetworks(network?.let { arrayOf(it) })
 
                     if (settings.get(ServiceSettings.AUTO_ADD_SYSTEM_DNS)) {
-                        withContext(Dispatchers.Default) {
-                            val dnsServers = d.second?.dnsServers ?: emptyList()
-
-                            val dnsStrings = dnsServers.map {
-                                it.asSocketAddressText(53)
-                            }
-
-                            dnsInject.appendDns = dnsStrings
+                        val dnsStrings = dnsServers.map {
+                            it.asSocketAddressText(53)
                         }
+
+                        dnsInject.appendDns = dnsStrings
                     }
 
                     broadcastNetworkChanged()
                 }
             }
-            finally {
-                defaultNetworkChannel.unregister()
-            }
+
+            runtime.exec()
         }
     }
 
@@ -127,13 +110,9 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     }
 
     override fun onDestroy() {
-        runBlocking {
-            ServiceStatusProvider.serviceRunning = false
+        ServiceStatusProvider.serviceRunning = false
 
-            runtime.stop()
-
-            broadcastClashStopped(reason)
-        }
+        broadcastClashStopped(reason)
 
         cancel()
 

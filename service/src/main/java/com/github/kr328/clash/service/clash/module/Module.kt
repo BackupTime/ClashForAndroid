@@ -1,16 +1,14 @@
 package com.github.kr328.clash.service.clash.module
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
+import android.content.Intent
 
-interface Module : CoroutineScope {
-    override val coroutineContext: CoroutineContext
-        suspend fun get() = Dispatchers.Unconfined
+abstract class Module {
+    open suspend fun onCreate() {}
+    open suspend fun onStart() {}
+    open suspend fun onStop() {}
+    open suspend fun onTick() {}
+    open suspend fun onBroadcastReceived(intent: Intent) {}
 
-    suspend fun onCreate()
-    suspend fun onStart()
-    suspend fun onStop()
-    suspend fun onDestroy()
+    open val receiveBroadcasts: Set<String> = emptySet()
+    var enableTicker: Boolean = false
 }

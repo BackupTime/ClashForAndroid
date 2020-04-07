@@ -12,11 +12,10 @@ import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.broadcastClashStarted
 import com.github.kr328.clash.service.util.broadcastClashStopped
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class ClashService : BaseService() {
     private val service = this
-    private val runtime = ClashRuntime()
+    private val runtime = ClashRuntime(this)
     private var reason: String? = null
 
     override fun onCreate() {
@@ -34,13 +33,13 @@ class ClashService : BaseService() {
             val settings = ServiceSettings(service)
 
             runtime.install(ReloadModule(service)) {
-                onEmptyProfile {
+                onEmpty {
                     reason = "No profile selected"
 
                     stopSelf()
                 }
             }
-            runtime.install(CloseModule(service)) {
+            runtime.install(CloseModule()) {
                 onClose {
                     reason = null
 
@@ -53,7 +52,7 @@ class ClashService : BaseService() {
             else
                 runtime.install(StaticNotificationModule(service))
 
-            runtime.start()
+            runtime.exec()
         }
     }
 
@@ -68,13 +67,9 @@ class ClashService : BaseService() {
     }
 
     override fun onDestroy() {
-        runBlocking {
-            ServiceStatusProvider.serviceRunning = false
+        ServiceStatusProvider.serviceRunning = false
 
-            runtime.stop()
-
-            service.broadcastClashStopped(reason)
-        }
+        service.broadcastClashStopped(reason)
 
         super.onDestroy()
     }

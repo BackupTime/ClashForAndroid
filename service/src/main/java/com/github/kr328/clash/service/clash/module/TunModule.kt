@@ -4,13 +4,13 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
-import com.github.kr328.clash.component.ids.NotificationIds
+import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.util.parseCIDR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class TunModule(private val service: VpnService) : Module {
+class TunModule(private val service: VpnService) : Module() {
     interface Configure {
         val builder: VpnService.Builder
         val mtu: Int
@@ -34,7 +34,6 @@ class TunModule(private val service: VpnService) : Module {
 
     var configure: Configure? = null
 
-    override suspend fun onCreate() {}
     override suspend fun onStart() {
         withContext(Dispatchers.IO) {
             val c = configure ?: throw IllegalArgumentException("Configure required")
@@ -107,5 +106,9 @@ class TunModule(private val service: VpnService) : Module {
         Clash.stopTunDevice()
     }
 
-    override suspend fun onDestroy() {}
+    companion object {
+        fun requestStop() {
+            Clash.stopTunDevice()
+        }
+    }
 }

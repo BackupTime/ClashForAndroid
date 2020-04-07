@@ -4,7 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.github.kr328.clash.component.ids.Intents
+import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.service.ProfileRequestReceiver
 import com.github.kr328.clash.service.data.ClashProfileEntity
 

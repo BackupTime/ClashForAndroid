@@ -2,27 +2,27 @@ package com.github.kr328.clash.service.clash.module
 
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
-import com.github.kr328.clash.component.ids.Intents
-import com.github.kr328.clash.component.ids.NotificationChannels
-import com.github.kr328.clash.component.ids.NotificationIds
+import com.github.kr328.clash.common.ids.Intents
+import com.github.kr328.clash.common.ids.NotificationChannels
+import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.core.Clash
+import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.core.utils.asBytesString
 import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.data.ClashDatabase
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class DynamicNotificationModule(private val service: Service) : Module {
+class DynamicNotificationModule(private val service: Service) : Module() {
+    override val receiveBroadcasts: Set<String>
+        get() = setOf(
+            Intent.ACTION_SCREEN_ON,
+            Intent.ACTION_SCREEN_OFF,
+            Intents.INTENT_ACTION_PROFILE_CHANGED
+        )
     private val contentIntent = Intent(Intent.ACTION_MAIN)
         .addCategory(Intent.CATEGORY_DEFAULT)
         .addCategory(Intent.CATEGORY_LAUNCHER)
@@ -43,76 +43,30 @@ class DynamicNotificationModule(private val service: Service) : Module {
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
         )
-    private val reloadChannel = Channel<Unit>(Channel.CONFLATED)
-    private val screenChannel = Channel<Boolean>(Channel.CONFLATED)
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.action) {
-                Intent.ACTION_SCREEN_ON ->
-                    screenChannel.offer(true)
-                Intent.ACTION_SCREEN_OFF ->
-                    screenChannel.offer(false)
-                Intents.INTENT_ACTION_PROFILE_CHANGED ->
-                    reloadChannel.offer(Unit)
-            }
-        }
-    }
-    private lateinit var backgroundJob: Job
     private var currentProfile = "Not selected"
 
-    override suspend fun onCreate() {
-        val database = ClashDatabase.getInstance(service).openClashProfileDao()
-        val tickerChannel = Channel<Unit>()
-
-        backgroundJob = launch {
-            launch {
-                while (isActive) {
-                    tickerChannel.send(Unit)
-                    delay(1000)
-                }
-            }
-
-            var refreshEnabled =
-                service.getSystemService(PowerManager::class.java).isInteractive
-
-            while (isActive) {
-                select<Unit> {
-                    reloadChannel.onReceive {
-                        currentProfile = database.queryActiveProfile()?.name ?: "Not selected"
-                    }
-                    screenChannel.onReceive {
-                        refreshEnabled = it
-                    }
-                    if (refreshEnabled) {
-                        tickerChannel.onReceive
-                    }
-                }
-
-                update()
-            }
+    override suspend fun onBroadcastReceived(intent: Intent) {
+        when (intent.action) {
+            Intent.ACTION_SCREEN_ON ->
+                enableTicker = true
+            Intent.ACTION_SCREEN_OFF ->
+                enableTicker = false
+            Intents.INTENT_ACTION_PROFILE_CHANGED ->
+                reload()
         }
     }
 
     override suspend fun onStart() {
-        reloadChannel.offer(Unit)
+        enableTicker = service.getSystemService(PowerManager::class.java).isInteractive
 
-        service.registerReceiver(receiver, IntentFilter().apply {
-            addAction(Intents.INTENT_ACTION_PROFILE_CHANGED)
-            addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Intent.ACTION_SCREEN_ON)
-        })
+        reload()
     }
 
     override suspend fun onStop() {
-        service.unregisterReceiver(receiver)
         service.stopForeground(true)
     }
 
-    override suspend fun onDestroy() {
-        backgroundJob.cancel()
-    }
-
-    private fun update() {
+    override suspend fun onTick() {
         val traffic = Clash.queryTraffic()
         val bandwidth = Clash.queryBandwidth()
 
@@ -121,22 +75,30 @@ class DynamicNotificationModule(private val service: Service) : Module {
         val uploaded = bandwidth.upload.asBytesString()
         val downloaded = bandwidth.download.asBytesString()
 
-        val notification = builder
-            .setContentTitle(currentProfile)
-            .setContentText(
-                service.getString(
-                    R.string.clash_notification_content,
-                    uploading, downloading
+        withContext(Dispatchers.Default) {
+            val notification = builder
+                .setContentTitle(currentProfile)
+                .setContentText(
+                    service.getString(
+                        R.string.clash_notification_content,
+                        uploading, downloading
+                    )
                 )
-            )
-            .setSubText(
-                service.getString(
-                    R.string.clash_notification_content,
-                    uploaded, downloaded
+                .setSubText(
+                    service.getString(
+                        R.string.clash_notification_content,
+                        uploaded, downloaded
+                    )
                 )
-            )
-            .build()
+                .build()
 
-        service.startForeground(NotificationIds.CLASH_STATUS, notification)
+            service.startForeground(NotificationIds.CLASH_STATUS, notification)
+        }
+    }
+
+    private suspend fun reload() {
+        val active =
+            ClashDatabase.getInstance(service).openClashProfileDao().queryActiveProfile()
+        currentProfile = active?.name ?: "Not selected"
     }
 }
