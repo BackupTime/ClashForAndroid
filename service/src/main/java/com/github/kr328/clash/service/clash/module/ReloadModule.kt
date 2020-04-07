@@ -9,7 +9,6 @@ import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.util.resolveBase
 import com.github.kr328.clash.service.util.resolveProfile
 import kotlinx.coroutines.sync.Mutex
-import java.lang.NullPointerException
 
 class ReloadModule(private val context: Context) : Module() {
     override val receiveBroadcasts: Set<String>

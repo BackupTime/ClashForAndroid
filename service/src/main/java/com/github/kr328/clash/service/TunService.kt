@@ -48,14 +48,13 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
             runtime.install(ReloadModule(service)) {
                 onLoaded {
-                    if ( it != null ) {
+                    if (it != null) {
                         reason = it.message
 
                         stopSelf()
 
                         TunModule.requestStop()
-                    }
-                    else {
+                    } else {
                         broadcastProfileLoaded()
                     }
                 }

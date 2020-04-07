@@ -35,12 +35,11 @@ class ClashService : BaseService() {
 
             runtime.install(ReloadModule(service)) {
                 onLoaded {
-                    if ( it != null ) {
+                    if (it != null) {
                         reason = it.message
 
                         stopSelf()
-                    }
-                    else {
+                    } else {
                         broadcastProfileLoaded()
                     }
                 }
