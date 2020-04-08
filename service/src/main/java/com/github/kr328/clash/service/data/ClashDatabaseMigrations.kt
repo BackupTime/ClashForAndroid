@@ -134,7 +134,6 @@ object ClashDatabaseMigrations {
 
                 put(ServiceSettings.ACCESS_CONTROL_MODE, newAccessMode)
                 put(ServiceSettings.ACCESS_CONTROL_PACKAGES, accessPackages)
-                put(ServiceSettings.IPV6_SUPPORT, ipv6Enabled)
                 put(ServiceSettings.DNS_HIJACKING, dnsHijack)
                 put(ServiceSettings.BYPASS_PRIVATE_NETWORK, bypassPrivate)
             }
