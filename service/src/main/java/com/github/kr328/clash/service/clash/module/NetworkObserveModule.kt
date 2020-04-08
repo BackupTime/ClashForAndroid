@@ -89,8 +89,6 @@ class NetworkObserveModule(context: Context) : Module() {
                     0
             }
             .map {
-                Log.d("Detected network ${it.first}")
-
                 it.second
             }
             .firstOrNull()
