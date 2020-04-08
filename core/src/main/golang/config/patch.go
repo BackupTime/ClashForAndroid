@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/Dreamacro/clash/component/fakeip"
 	"github.com/Dreamacro/clash/config"
+	"github.com/Dreamacro/clash/dns"
 	"net/url"
 )
 
@@ -13,6 +14,31 @@ var (
 
 	cachedPool *fakeip.Pool
 )
+
+func init() {
+	defaultNameServers := []string{
+		"223.5.5.5",
+		"119.29.29.29",
+		"1.1.1.1",
+		"208.67.222.222",
+	}
+
+	OptionalDnsPatch = &config.RawDNS{
+		Enable:     true,
+		IPv6:       true,
+		NameServer: defaultNameServers,
+		Fallback:   []string{},
+		FallbackFilter: config.RawFallbackFilter{
+			GeoIP:  false,
+			IPCIDR: []string{},
+		},
+		Listen:            ":0",
+		EnhancedMode:      dns.FAKEIP,
+		FakeIPRange:       "198.18.0.0/16",
+		FakeIPFilter:      []string{},
+		DefaultNameserver: defaultNameServers,
+	}
+}
 
 func patchRawConfig(rawConfig *config.RawConfig) {
 	rawConfig.DNS.FakeIPRange = "198.18.0.0/16"
