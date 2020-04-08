@@ -2,6 +2,7 @@ package com.github.kr328.clash.service.clash.module
 
 import android.content.Context
 import android.net.*
+import com.github.kr328.clash.core.utils.Log
 import kotlinx.coroutines.sync.Mutex
 import java.net.InetAddress
 
@@ -18,7 +19,7 @@ class NetworkObserveModule(context: Context) : Module() {
             detectDefaultNetwork()
         }
 
-        override fun onLosing(network: Network, maxMsToLive: Int) {
+        override fun onLost(network: Network) {
             internet.remove(network)
             dns.remove(network)
 
@@ -88,6 +89,8 @@ class NetworkObserveModule(context: Context) : Module() {
                     0
             }
             .map {
+                Log.d("Detected network ${it.first}")
+
                 it.second
             }
             .firstOrNull()
