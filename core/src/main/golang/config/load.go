@@ -12,8 +12,6 @@ import (
 	"github.com/kr328/cfa/tun"
 )
 
-const tunAddress = "172.31.255.253/30"
-
 const defaultConfig = `
 log: debug
 mode: Direct
