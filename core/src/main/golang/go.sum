@@ -14,6 +14,8 @@ github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/ad
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr328/tun2socket v0.0.0-20200329184923-76cc473668aa h1:WO6oDyis1HjzAYwv1Eu+wYmo6qzN8ph9ZllUpO3oQfE=
 github.com/kr328/tun2socket v0.0.0-20200329184923-76cc473668aa/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
+github.com/kr328/tun2socket v0.0.0-20200408030108-2c2effd1201d h1:+IU9AD+eA0tbMdl9TdxAqvbOWU8SnOQtbsPAMYqeXtU=
+github.com/kr328/tun2socket v0.0.0-20200408030108-2c2effd1201d/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
 github.com/miekg/dns v1.1.29 h1:xHBEhR+t5RzcFJjBLJlax2daXOrTYtr9z4WdKEfWFzg=
 github.com/miekg/dns v1.1.29/go.mod h1:KNUDUusw/aVsxyTYZM1oqvCicbwhgbNgztCETuNZ7xM=
 github.com/oschwald/geoip2-golang v1.4.0 h1:5RlrjCgRyIGDz/mBmPfnAF4h8k0IAcRv9PvrpOfz+Ug=

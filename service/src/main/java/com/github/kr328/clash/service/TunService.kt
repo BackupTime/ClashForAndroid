@@ -17,11 +17,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
         private const val VPN_MTU = 65535
         private const val PRIVATE_VLAN4_SUBNET = 30
-        private const val PRIVATE_VLAN6_SUBNET = 126
         private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
-        private const val PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1"
         private const val PRIVATE_VLAN4_MIRROR = "172.31.255.254"
-        private const val PRIVATE_VLAN6_MIRROR = "fdfe:dcba:9876::2"
         private const val PRIVATE_VLAN_DNS = "198.18.0.1"
     }
 
@@ -125,35 +122,16 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             get() = Builder()
         override val mtu: Int
             get() = VPN_MTU
-        override val gateway4: String
+        override val gateway: String
             get() = "$PRIVATE_VLAN4_CLIENT/$PRIVATE_VLAN4_SUBNET"
-        override val mirror4: String
+        override val mirror: String
             get() = PRIVATE_VLAN4_MIRROR
-        override val route4: List<String>
+        override val route: List<String>
             get() {
                 return if (settings.get(ServiceSettings.BYPASS_PRIVATE_NETWORK))
                     resources.getStringArray(R.array.bypass_private_route).toList()
                 else
                     listOf("0.0.0.0/0")
-            }
-        override val gateway6: String?
-            get() {
-                return if (settings.get(ServiceSettings.IPV6_SUPPORT))
-                    "$PRIVATE_VLAN6_CLIENT/$PRIVATE_VLAN6_SUBNET"
-                else null
-            }
-        override val mirror6: String?
-            get() {
-                return if (settings.get(ServiceSettings.IPV6_SUPPORT))
-                    PRIVATE_VLAN6_MIRROR
-                else null
-            }
-        override val route6: List<String>?
-            get() {
-                // from https://github.com/shadowsocks/shadowsocks-android/commit/cc840c9fddb3f4f6677005de18f1fcb387b84064#diff-e089fe63dcb3674c0a1e459a95508e3e
-                return if (settings.get(ServiceSettings.IPV6_SUPPORT))
-                    listOf("2000::/3")
-                else null
             }
         override val dnsAddress: String
             get() = PRIVATE_VLAN_DNS

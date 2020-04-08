@@ -2,6 +2,7 @@ package com.github.kr328.clash.service.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.github.kr328.clash.common.settings.BaseSettings
 import com.github.kr328.clash.service.ServiceSettingsProvider
 
 class ServiceSettings(preference: SharedPreferences) :
@@ -17,8 +18,6 @@ class ServiceSettings(preference: SharedPreferences) :
 
         val LANGUAGE =
             StringEntry("language", "")
-        val IPV6_SUPPORT =
-            BooleanEntry("ipv6_support", false)
         val BYPASS_PRIVATE_NETWORK =
             BooleanEntry("bypass_private_network", true)
         val ACCESS_CONTROL_MODE =

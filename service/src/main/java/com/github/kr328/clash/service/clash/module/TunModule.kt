@@ -14,12 +14,9 @@ class TunModule(private val service: VpnService) : Module() {
     interface Configure {
         val builder: VpnService.Builder
         val mtu: Int
-        val gateway4: String
-        val mirror4: String
-        val route4: List<String>
-        val gateway6: String?
-        val mirror6: String?
-        val route6: List<String>?
+        val gateway: String
+        val mirror: String
+        val route: List<String>
         val dnsAddress: String
         val dnsHijacking: Boolean
         val allowApplications: List<String>
@@ -40,16 +37,10 @@ class TunModule(private val service: VpnService) : Module() {
 
             val builder = c.builder
 
-            parseCIDR(c.gateway4).let {
+            parseCIDR(c.gateway).let {
                 builder.addAddress(it.ip, it.prefix)
             }
-            c.route4.map { parseCIDR(it) }.forEach {
-                builder.addRoute(it.ip, it.prefix)
-            }
-            c.gateway6?.let { parseCIDR(it) }?.let {
-                builder.addAddress(it.ip, it.prefix)
-            }
-            c.route6?.map { parseCIDR(it) }?.forEach {
+            c.route.map { parseCIDR(it) }.forEach {
                 builder.addRoute(it.ip, it.prefix)
             }
             c.allowApplications.forEach {
@@ -82,8 +73,8 @@ class TunModule(private val service: VpnService) : Module() {
                 Clash.startTunDevice(
                     fd.detachFd(),
                     c.mtu,
-                    c.gateway4,
-                    c.mirror4,
+                    c.gateway,
+                    c.mirror,
                     IPV4_ANY,
                     service::protect,
                     service::stopSelf
@@ -92,8 +83,8 @@ class TunModule(private val service: VpnService) : Module() {
                 Clash.startTunDevice(
                     fd.detachFd(),
                     c.mtu,
-                    c.gateway4,
-                    c.mirror4,
+                    c.gateway,
+                    c.mirror,
                     c.dnsAddress,
                     service::protect,
                     service::stopSelf

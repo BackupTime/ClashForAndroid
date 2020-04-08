@@ -1,7 +1,7 @@
 package com.github.kr328.clash.preference
 
 import android.content.Context
-import com.github.kr328.clash.service.settings.BaseSettings
+import com.github.kr328.clash.common.settings.BaseSettings
 
 class UiSettings(context: Context) :
     BaseSettings(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)) {

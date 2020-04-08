@@ -1,4 +1,4 @@
-package com.github.kr328.clash.service.settings
+package com.github.kr328.clash.common.settings
 
 import android.content.SharedPreferences
 
@@ -8,7 +8,8 @@ abstract class BaseSettings(private val preferences: SharedPreferences) {
         fun put(editor: SharedPreferences.Editor, value: T)
     }
 
-    class StringEntry(private val key: String, private val defaultValue: String) : Entry<String> {
+    class StringEntry(private val key: String, private val defaultValue: String) :
+        Entry<String> {
         override fun get(preferences: SharedPreferences): String {
             return preferences.getString(key, defaultValue)!!
         }

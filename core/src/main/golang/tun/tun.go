@@ -56,6 +56,10 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string) error {
 
 	adapter = tun2socket.NewTun2Socket(file, mtu, gatewayIP, mirrorIP.To4())
 
+	adapter.SetLogger(&ClashLogger{})
+	adapter.SetClosedHandler(func() {
+		StopTunDevice()
+	})
 	adapter.SetAllocator(func(length int) []byte {
 		if length <= maxUdpPacketSize {
 			return udpPool.Get().([]byte)[:length]
