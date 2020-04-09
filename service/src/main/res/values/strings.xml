@@ -13,4 +13,8 @@
     <string name="running">Running</string>
     <string name="destroying">Destroying</string>
     <string name="recycling_resources">Recycling resources</string>
+    <string name="clash_for_android">Clash for Android</string>
+    <string name="profiles_and_providers">Profiles and Providers</string>
+    <string name="profile_yaml">Profile.yaml</string>
+    <string name="provider_files">Provider Files</string>
 </resources>

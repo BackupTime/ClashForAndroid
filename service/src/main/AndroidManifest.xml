@@ -46,6 +46,17 @@
                 android:resource="@xml/profile_provider" />
         </provider>
         <provider
+            android:name=".ProfileDocumentProvider"
+            android:authorities="${applicationId}.documents"
+            android:grantUriPermissions="true"
+            android:exported="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS"
+            android:process=":background">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+        <provider
             android:name=".ServiceStatusProvider"
             android:authorities="${applicationId}.status"
             android:exported="false"
