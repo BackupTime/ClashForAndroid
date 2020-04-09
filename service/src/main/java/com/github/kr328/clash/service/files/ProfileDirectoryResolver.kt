@@ -7,7 +7,6 @@ import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.util.resolveBase
 import com.github.kr328.clash.service.util.resolveProfile
 import java.io.FileNotFoundException
-import java.lang.UnsupportedOperationException
 
 class ProfileDirectoryResolver(private val context: Context) {
     companion object {
@@ -15,7 +14,7 @@ class ProfileDirectoryResolver(private val context: Context) {
         const val FILE_NAME_PROVIDER = "providers"
     }
 
-    private val nextResolver = ProviderResolver(context)
+    private val nextResolver = ProviderResolver()
 
     fun resolve(id: Long, paths: List<String>): VirtualFile {
         if (paths.size == 1) {

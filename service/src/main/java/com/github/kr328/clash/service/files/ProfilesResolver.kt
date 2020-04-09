@@ -7,7 +7,6 @@ import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.data.ClashProfileEntity
 import java.io.FileNotFoundException
-import java.lang.UnsupportedOperationException
 
 class ProfilesResolver(private val context: Context, private val database: ClashDatabase) {
     private val nextResolver = ProfileDirectoryResolver(context)
