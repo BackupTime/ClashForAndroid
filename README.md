@@ -37,7 +37,7 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
 
 2. Install `JDK 1.8`, `Android SDK` ,`Android NDK` and `Golang`
 
-3. Configure `local.properties` 
+3. Create `local.properties` on project root with 
 
    ```properties
    sdk.dir=/path/to/android-sdk
@@ -45,7 +45,7 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
    appcenter.key=<AppCenter Key>    # Optional, from "appcenter.ms"
    ```
 
-4. Configure `keystore.properties`
+4. Create `keystore.properties` on project root with
 
    ```properties
    storeFile=/path/to/keystore/file
@@ -60,4 +60,4 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
    ./gradlew app:assembleRelease
    ```
 
-   
+6. Pick `app-release-<arch>.apk` in `app/build/outputs/apks`
