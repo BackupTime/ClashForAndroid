@@ -65,6 +65,28 @@ android {
             isUniversalApk = true
         }
     }
+
+    val signingFile = rootProject.file("keystore.properties")
+    if ( signingFile.exists() ) {
+        val properties = Properties().apply {
+            signingFile.inputStream().use {
+                load(it)
+            }
+        }
+        signingConfigs {
+            maybeCreate("release").apply {
+                storeFile = rootProject.file(Objects.requireNonNull(properties.getProperty("storeFile")))
+                storePassword = Objects.requireNonNull(properties.getProperty("storePassword"))
+                keyAlias = Objects.requireNonNull(properties.getProperty("keyAlias"))
+                keyPassword = Objects.requireNonNull(properties.getProperty("keyPassword"))
+            }
+        }
+        buildTypes {
+            maybeCreate("release").apply {
+                this.signingConfig = signingConfigs.findByName("release")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -86,10 +108,13 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-crashes:$gAppCenterVersion")
 }
 
-task("appCenterKey") {
+task("injectAppCenterKey") {
     doFirst {
-        val properties = Properties()
-        properties.load(rootProject.file("local.properties").inputStream())
+        val properties = Properties().apply {
+            rootProject.file("local.properties").inputStream().use {
+                load(it)
+            }
+        }
 
         val key = properties.getProperty("appcenter.key", "")
 
@@ -100,5 +125,5 @@ task("appCenterKey") {
 }
 
 afterEvaluate {
-    tasks["preBuild"].dependsOn(tasks["appCenterKey"])
+    tasks["preBuild"].dependsOn(tasks["injectAppCenterKey"])
 }

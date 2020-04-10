@@ -45,18 +45,19 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
    appcenter.key=<AppCenter Key>    # Optional, from "appcenter.ms"
    ```
 
-4. Build
+4. Configure `keystore.properties`
 
-   on Linux
+   ```properties
+   storeFile=/path/to/keystore/file
+   storePassword=<key store password>
+   keyAlias=<key alias>
+   keyPassword=<key password>
+   ``` 
+
+5. Build
 
    ```bash
-   ./gradlew build
-   ```
-
-   on Windows
-
-   ```bash
-   .\gradlew.bat build
+   ./gradlew app:assembleRelease
    ```
 
    
