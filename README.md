@@ -37,7 +37,7 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
 
 2. Install `JDK 1.8`, `Android SDK` ,`Android NDK` and `Golang`
 
-3. Create `local.properties` on project root with 
+3. Create `local.properties` in project root with 
 
    ```properties
    sdk.dir=/path/to/android-sdk
@@ -45,7 +45,7 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
    appcenter.key=<AppCenter Key>    # Optional, from "appcenter.ms"
    ```
 
-4. Create `keystore.properties` on project root with
+4. Create `keystore.properties` in project root with
 
    ```properties
    storeFile=/path/to/keystore/file
