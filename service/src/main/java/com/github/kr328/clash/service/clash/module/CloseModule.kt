@@ -9,7 +9,7 @@ class CloseModule : Module() {
 
     private var callback: () -> Unit = {}
 
-    fun onClose(cb: () -> Unit) {
+    fun onClosed(cb: () -> Unit) {
         callback = cb
     }
 

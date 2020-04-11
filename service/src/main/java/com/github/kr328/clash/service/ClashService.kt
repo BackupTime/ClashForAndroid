@@ -45,7 +45,7 @@ class ClashService : BaseService() {
                 }
             }
             runtime.install(CloseModule()) {
-                onClose {
+                onClosed {
                     reason = null
 
                     stopSelf()

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
-        private const val VPN_MTU = 65535
+        private const val VPN_MTU = 9000
         private const val PRIVATE_VLAN4_SUBNET = 30
         private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
         private const val PRIVATE_VLAN4_MIRROR = "172.31.255.254"
@@ -57,7 +57,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 }
             }
             runtime.install(CloseModule()) {
-                onClose {
+                onClosed {
                     launch {
                         reason = null
 
@@ -149,6 +149,5 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                     settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toList()
                 } else emptyList()
             }
-
     }
 }
