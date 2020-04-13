@@ -18,10 +18,12 @@ import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
-import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.common.util.intent
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.withTimeout
 
 class ProfileBackgroundService : BaseService() {
     private val self = this
@@ -85,8 +87,8 @@ class ProfileBackgroundService : BaseService() {
         val queue: MutableSet<Long> = mutableSetOf()
         val responses = Channel<Pair<Long, Exception?>>(Channel.UNLIMITED)
 
-        do {
-            select<Unit> {
+        while (true) {
+            val stop = select<Boolean> {
                 requests.onReceive {
                     ProfileReceiver.cancelNextUpdate(self, it)
 
@@ -101,17 +103,28 @@ class ProfileBackgroundService : BaseService() {
 
                         override fun send(data: ParcelableContainer?) {}
                     })
+
+                    false
                 }
                 responses.onReceive {
                     if (it.second == null)
                         sendUpdateCompleted(it.first)
                     else
                         sendUpdateFailed(it.first, it.second!!.message ?: "Unknown")
+
+                    false
+                }
+                if ( queue.isEmpty() ) {
+                    launch { delay(1000 * 10) }.onJoin {
+                        true
+                    }
                 }
             }
 
             refreshStatusNotification(queue.size)
-        } while (queue.isNotEmpty())
+
+            if ( stop ) break
+        }
 
         stopSelf()
     }
