@@ -55,7 +55,7 @@ class ProfileService : BaseService() {
             override fun acquireUnused(type: String): Long {
                 return runBlocking {
                     lock.withLock {
-                        val id = (ProfileDao.queryAllIds() + pending.keys).max()?.plus(1) ?: 0
+                        val id = generateNextId()
 
                         pending[id] = ProfileMetadata(
                             id = id,
@@ -80,9 +80,9 @@ class ProfileService : BaseService() {
 
             override fun acquireCloned(id: Long): Long {
                 return runBlocking {
-                    val clonedId = (ProfileDao.queryAllIds() + pending.keys).max()?.plus(1) ?: 0
+                    val clonedId = generateNextId()
 
-                    pending[clonedId] = queryMetadataById(id) ?: return@runBlocking -1
+                    pending[clonedId] = queryMetadataById(id) ?: return@runBlocking -1L
 
                     clonedId
                 }
@@ -183,5 +183,9 @@ class ProfileService : BaseService() {
 
     private suspend fun queryMetadataById(id: Long): ProfileMetadata? {
         return pending[id] ?: ProfileDao.queryById(id)?.toProfileMetadata(service)
+    }
+
+    private suspend fun generateNextId(): Long {
+        return (ProfileDao.queryAllIds() + pending.keys).max()?.plus(1) ?: 0
     }
 }

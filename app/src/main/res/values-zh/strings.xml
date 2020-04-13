@@ -59,7 +59,6 @@
     <string name="history">历史</string>
     <string name="import_from_file">从文件导入</string>
     <string name="import_from_url">从 URL 导入</string>
-    <string name="seconds">秒</string>
     <string name="interface_">界面</string>
     <string name="invalid_interval">无效的间隔</string>
     <string name="invalid_url">无效的 URL</string>
@@ -131,4 +130,8 @@
     <string name="reinstall_from_google_play">重新从 Google Play 安装</string>
     <string name="download_from_github_releases">从 Github Release 下载</string>
     <string name="missing_vpn_component">系统 VPN 组件缺失</string>
+    <string name="profile_not_found">配置文件丢失</string>
+    <string name="more_than_15_minutes">大于15分钟</string>
+    <string name="loading">载入中</string>
+    <string name="clone_profile">复制配置</string>
 </resources>

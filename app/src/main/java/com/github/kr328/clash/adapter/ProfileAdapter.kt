@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
-import com.github.kr328.clash.service.data.ProfileEntity
+import com.github.kr328.clash.service.model.ProfileMetadata
 import com.github.kr328.clash.utils.IntervalUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,12 +17,12 @@ import kotlinx.coroutines.withContext
 class ProfileAdapter(private val context: Context, private val callback: Callback) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     interface Callback {
-        fun onProfileClicked(entity: ProfileEntity)
-        fun onMenuClicked(entity: ProfileEntity)
+        fun onProfileClicked(entity: ProfileMetadata)
+        fun onMenuClicked(entity: ProfileMetadata)
         fun onNewProfile()
     }
 
-    private var entities: List<ProfileEntity> = emptyList()
+    private var entities: List<ProfileMetadata> = emptyList()
 
     class EntityHolder(view: View) : RecyclerView.ViewHolder(view) {
         val root: View = view.findViewById(R.id.root)
@@ -37,7 +37,7 @@ class ProfileAdapter(private val context: Context, private val callback: Callbac
         val root: View = view.findViewById(R.id.root)
     }
 
-    suspend fun setEntitiesAsync(new: List<ProfileEntity>) {
+    suspend fun setEntitiesAsync(new: List<ProfileMetadata>) {
         val old = withContext(Dispatchers.Main) {
             entities
         }
@@ -101,7 +101,7 @@ class ProfileAdapter(private val context: Context, private val callback: Callbac
                 holder.radio.isChecked = current.active
                 holder.name.text = current.name
                 holder.type.text = getTypeName(current.type)
-                holder.interval.text = offsetDate(current.lastUpdate)
+                holder.interval.text = offsetDate(current.lastModified)
 
                 holder.root.setOnClickListener {
                     callback.onProfileClicked(current)
@@ -118,13 +118,13 @@ class ProfileAdapter(private val context: Context, private val callback: Callbac
         }
     }
 
-    private fun getTypeName(type: Int): CharSequence {
+    private fun getTypeName(type: ProfileMetadata.Type): CharSequence {
         return when (type) {
-            ProfileEntity.TYPE_FILE ->
+            ProfileMetadata.Type.FILE ->
                 context.getText(R.string.file)
-            ProfileEntity.TYPE_URL ->
+            ProfileMetadata.Type.URL ->
                 context.getText(R.string.url)
-            ProfileEntity.TYPE_EXTERNAL ->
+            ProfileMetadata.Type.EXTERNAL ->
                 context.getText(R.string.external)
             else ->
                 context.getText(R.string.unknown)

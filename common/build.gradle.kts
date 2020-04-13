@@ -18,6 +18,7 @@ val gVersionName: String by rootExtra
 val gKotlinVersion: String by rootExtra
 val gKotlinCoroutineVersion: String by rootExtra
 val gAndroidKtxVersion: String by rootExtra
+val gKotlinSerializationVersion: String by rootExtra
 
 android {
     compileSdkVersion(gCompileSdkVersion)
@@ -54,6 +55,7 @@ dependencies {
     implementation("androidx.core:core-ktx:$gAndroidKtxVersion")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$gKotlinCoroutineVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$gKotlinSerializationVersion")
 }
 
 repositories {

@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import com.github.kr328.clash.core.model.General
+import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.utils.asBytesString
+import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.utils.startClashService
 import com.github.kr328.clash.utils.stopClashService
 import kotlinx.android.synthetic.main.activity_main.*
@@ -37,10 +37,9 @@ class MainActivity : BaseActivity() {
                 val vpnRequest = startClashService()
                 if (vpnRequest != null) {
                     val resolved = packageManager.resolveActivity(vpnRequest, 0)
-                    if ( resolved != null ) {
+                    if (resolved != null) {
                         startActivityForResult(vpnRequest, REQUEST_CODE)
-                    }
-                    else {
+                    } else {
                         makeSnackbarException(getString(R.string.missing_vpn_component), null)
                     }
                 }
@@ -160,7 +159,7 @@ class MainActivity : BaseActivity() {
                 queryGeneral()
             }
             val active = withProfile {
-                queryActiveProfile()
+                queryActive()
             }
 
             val modeResId = when (general.mode) {

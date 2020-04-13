@@ -20,12 +20,6 @@ abstract class BaseService : Service(), CoroutineScope by MainScope() {
         super.attachBaseContext(base.createLanguageConfigurationContext(language))
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
-        Clash.initialize(this)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
 

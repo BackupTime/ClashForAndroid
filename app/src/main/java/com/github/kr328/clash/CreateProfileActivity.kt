@@ -14,6 +14,8 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.remote.withProfile
+import com.github.kr328.clash.service.model.ProfileMetadata.Type
 import kotlinx.android.synthetic.main.activity_create_profile.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,12 +43,16 @@ class CreateProfileActivity : BaseActivity() {
             mainList.setOnItemClickListener { _, _, position, _ ->
                 val item = providers[position]
 
-                startActivityForResult(
-                    ProfileEditActivity::class.intent
-                        .putExtra("type", item.type)
-                        .putExtra("intent", item.intent),
-                    REQUEST_CODE
-                )
+                launch {
+                    val id = withProfile {
+                        acquireUnused(item.type)
+                    }
+
+                    startActivityForResult(
+                        ProfileEditActivity::class.intent.putExtra("id", id),
+                        REQUEST_CODE
+                    )
+                }
             }
             mainList.setOnItemLongClickListener { _, _, position, _ ->
                 val item = providers[position]
@@ -80,14 +86,14 @@ class CreateProfileActivity : BaseActivity() {
                     getText(R.string.file),
                     getText(R.string.import_from_file),
                     getDrawable(R.drawable.ic_file)!!,
-                    Constants.URL_PROVIDER_TYPE_FILE,
+                    Type.FILE,
                     null
                 ),
                 UrlProvider(
                     getText(R.string.url),
                     getText(R.string.import_from_url),
                     getDrawable(R.drawable.ic_download)!!,
-                    Constants.URL_PROVIDER_TYPE_URL,
+                    Type.URL,
                     null
                 )
             )
@@ -101,7 +107,7 @@ class CreateProfileActivity : BaseActivity() {
                 val name = activity.applicationInfo.loadLabel(packageManager)
                 val summary = activity.loadLabel(packageManager)
                 val icon = activity.loadIcon(packageManager)
-                val type = Constants.URL_PROVIDER_TYPE_EXTERNAL
+                val type = Type.EXTERNAL
                 val intent = Intent(Constants.URL_PROVIDER_INTENT_ACTION)
                     .setComponent(
                         ComponentName.createRelative(
@@ -120,7 +126,7 @@ class CreateProfileActivity : BaseActivity() {
         val name: CharSequence,
         val summary: CharSequence,
         val icon: Drawable,
-        val type: String,
+        val type: Type,
         val intent: Intent?
     )
 

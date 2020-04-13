@@ -1,25 +1,27 @@
 package com.github.kr328.clash
 
+import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.ProfileAdapter
-import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.common.ids.Intents
-import com.github.kr328.clash.service.ProfileBackgroundService
-import com.github.kr328.clash.service.data.ProfileEntity
-import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.common.util.componentName
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.util.startForegroundServiceCompat
+import com.github.kr328.clash.remote.withProfile
+import com.github.kr328.clash.service.ProfileBackgroundService
+import com.github.kr328.clash.service.ProfileProvider
+import com.github.kr328.clash.service.model.ProfileMetadata
 import com.github.kr328.clash.weight.ProfilesMenu
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_profiles.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import java.io.FileNotFoundException
 import java.util.*
 
 class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.Callback {
@@ -27,9 +29,10 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         private const val EDITOR_REQUEST_CODE = 30000
     }
 
+    private val self = this
     private var backgroundJob: Job? = null
     private val reloadMutex = Mutex()
-    private val editorStack = Stack<String>()
+    private val editorStack = Stack<Long>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,10 +68,13 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EDITOR_REQUEST_CODE) {
             launch {
-                val uri = editorStack.pop()
+                val id = editorStack.pop()
 
                 withProfile {
-                    commitProfileEditUri(uri)
+                    if (resultCode == Activity.RESULT_OK)
+                        commitAsync(id)
+                    else
+                        ProfileProvider.releaseTemp(self, id)
                 }
             }
 
@@ -87,24 +93,23 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
             return
 
         val profiles = withProfile {
-            queryProfiles()
+            queryAll()
         }
 
-        (mainList.adapter as ProfileAdapter)
-            .setEntitiesAsync(profiles.toList())
+        (mainList.adapter as ProfileAdapter).setEntitiesAsync(profiles.toList())
 
         reloadMutex.unlock()
     }
 
-    override fun onProfileClicked(entity: ProfileEntity) {
+    override fun onProfileClicked(entity: ProfileMetadata) {
         launch {
             withProfile {
-                setActiveProfile(entity.id)
+                setActive(entity.id)
             }
         }
     }
 
-    override fun onMenuClicked(entity: ProfileEntity) {
+    override fun onMenuClicked(entity: ProfileMetadata) {
         ProfilesMenu(this, entity, this).show()
     }
 
@@ -112,96 +117,80 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         startActivity(CreateProfileActivity::class.intent)
     }
 
-    private fun deleteProfile(entity: ProfileEntity) = launch {
-        val request = ProfileRequest().action(ProfileRequest.Action.REMOVE).withId(entity.id)
+    private fun openProperties(id: Long) {
+        if (id < 0) {
+            Snackbar.make(rootView, getText(R.string.profile_not_found), Snackbar.LENGTH_LONG)
+                .show()
+            return
+        }
 
-        withProfile {
-            enqueueRequest(request)
+        startActivity(ProfileEditActivity::class.intent.putExtra("id", id))
+    }
+
+    private fun openEditor(id: Long) = launch {
+        try {
+            if (id < 0)
+                throw FileNotFoundException()
+
+            val uri = ProfileProvider.acquireTemp(self, id)
+
+            editorStack.push(id)
+
+            startActivityForResult(
+                Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(uri, "text/plain")
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
+                EDITOR_REQUEST_CODE
+            )
+        } catch (e: Exception) {
+            Snackbar.make(rootView, getText(R.string.profile_not_found), Snackbar.LENGTH_LONG)
+                .show()
         }
     }
 
-    private fun resetProviders(entity: ProfileEntity) = launch {
-        val request = ProfileRequest().action(ProfileRequest.Action.CLEAR).withId(entity.id)
-
-        withProfile {
-            enqueueRequest(request)
-        }
-    }
-
-    private fun openPropertiesEditor(entity: ProfileEntity, duplicate: Boolean) {
-        val type = when (entity.type) {
-            ProfileEntity.TYPE_FILE ->
-                Constants.URL_PROVIDER_TYPE_FILE
-            ProfileEntity.TYPE_URL ->
-                Constants.URL_PROVIDER_TYPE_URL
-            ProfileEntity.TYPE_EXTERNAL ->
-                Constants.URL_PROVIDER_TYPE_EXTERNAL
-            else -> throw IllegalArgumentException("Invalid type ${entity.type}")
-        }
-        val intent = entity.source?.run { Intent.parseUri(this, 0) }
-        val name = entity.name
-        val uri = entity.uri
-        val interval = entity.updateInterval.toString()
-
-        val editor = ProfileEditActivity::class.intent
-            .putExtra("id", if (duplicate) -1L else entity.id)
-            .putExtra("type", if (duplicate) Constants.URL_PROVIDER_TYPE_FILE else type)
-            .putExtra("intent", intent)
-            .putExtra("name", name)
-            .putExtra("url", uri)
-            .putExtra("interval", if (duplicate) "0" else interval)
-
-        startActivity(editor)
-    }
-
-    private fun openEditor(entity: ProfileEntity) = launch {
-        val uri = withProfile {
-            requestProfileEditUri(entity.id)
-        } ?: return@launch
-
-        editorStack.push(uri)
-
-        startActivityForResult(
-            Intent(Intent.ACTION_VIEW)
-                .setDataAndType(Uri.parse(uri), "text/plain")
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
-            EDITOR_REQUEST_CODE
-        )
-    }
-
-    private fun startUpdate(entity: ProfileEntity) {
-        val request = ProfileRequest()
-            .action(ProfileRequest.Action.UPDATE_OR_CREATE)
-            .withId(entity.id)
-
+    private fun startUpdate(id: Long) {
         val intent = Intent(Intents.INTENT_ACTION_PROFILE_REQUEST_UPDATE)
             .setComponent(ProfileBackgroundService::class.componentName)
-            .putExtra(Intents.INTENT_EXTRA_PROFILE_REQUEST, request)
+            .putExtra(Intents.INTENT_EXTRA_PROFILE_ID, id)
 
         startForegroundServiceCompat(intent)
     }
 
-    override fun onOpenEditor(entity: ProfileEntity) {
-        openEditor(entity)
+    override fun onOpenEditor(entity: ProfileMetadata) {
+        openEditor(entity.id)
     }
 
-    override fun onUpdate(entity: ProfileEntity) {
-        startUpdate(entity)
+    override fun onUpdate(entity: ProfileMetadata) {
+        startUpdate(entity.id)
     }
 
-    override fun onOpenProperties(entity: ProfileEntity) {
-        openPropertiesEditor(entity, false)
+    override fun onOpenProperties(entity: ProfileMetadata) {
+        openProperties(entity.id)
     }
 
-    override fun onDuplicate(entity: ProfileEntity) {
-        openPropertiesEditor(entity, true)
+    override fun onDuplicate(entity: ProfileMetadata) {
+        launch {
+            withProfile {
+                val newId = acquireCloned(entity.id)
+
+                openProperties(newId)
+            }
+        }
     }
 
-    override fun onResetProvider(entity: ProfileEntity) {
-        resetProviders(entity)
+    override fun onResetProvider(entity: ProfileMetadata) {
+        launch {
+            withProfile {
+                clear(entity.id)
+            }
+        }
     }
 
-    override fun onDelete(entity: ProfileEntity) {
-        deleteProfile(entity)
+    override fun onDelete(entity: ProfileMetadata) {
+        launch {
+            withProfile {
+                delete(entity.id)
+            }
+        }
     }
 }

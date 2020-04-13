@@ -13,9 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.github.kr328.clash.common.util.createLanguageConfigurationContext
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.Broadcasts
-import com.github.kr328.clash.common.util.createLanguageConfigurationContext
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -213,7 +213,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     private fun resolveActivityTitle(): CharSequence {
         val info = packageManager.getActivityInfo(componentName, 0)
 
-        if ( info.labelRes <= 0 )
+        if (info.labelRes <= 0)
             return title
 
         return resources.getText(info.labelRes)
