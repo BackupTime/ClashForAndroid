@@ -47,8 +47,7 @@ class ProfileService : BaseService() {
             override fun cancel(id: Long) {
                 launch {
                     lock.withLock {
-                        if (pending.remove(id) != null)
-                            service.resolveBaseDir(id).deleteRecursively()
+                        pending.remove(id)
                     }
                 }
             }
