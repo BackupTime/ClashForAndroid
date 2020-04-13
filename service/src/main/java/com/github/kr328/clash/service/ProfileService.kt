@@ -20,7 +20,7 @@ import java.util.*
 class ProfileService : BaseService() {
     private val service = this
     private val lock = Mutex()
-    private val pending = Collections.synchronizedMap(mutableMapOf<Long, ProfileMetadata>())
+    private val pending = mutableMapOf<Long, ProfileMetadata>()
     private val tasks = mutableMapOf<Long, IStreamCallback?>()
     private val request = Channel<Unit>(Channel.CONFLATED)
 
