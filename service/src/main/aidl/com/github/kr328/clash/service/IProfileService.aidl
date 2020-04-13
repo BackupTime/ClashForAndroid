@@ -6,6 +6,7 @@ import com.github.kr328.clash.service.model.ProfileMetadata;
 
 interface IProfileService {
     long acquireUnused(String type);
+    long acquireCloned(long id);
     void updateMetadata(long id, in ProfileMetadata metadata);
     void commit(long id, in IStreamCallback callback);
     void cancel(long id);

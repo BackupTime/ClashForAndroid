@@ -78,6 +78,16 @@ class ProfileService : BaseService() {
                 }
             }
 
+            override fun acquireCloned(id: Long): Long {
+                return runBlocking {
+                    val clonedId = (ProfileDao.queryAllIds() + pending.keys).max()?.plus(1) ?: 0
+
+                    pending[clonedId] = queryMetadataById(id) ?: return@runBlocking -1
+
+                    clonedId
+                }
+            }
+
             override fun queryActive(): ProfileMetadata? {
                 return runBlocking {
                     ProfileDao.queryActive()?.toProfileMetadata(service)
