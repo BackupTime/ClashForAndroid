@@ -2,9 +2,9 @@ package com.github.kr328.clash.service
 
 import android.app.Service
 import android.content.Context
+import com.github.kr328.clash.common.util.createLanguageConfigurationContext
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.settings.ServiceSettings
-import com.github.kr328.clash.common.util.createLanguageConfigurationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel

@@ -15,15 +15,14 @@ import androidx.core.app.NotificationManagerCompat
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
+import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
-import com.github.kr328.clash.common.util.intent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.withTimeout
 
 class ProfileBackgroundService : BaseService() {
     private val self = this
@@ -114,7 +113,7 @@ class ProfileBackgroundService : BaseService() {
 
                     false
                 }
-                if ( queue.isEmpty() ) {
+                if (queue.isEmpty()) {
                     launch { delay(1000 * 10) }.onJoin {
                         true
                     }
@@ -123,7 +122,7 @@ class ProfileBackgroundService : BaseService() {
 
             refreshStatusNotification(queue.size)
 
-            if ( stop ) break
+            if (stop) break
         }
 
         stopSelf()

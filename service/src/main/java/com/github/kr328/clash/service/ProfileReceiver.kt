@@ -8,11 +8,11 @@ import android.content.Intent
 import androidx.core.content.getSystemService
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.PendingIds
-import com.github.kr328.clash.service.data.ProfileDao
-import com.github.kr328.clash.service.model.toProfileMetadata
 import com.github.kr328.clash.common.util.componentName
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.util.startForegroundServiceCompat
+import com.github.kr328.clash.service.data.ProfileDao
+import com.github.kr328.clash.service.model.toProfileMetadata
 
 class ProfileReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -36,7 +36,7 @@ class ProfileReceiver : BroadcastReceiver() {
 
         @Synchronized
         fun tryInitialize(context: Context) {
-            if ( initialized )
+            if (initialized)
                 return
             initialized = true
 

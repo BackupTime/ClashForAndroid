@@ -5,9 +5,9 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.common.utils.asBytesString
 import com.github.kr328.clash.common.utils.asSpeedString
+import com.github.kr328.clash.core.Clash
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

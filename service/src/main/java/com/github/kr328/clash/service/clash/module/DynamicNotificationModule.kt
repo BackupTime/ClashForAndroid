@@ -8,9 +8,9 @@ import androidx.core.app.NotificationCompat
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
-import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.common.utils.asBytesString
 import com.github.kr328.clash.common.utils.asSpeedString
+import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.ServiceStatusProvider
 import kotlinx.coroutines.Dispatchers
