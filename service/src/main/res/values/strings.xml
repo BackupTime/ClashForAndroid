@@ -5,7 +5,8 @@
     <string name="clash_service_status_channel">Clash Status</string>
     <string name="profile_service_status_channel">Profile Service Status</string>
     <string name="processing_profiles">Processing Profiles</string>
-    <string name="format_in_queue">%d items in Queue</string>
+    <string name="format_in_queue">%d items in queue</string>
+    <string name="waiting">Waiting</string>
     <string name="process_result">Process Result</string>
     <string name="format_update_complete">Update %s Completed</string>
     <string name="format_update_failure">Update %s Failure</string>

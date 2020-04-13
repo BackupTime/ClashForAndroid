@@ -159,9 +159,14 @@ class ProfileBackgroundService : BaseService() {
     }
 
     private fun refreshStatusNotification(queueSize: Int) {
+        val content = if ( queueSize != 0 )
+            getString(R.string.format_in_queue, queueSize)
+        else
+            getString(R.string.waiting)
+
         val notification = NotificationCompat.Builder(this, NotificationChannels.PROFILE_STATUS)
             .setContentTitle(getText(R.string.processing_profiles))
-            .setContentText(getString(R.string.format_in_queue, queueSize))
+            .setContentText(content)
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)

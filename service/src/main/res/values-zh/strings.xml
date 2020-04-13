@@ -15,4 +15,5 @@
     <string name="profiles_and_providers">配置文件和外部引用</string>
     <string name="profile_yaml">配置文件.yaml</string>
     <string name="provider_files">外部引用文件</string>
+    <string name="waiting">等待中</string>
 </resources>
