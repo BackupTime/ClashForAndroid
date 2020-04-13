@@ -4,20 +4,17 @@ import android.content.Context
 import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
 import com.github.kr328.clash.service.R
-import com.github.kr328.clash.service.data.ClashDatabase
-import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.service.data.ProfileDao
+import com.github.kr328.clash.service.util.resolveProfileFile
 import java.io.FileNotFoundException
 
-class ProfilesResolver(private val context: Context, private val database: ClashDatabase) {
+class ProfilesResolver(private val context: Context) {
     private val nextResolver = ProfileDirectoryResolver(context)
 
     suspend fun resolve(paths: List<String>): VirtualFile {
         return when (paths.size) {
             0 -> {
-                val files = database.openClashProfileDao()
-                    .queryProfiles()
-                    .map(ClashProfileEntity::id)
-                    .map(Long::toString)
+                val files = ProfileDao.queryAllIds().map(Long::toString)
 
                 object : VirtualFile {
                     override fun name(): String {
@@ -47,7 +44,7 @@ class ProfilesResolver(private val context: Context, private val database: Clash
             }
             1 -> {
                 val profile = paths[0].toLongOrNull()?.let {
-                    database.openClashProfileDao().queryProfileById(it)
+                    ProfileDao.queryById(it)
                 } ?: throw FileNotFoundException()
 
                 object : VirtualFile {
@@ -56,7 +53,7 @@ class ProfilesResolver(private val context: Context, private val database: Clash
                     }
 
                     override fun lastModified(): Long {
-                        return profile.lastUpdate
+                        return context.resolveProfileFile(profile.id).lastModified()
                     }
 
                     override fun size(): Long {

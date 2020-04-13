@@ -13,7 +13,6 @@ import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.ServiceStatusProvider
-import com.github.kr328.clash.service.data.ClashDatabase
 
 class StaticNotificationModule(private val service: Service) : Module() {
     override val receiveBroadcasts: Set<String>
@@ -51,7 +50,7 @@ class StaticNotificationModule(private val service: Service) : Module() {
         service.stopForeground(true)
     }
 
-    private suspend fun update() {
+    private fun update() {
         val profileName = ServiceStatusProvider.currentProfile ?: "Not selected"
 
         val notification = builder

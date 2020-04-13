@@ -9,7 +9,7 @@ object Intents {
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.clash.stopped"
     const val INTENT_ACTION_PROFILE_CHANGED =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.changed"
-    const val INTENT_ACTION_PROFILE_ENQUEUE_REQUEST =
+    const val INTENT_ACTION_PROFILE_REQUEST_UPDATE =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.enqueue.request"
     const val INTENT_ACTION_PROFILE_SETUP =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.setup"
@@ -24,8 +24,6 @@ object Intents {
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.clash.stop.reason"
     const val INTENT_EXTRA_PROFILE_REQUEST =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.request"
-    const val INTENT_EXTRA_START_TUN =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.start.tun"
     const val INTENT_EXTRA_PROFILE_ID =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.id"
 }

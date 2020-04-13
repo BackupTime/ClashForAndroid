@@ -10,9 +10,9 @@ import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.utils.asBytesString
+import com.github.kr328.clash.core.utils.asSpeedString
 import com.github.kr328.clash.service.R
 import com.github.kr328.clash.service.ServiceStatusProvider
-import com.github.kr328.clash.service.data.ClashDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -68,8 +68,8 @@ class DynamicNotificationModule(private val service: Service) : Module() {
         val traffic = Clash.queryTraffic()
         val bandwidth = Clash.queryBandwidth()
 
-        val uploading = traffic.upload.asBytesString()
-        val downloading = traffic.download.asBytesString()
+        val uploading = traffic.upload.asSpeedString()
+        val downloading = traffic.download.asSpeedString()
         val uploaded = bandwidth.upload.asBytesString()
         val downloaded = bandwidth.download.asBytesString()
 

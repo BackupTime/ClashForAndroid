@@ -5,9 +5,10 @@ import android.content.Intent
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.ServiceStatusProvider
-import com.github.kr328.clash.service.data.ClashDatabase
-import com.github.kr328.clash.service.util.resolveBase
-import com.github.kr328.clash.service.util.resolveProfile
+import com.github.kr328.clash.service.data.ProfileDao
+import com.github.kr328.clash.service.data.SelectedProxyDao
+import com.github.kr328.clash.service.util.resolveBaseDir
+import com.github.kr328.clash.service.util.resolveProfileFile
 import kotlinx.coroutines.sync.Mutex
 
 class ReloadModule(private val context: Context) : Module() {
@@ -40,20 +41,19 @@ class ReloadModule(private val context: Context) : Module() {
 
     private suspend fun reload() {
         try {
-            val database = ClashDatabase.getInstance(context)
-            val profileDao = database.openClashProfileDao()
-            val proxyDao = database.openClashProfileProxyDao()
-
-            val active = profileDao.queryActiveProfile()
+            val active = ProfileDao.queryActive()
                 ?: throw NullPointerException("No profile selected")
 
-            Clash.loadProfile(resolveProfile(active.id), resolveBase(active.id)).await()
+            Clash.loadProfile(
+                context.resolveProfileFile(active.id),
+                context.resolveBaseDir(active.id)
+            ).await()
 
-            val remove = proxyDao.querySelectedForProfile(active.id)
+            val remove = SelectedProxyDao.querySelectedForProfile(active.id)
                 .filterNot { Clash.setSelectedProxy(it.proxy, it.selected) }
                 .map { it.selected }
 
-            proxyDao.removeSelectedForProfile(active.id, remove)
+            SelectedProxyDao.removeSelectedForProfile(active.id, remove)
 
             ServiceStatusProvider.currentProfile = active.name
 

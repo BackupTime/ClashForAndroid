@@ -2,7 +2,7 @@ package com.github.kr328.clash
 
 import android.app.Application
 import android.content.Context
-import com.github.kr328.clash.core.Global
+import com.github.kr328.clash.common.Global
 import com.github.kr328.clash.dump.LogcatDumper
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.remote.Remote

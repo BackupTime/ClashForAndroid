@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
-import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.service.data.ProfileEntity
 import com.github.kr328.clash.utils.IntervalUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,12 +17,12 @@ import kotlinx.coroutines.withContext
 class ProfileAdapter(private val context: Context, private val callback: Callback) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     interface Callback {
-        fun onProfileClicked(entity: ClashProfileEntity)
-        fun onMenuClicked(entity: ClashProfileEntity)
+        fun onProfileClicked(entity: ProfileEntity)
+        fun onMenuClicked(entity: ProfileEntity)
         fun onNewProfile()
     }
 
-    private var entities: List<ClashProfileEntity> = emptyList()
+    private var entities: List<ProfileEntity> = emptyList()
 
     class EntityHolder(view: View) : RecyclerView.ViewHolder(view) {
         val root: View = view.findViewById(R.id.root)
@@ -37,7 +37,7 @@ class ProfileAdapter(private val context: Context, private val callback: Callbac
         val root: View = view.findViewById(R.id.root)
     }
 
-    suspend fun setEntitiesAsync(new: List<ClashProfileEntity>) {
+    suspend fun setEntitiesAsync(new: List<ProfileEntity>) {
         val old = withContext(Dispatchers.Main) {
             entities
         }
@@ -120,11 +120,11 @@ class ProfileAdapter(private val context: Context, private val callback: Callbac
 
     private fun getTypeName(type: Int): CharSequence {
         return when (type) {
-            ClashProfileEntity.TYPE_FILE ->
+            ProfileEntity.TYPE_FILE ->
                 context.getText(R.string.file)
-            ClashProfileEntity.TYPE_URL ->
+            ProfileEntity.TYPE_URL ->
                 context.getText(R.string.url)
-            ClashProfileEntity.TYPE_EXTERNAL ->
+            ProfileEntity.TYPE_EXTERNAL ->
                 context.getText(R.string.external)
             else ->
                 context.getText(R.string.unknown)

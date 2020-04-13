@@ -2,7 +2,6 @@ package com.github.kr328.clash.service
 
 import android.content.Intent
 import android.net.VpnService
-import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.clash.ClashRuntime
 import com.github.kr328.clash.service.clash.module.*
 import com.github.kr328.clash.service.settings.ServiceSettings
@@ -28,8 +27,6 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
     override fun onCreate() {
         super.onCreate()
-
-        Clash.initialize(this)
 
         if (ServiceStatusProvider.serviceRunning)
             return stopSelf()

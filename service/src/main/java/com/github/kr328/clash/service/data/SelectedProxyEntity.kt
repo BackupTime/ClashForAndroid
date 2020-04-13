@@ -5,9 +5,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 
 @Entity(
-    tableName = "profile_select_proxies",
+    tableName = "selected_proxies",
     foreignKeys = [ForeignKey(
-        entity = ClashProfileEntity::class,
+        entity = ProfileEntity::class,
         childColumns = ["profile_id"],
         parentColumns = ["id"],
         onDelete = ForeignKey.CASCADE,
@@ -15,7 +15,7 @@ import androidx.room.ForeignKey
     )],
     primaryKeys = ["profile_id", "proxy"]
 )
-data class ClashProfileProxyEntity(
+data class SelectedProxyEntity(
     @ColumnInfo(name = "profile_id") val profileId: Long,
     @ColumnInfo(name = "proxy") val proxy: String,
     @ColumnInfo(name = "selected") val selected: String

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.github.kr328.clash.common.Permissions
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.clash.module.Module
 import kotlinx.coroutines.channels.Channel
@@ -65,7 +66,7 @@ class ClashRuntime(private val context: Context) {
                     modules.flatMap { it.receiveBroadcasts }.distinct().forEach {
                         addAction(it)
                     }
-                })
+                }, Permissions.PERMISSION_ACCESS_CLASH, null)
 
                 while (isActive) {
                     tickerEnabled = modules.any { it.enableTicker }

@@ -3,6 +3,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application>
         <service
@@ -28,11 +29,6 @@
             android:process=":background" />
         <service
             android:name=".ProfileBackgroundService"
-            android:exported="false"
-            android:process=":background" />
-
-        <receiver
-            android:name=".ProfileRequestReceiver"
             android:exported="false"
             android:process=":background" />
 
@@ -66,5 +62,11 @@
             android:authorities="${applicationId}.settings"
             android:exported="false"
             android:process=":background" />
+
+        <receiver
+            android:name=".ProfileReceiver"
+            android:exported="false"
+            android:process=":background"
+            android:permission="${applicationId}.permission.RECEIVE_BROADCASTS" />
     </application>
 </manifest>

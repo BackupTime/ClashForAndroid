@@ -7,7 +7,6 @@ import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract.Document
 import android.provider.DocumentsContract.Root
 import android.provider.DocumentsProvider
-import com.github.kr328.clash.service.data.ClashDatabase
 import com.github.kr328.clash.service.files.ProfilesResolver
 import kotlinx.coroutines.runBlocking
 
@@ -33,7 +32,7 @@ class ProfileDocumentProvider : DocumentsProvider() {
     }
 
     private val resolver: ProfilesResolver by lazy {
-        ProfilesResolver(context!!, ClashDatabase.getInstance(context!!))
+        ProfilesResolver(context!!)
     }
 
     override fun openDocument(

@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
 import com.github.kr328.clash.service.R
-import com.github.kr328.clash.service.util.resolveBase
-import com.github.kr328.clash.service.util.resolveProfile
+import com.github.kr328.clash.service.util.resolveBaseDir
+import com.github.kr328.clash.service.util.resolveProfileFile
 import java.io.FileNotFoundException
 
 class ProfileDirectoryResolver(private val context: Context) {
@@ -14,7 +14,7 @@ class ProfileDirectoryResolver(private val context: Context) {
         const val FILE_NAME_PROVIDER = "providers"
     }
 
-    private val nextResolver = ProviderResolver()
+    private val nextResolver = ProviderResolver(context)
 
     fun resolve(id: Long, paths: List<String>): VirtualFile {
         if (paths.size == 1) {
@@ -35,7 +35,7 @@ class ProfileDirectoryResolver(private val context: Context) {
                 }
 
                 override fun size(): Long {
-                    return resolveProfile(id).length()
+                    return context.resolveProfileFile(id).length()
                 }
 
                 override fun mimeType(): String {
@@ -51,7 +51,7 @@ class ProfileDirectoryResolver(private val context: Context) {
 
                 override fun listFiles(): List<String> {
                     if (paths[0] == FILE_NAME_PROVIDER) {
-                        return resolveBase(id).list()?.toList() ?: emptyList()
+                        return context.resolveBaseDir(id).list()?.toList() ?: emptyList()
                     }
 
                     return emptyList()
@@ -59,7 +59,7 @@ class ProfileDirectoryResolver(private val context: Context) {
 
                 override fun openFile(mode: Int): ParcelFileDescriptor {
                     return if (paths[0] == FILE_NAME_CONFIG)
-                        ParcelFileDescriptor.open(resolveProfile(id), mode)
+                        ParcelFileDescriptor.open(context.resolveProfileFile(id), mode)
                     else
                         throw UnsupportedOperationException()
                 }

@@ -2,91 +2,71 @@ package com.github.kr328.clash.service
 
 import android.content.Context
 import android.net.Uri
-import androidx.core.content.FileProvider
+import android.webkit.URLUtil
 import com.github.kr328.clash.core.Clash
-import com.github.kr328.clash.service.data.ClashDatabase
-import com.github.kr328.clash.service.data.ClashProfileEntity
-import com.github.kr328.clash.service.util.resolveBase
-import com.github.kr328.clash.service.util.resolveProfile
+import com.github.kr328.clash.service.data.ProfileDao
+import com.github.kr328.clash.service.model.ProfileMetadata
+import com.github.kr328.clash.service.model.ProfileMetadata.Type
+import com.github.kr328.clash.service.model.toProfileEntity
+import com.github.kr328.clash.service.util.resolveBaseDir
+import com.github.kr328.clash.service.util.resolveProfileFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
+import java.util.*
 
-class ProfileProcessor(private val context: Context) {
-    suspend fun createOrUpdate(entity: ClashProfileEntity, newRecord: Boolean) {
-        val database = ClashDatabase.getInstance(context).openClashProfileDao()
+object ProfileProcessor {
+    suspend fun createOrUpdate(context: Context, metadata: ProfileMetadata) =
+        withContext(Dispatchers.IO) {
+            metadata.enforceFieldValid()
 
-        val uri = Uri.parse(entity.uri)
-        if (uri == null || uri == Uri.EMPTY)
-            throw IllegalArgumentException("Invalid uri $uri")
-
-        downloadProfile(
-            uri,
-            resolveProfile(entity.id),
-            resolveBase(entity.id),
-            newRecord
-        )
-
-        val newEntity = if (entity.type == ClashProfileEntity.TYPE_FILE)
-            entity.copy(
-                lastUpdate = System.currentTimeMillis(),
-                uri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}${Constants.PROFILE_PROVIDER_SUFFIX}",
-                    resolveProfile(entity.id)
-                ).toString()
+            downloadProfile(
+                context, metadata.uri,
+                context.resolveProfileFile(metadata.id),
+                context.resolveBaseDir(metadata.id)
             )
-        else
-            entity.copy(lastUpdate = System.currentTimeMillis())
 
-        if (newRecord)
-            database.addProfile(newEntity)
-        else
-            database.updateProfile(newEntity)
-    }
+            val entity = metadata.toProfileEntity()
 
-    suspend fun remove(id: Long) {
-        val database = ClashDatabase.getInstance(context).openClashProfileDao()
-
-        resolveProfile(id).delete()
-        resolveBase(id).deleteRecursively()
-
-        database.removeProfile(id)
-    }
-
-    fun clear(id: Long) {
-        resolveBase(id).listFiles()?.forEach {
-            it.deleteRecursively()
+            if (ProfileDao.queryById(metadata.id) == null)
+                ProfileDao.insert(entity)
+            else
+                ProfileDao.update(entity)
         }
-    }
 
     private suspend fun downloadProfile(
+        context: Context,
         source: Uri,
         target: File,
-        baseDir: File,
-        newRecord: Boolean
-    ) {
-        try {
-            target.parentFile?.mkdirs()
-            baseDir.mkdirs()
-
-            if (source.scheme.equals("content", ignoreCase = true)
-                || source.scheme.equals("file", ignoreCase = true)
-            ) {
-                val parcelFileDescriptor = context.contentResolver.openFileDescriptor(source, "r")
-                    ?: throw FileNotFoundException("Unable to open file $source")
-
-                val fd = parcelFileDescriptor.detachFd()
-
-                Clash.downloadProfile(fd, target, baseDir).await()
-            } else {
-                Clash.downloadProfile(source.toString(), target, baseDir).await()
+        baseDir: File
+    ) = withContext(Dispatchers.IO) {
+        when (source.scheme?.toLowerCase(Locale.getDefault())) {
+            "http", "https" ->
+                Clash.downloadProfile(source.toString(), target, baseDir)
+            "content", "file", "resource" -> {
+                val fd = context.contentResolver.openFileDescriptor(source, "r")
+                    ?: throw FileNotFoundException("$source not found")
+                Clash.downloadProfile(fd.detachFd(), target, baseDir)
             }
-        } catch (e: Exception) {
-            if (newRecord) {
-                target.delete()
-                baseDir.deleteRecursively()
-            }
-            throw e
+            else -> throw IllegalArgumentException("Invalid uri type")
+        }.await()
+    }
+
+    private fun ProfileMetadata.enforceFieldValid() {
+        when {
+            id < 0 ->
+                throw IllegalArgumentException("Invalid id")
+            name.isBlank() ->
+                throw IllegalArgumentException("Empty name")
+            type != Type.FILE && type != Type.URL && type != Type.EXTERNAL ->
+                throw IllegalArgumentException("Invalid type")
+            !URLUtil.isValidUrl(uri.toString()) ->
+                throw IllegalArgumentException("Invalid uri")
+            source?.let { URLUtil.isValidUrl(it.toString()) } == false ->
+                throw IllegalArgumentException("Invalid source")
+            interval < 0 ->
+                throw IllegalArgumentException("Invalid interval")
         }
     }
 }

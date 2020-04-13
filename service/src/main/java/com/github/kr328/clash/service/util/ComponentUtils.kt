@@ -2,7 +2,7 @@ package com.github.kr328.clash.service.util
 
 import android.content.ComponentName
 import android.content.Intent
-import com.github.kr328.clash.core.Global
+import com.github.kr328.clash.common.Global
 import kotlin.reflect.KClass
 
 val KClass<*>.componentName: ComponentName

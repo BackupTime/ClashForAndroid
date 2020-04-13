@@ -1,13 +1,14 @@
 package com.github.kr328.clash.service.files
 
+import android.content.Context
 import android.os.ParcelFileDescriptor
-import com.github.kr328.clash.service.util.resolveBase
+import com.github.kr328.clash.service.util.resolveBaseDir
 import java.io.FileNotFoundException
 import java.net.URLDecoder
 
-class ProviderResolver {
+class ProviderResolver(private val context: Context) {
     fun resolve(id: Long, fileName: String): VirtualFile {
-        val file = resolveBase(id).resolve(fileName)
+        val file = context.resolveBaseDir(id).resolve(fileName)
         if (!file.exists())
             throw FileNotFoundException()
 

@@ -8,7 +8,7 @@ import com.github.kr328.clash.adapter.ProfileAdapter
 import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.service.ProfileBackgroundService
-import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.service.data.ProfileEntity
 import com.github.kr328.clash.service.transact.ProfileRequest
 import com.github.kr328.clash.service.util.componentName
 import com.github.kr328.clash.service.util.intent
@@ -96,7 +96,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         reloadMutex.unlock()
     }
 
-    override fun onProfileClicked(entity: ClashProfileEntity) {
+    override fun onProfileClicked(entity: ProfileEntity) {
         launch {
             withProfile {
                 setActiveProfile(entity.id)
@@ -104,7 +104,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         }
     }
 
-    override fun onMenuClicked(entity: ClashProfileEntity) {
+    override fun onMenuClicked(entity: ProfileEntity) {
         ProfilesMenu(this, entity, this).show()
     }
 
@@ -112,7 +112,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         startActivity(CreateProfileActivity::class.intent)
     }
 
-    private fun deleteProfile(entity: ClashProfileEntity) = launch {
+    private fun deleteProfile(entity: ProfileEntity) = launch {
         val request = ProfileRequest().action(ProfileRequest.Action.REMOVE).withId(entity.id)
 
         withProfile {
@@ -120,7 +120,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         }
     }
 
-    private fun resetProviders(entity: ClashProfileEntity) = launch {
+    private fun resetProviders(entity: ProfileEntity) = launch {
         val request = ProfileRequest().action(ProfileRequest.Action.CLEAR).withId(entity.id)
 
         withProfile {
@@ -128,13 +128,13 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         }
     }
 
-    private fun openPropertiesEditor(entity: ClashProfileEntity, duplicate: Boolean) {
+    private fun openPropertiesEditor(entity: ProfileEntity, duplicate: Boolean) {
         val type = when (entity.type) {
-            ClashProfileEntity.TYPE_FILE ->
+            ProfileEntity.TYPE_FILE ->
                 Constants.URL_PROVIDER_TYPE_FILE
-            ClashProfileEntity.TYPE_URL ->
+            ProfileEntity.TYPE_URL ->
                 Constants.URL_PROVIDER_TYPE_URL
-            ClashProfileEntity.TYPE_EXTERNAL ->
+            ProfileEntity.TYPE_EXTERNAL ->
                 Constants.URL_PROVIDER_TYPE_EXTERNAL
             else -> throw IllegalArgumentException("Invalid type ${entity.type}")
         }
@@ -154,7 +154,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         startActivity(editor)
     }
 
-    private fun openEditor(entity: ClashProfileEntity) = launch {
+    private fun openEditor(entity: ProfileEntity) = launch {
         val uri = withProfile {
             requestProfileEditUri(entity.id)
         } ?: return@launch
@@ -169,39 +169,39 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         )
     }
 
-    private fun startUpdate(entity: ClashProfileEntity) {
+    private fun startUpdate(entity: ProfileEntity) {
         val request = ProfileRequest()
             .action(ProfileRequest.Action.UPDATE_OR_CREATE)
             .withId(entity.id)
 
-        val intent = Intent(Intents.INTENT_ACTION_PROFILE_ENQUEUE_REQUEST)
+        val intent = Intent(Intents.INTENT_ACTION_PROFILE_REQUEST_UPDATE)
             .setComponent(ProfileBackgroundService::class.componentName)
             .putExtra(Intents.INTENT_EXTRA_PROFILE_REQUEST, request)
 
         startForegroundServiceCompat(intent)
     }
 
-    override fun onOpenEditor(entity: ClashProfileEntity) {
+    override fun onOpenEditor(entity: ProfileEntity) {
         openEditor(entity)
     }
 
-    override fun onUpdate(entity: ClashProfileEntity) {
+    override fun onUpdate(entity: ProfileEntity) {
         startUpdate(entity)
     }
 
-    override fun onOpenProperties(entity: ClashProfileEntity) {
+    override fun onOpenProperties(entity: ProfileEntity) {
         openPropertiesEditor(entity, false)
     }
 
-    override fun onDuplicate(entity: ClashProfileEntity) {
+    override fun onDuplicate(entity: ProfileEntity) {
         openPropertiesEditor(entity, true)
     }
 
-    override fun onResetProvider(entity: ClashProfileEntity) {
+    override fun onResetProvider(entity: ProfileEntity) {
         resetProviders(entity)
     }
 
-    override fun onDelete(entity: ClashProfileEntity) {
+    override fun onDelete(entity: ProfileEntity) {
         deleteProfile(entity)
     }
 }

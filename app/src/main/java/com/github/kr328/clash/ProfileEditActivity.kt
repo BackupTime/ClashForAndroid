@@ -11,7 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import com.github.kr328.clash.core.utils.Log
 import com.github.kr328.clash.design.common.TextInput
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.service.data.ClashProfileEntity
+import com.github.kr328.clash.service.data.ProfileEntity
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.ipc.ParcelableContainer
 import com.github.kr328.clash.service.transact.ProfileRequest
@@ -251,11 +251,11 @@ class ProfileEditActivity : BaseActivity() {
             val source = intent?.getParcelableExtra<Intent>("intent")?.toUri(0)?.run(Uri::parse)
             val type = when (intent?.getStringExtra("type")) {
                 Constants.URL_PROVIDER_TYPE_FILE ->
-                    ClashProfileEntity.TYPE_FILE
+                    ProfileEntity.TYPE_FILE
                 Constants.URL_PROVIDER_TYPE_URL ->
-                    ClashProfileEntity.TYPE_URL
+                    ProfileEntity.TYPE_URL
                 Constants.URL_PROVIDER_TYPE_EXTERNAL ->
-                    ClashProfileEntity.TYPE_EXTERNAL
+                    ProfileEntity.TYPE_EXTERNAL
                 else -> throw IllegalArgumentException()
             }
 

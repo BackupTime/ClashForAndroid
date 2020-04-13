@@ -1,8 +1,8 @@
 package com.github.kr328.clash.core
 
-import android.content.Context
 import bridge.Bridge
 import bridge.TunCallback
+import com.github.kr328.clash.common.Global
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
@@ -18,13 +18,8 @@ import java.io.InputStream
 object Clash {
     private val logReceivers = mutableMapOf<String, (LogEvent) -> Unit>()
 
-    private var initialized = false
-
-    @Synchronized
-    fun initialize(context: Context) {
-        if (initialized)
-            return
-        initialized = true
+    fun init() {
+        val context = Global.application
 
         val bytes = context.assets.open("Country.mmdb")
             .use(InputStream::readBytes)
