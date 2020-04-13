@@ -46,7 +46,7 @@ class ReloadModule(private val context: Context) : Module() {
 
             Clash.loadProfile(
                 context.resolveProfileFile(active.id),
-                context.resolveBaseDir(active.id)
+                context.resolveBaseDir(active.id).apply { mkdirs() }
             ).await()
 
             val remove = SelectedProxyDao.querySelectedForProfile(active.id)

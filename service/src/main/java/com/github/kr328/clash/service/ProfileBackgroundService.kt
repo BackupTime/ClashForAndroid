@@ -159,7 +159,7 @@ class ProfileBackgroundService : BaseService() {
     }
 
     private fun refreshStatusNotification(queueSize: Int) {
-        val content = if ( queueSize != 0 )
+        val content = if (queueSize != 0)
             getString(R.string.format_in_queue, queueSize)
         else
             getString(R.string.waiting)

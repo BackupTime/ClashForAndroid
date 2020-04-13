@@ -153,11 +153,6 @@ object DatabaseMigrations {
 
                 database.query("SELECT name, type, uri, source, active, update_interval, id FROM _profiles")
                     .use { cursor ->
-                        Global.application.filesDir.resolve(Constants.CLASH_DIR).listFiles()
-                            ?.forEach {
-                                it.deleteRecursively()
-                            }
-
                         cursor.moveToFirst()
                         while (!cursor.isAfterLast) {
                             // old

@@ -5,9 +5,9 @@ import android.net.Uri
 import android.os.IBinder
 import android.os.RemoteException
 import com.github.kr328.clash.service.data.ProfileDao
-import com.github.kr328.clash.service.transact.IStreamCallback
 import com.github.kr328.clash.service.model.ProfileMetadata
 import com.github.kr328.clash.service.model.toProfileMetadata
+import com.github.kr328.clash.service.transact.IStreamCallback
 import com.github.kr328.clash.service.util.broadcastProfileChanged
 import com.github.kr328.clash.service.util.resolveBaseDir
 import com.github.kr328.clash.service.util.resolveProfileFile
@@ -149,8 +149,6 @@ class ProfileService : BaseService() {
 
     override fun onCreate() {
         super.onCreate()
-
-        ProfileReceiver.tryInitialize(this)
 
         launch {
             process()

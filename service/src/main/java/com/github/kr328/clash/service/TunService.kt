@@ -40,6 +40,10 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             val settings = ServiceSettings(service)
             val dnsInject = DnsInjectModule()
 
+            runtime.install(TunModule(service)) {
+                configure = TunConfigure(settings)
+            }
+
             runtime.install(ReloadModule(service)) {
                 onLoaded {
                     if (it != null) {
@@ -69,10 +73,6 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 runtime.install(DynamicNotificationModule(service))
             else
                 runtime.install(StaticNotificationModule(service))
-
-            runtime.install(TunModule(service)) {
-                configure = TunConfigure(settings)
-            }
 
             runtime.install(dnsInject) {
                 dnsOverride = settings.get(ServiceSettings.OVERRIDE_DNS)

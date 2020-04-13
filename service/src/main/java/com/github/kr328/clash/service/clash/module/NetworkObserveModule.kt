@@ -2,6 +2,7 @@ package com.github.kr328.clash.service.clash.module
 
 import android.content.Context
 import android.net.*
+import com.github.kr328.clash.common.utils.Log
 import kotlinx.coroutines.sync.Mutex
 import java.net.InetAddress
 
@@ -50,11 +51,19 @@ class NetworkObserveModule(context: Context) : Module() {
     }
 
     override suspend fun onStart() {
-        connectivity.registerNetworkCallback(NetworkRequest.Builder().build(), callback)
+        try {
+            connectivity.registerNetworkCallback(NetworkRequest.Builder().build(), callback)
+        } catch (e: Exception) {
+            Log.w("Register NetworkCallback failure", e)
+        }
     }
 
     override suspend fun onStop() {
-        connectivity.unregisterNetworkCallback(callback)
+        try {
+            connectivity.unregisterNetworkCallback(callback)
+        } catch (e: Exception) {
+            Log.w("Unregister NetworkCallback failure", e)
+        }
     }
 
     fun onNetworkChanged(callback: (Network?, List<InetAddress>) -> Unit) {
