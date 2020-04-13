@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.github.kr328.clash.common.Permissions
 import com.github.kr328.clash.common.ids.Intents
 
 object Broadcasts {
@@ -70,8 +71,7 @@ object Broadcasts {
                     addAction(Intents.INTENT_ACTION_CLASH_STOPPED)
                     addAction(Intents.INTENT_ACTION_CLASH_STARTED)
                     addAction(Intents.INTENT_ACTION_PROFILE_LOADED)
-                })
-
+                }, Permissions.PERMISSION_ACCESS_CLASH, null)
 
                 val current = RemoteUtils.detectClashRunning(application)
                 if (current != clashRunning) {

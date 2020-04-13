@@ -11,3 +11,7 @@ fun Context.resolveProfileFile(id: Long): File {
 fun Context.resolveBaseDir(id: Long): File {
     return filesDir.resolve(Constants.CLASH_DIR).resolve(id.toString())
 }
+
+fun Context.resolveTempProfileFile(id: Long): File {
+    return cacheDir.resolve(Constants.PROFILES_DIR).resolve("$id.yaml")
+}

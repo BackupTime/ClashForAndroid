@@ -33,7 +33,7 @@
             android:process=":background" />
 
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name=".ProfileProvider"
             android:authorities="${applicationId}.profiles"
             android:exported="false"
             android:grantUriPermissions="true">

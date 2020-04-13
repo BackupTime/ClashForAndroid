@@ -27,7 +27,15 @@ object ProfileProcessor {
                 context.resolveBaseDir(metadata.id)
             )
 
-            val entity = metadata.toProfileEntity()
+            val entity = if (metadata.type == Type.FILE)
+                metadata.copy(
+                    uri = ProfileProvider.resolveUri(
+                        context,
+                        context.resolveProfileFile(metadata.id)
+                    )
+                ).toProfileEntity()
+            else
+                metadata.toProfileEntity()
 
             if (ProfileDao.queryById(metadata.id) == null)
                 ProfileDao.insert(entity)

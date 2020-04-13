@@ -11,6 +11,7 @@ import com.github.kr328.clash.service.model.toProfileMetadata
 import com.github.kr328.clash.service.util.broadcastProfileChanged
 import com.github.kr328.clash.service.util.resolveBaseDir
 import com.github.kr328.clash.service.util.resolveProfileFile
+import com.github.kr328.clash.service.util.resolveTempProfileFile
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
@@ -87,11 +88,13 @@ class ProfileService : BaseService() {
             override fun delete(id: Long) {
                 launch {
                     lock.withLock {
-                        pending.remove(id)
+                        if (pending.remove(id) != null)
+                            service.resolveBaseDir(id).deleteRecursively()
                         ProfileDao.remove(id)
                     }
 
                     service.resolveProfileFile(id).delete()
+                    service.resolveTempProfileFile(id).delete()
                     service.resolveBaseDir(id).deleteRecursively()
 
                     service.broadcastProfileChanged()
