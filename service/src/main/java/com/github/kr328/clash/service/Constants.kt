@@ -8,6 +8,4 @@ object Constants {
     const val PROFILE_PROVIDER_SUFFIX = ".profiles"
     const val STATUS_PROVIDER_SUFFIX = ".status"
     const val SETTING_PROVIDER_SUFFIX = ".settings"
-
-    const val CLASH_SERVICE_RUNNING_FILE = "clash_running"
 }

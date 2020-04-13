@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.os.RemoteException
-import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.model.ProfileMetadata

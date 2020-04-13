@@ -32,7 +32,7 @@ class NetworkFragment : BaseSettingFragment() {
 
     override fun onCreateDataStore(): SettingsDataStore {
         return SettingsDataStore().apply {
-            on(KEY_ENABLE_VPN_SERVICE, UiSettings.ENABLE_VPN.asSource(ui))
+            on(KEY_ENABLE_VPN_SERVICE, ServiceSettings.ENABLE_VPN.asSource(service))
             on(BYPASS_PRIVATE_NETWORK, ServiceSettings.BYPASS_PRIVATE_NETWORK.asSource(service))
             on(KEY_DNS_HIJACKING, ServiceSettings.DNS_HIJACKING.asSource(service))
             on(KEY_DNS_OVERRIDE, ServiceSettings.OVERRIDE_DNS.asSource(service))

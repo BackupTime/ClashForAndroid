@@ -19,7 +19,7 @@ fun ProfileEntity.toProfileMetadata(context: Context): ProfileMetadata {
         name = name,
         type = type,
         uri = Uri.parse(uri),
-        source = source?.let { Uri.parse(it)},
+        source = source?.let { Uri.parse(it) },
         active = active,
         interval = interval,
         lastModified = lastModified

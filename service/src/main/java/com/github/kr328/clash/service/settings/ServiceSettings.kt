@@ -16,6 +16,8 @@ class ServiceSettings(preference: SharedPreferences) :
         const val ACCESS_CONTROL_MODE_BLACKLIST = "access_control_mode_blacklist"
         const val ACCESS_CONTROL_MODE_WHITELIST = "access_control_mode_whitelist"
 
+        val ENABLE_VPN =
+            BooleanEntry("enable_vpn", true)
         val LANGUAGE =
             StringEntry("language", "")
         val BYPASS_PRIVATE_NETWORK =

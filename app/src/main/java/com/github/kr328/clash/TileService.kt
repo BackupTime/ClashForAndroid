@@ -10,8 +10,8 @@ import android.service.quicksettings.TileService
 import com.github.kr328.clash.common.Permissions
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.remote.RemoteUtils
-import com.github.kr328.clash.utils.startClashService
-import com.github.kr328.clash.utils.stopClashService
+import com.github.kr328.clash.service.util.startClashService
+import com.github.kr328.clash.service.util.stopClashService
 
 class TileService : TileService() {
     private var currentProfile = ""

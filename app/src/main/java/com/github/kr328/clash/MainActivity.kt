@@ -13,8 +13,8 @@ import com.github.kr328.clash.common.utils.asBytesString
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.utils.startClashService
-import com.github.kr328.clash.utils.stopClashService
+import com.github.kr328.clash.service.util.startClashService
+import com.github.kr328.clash.service.util.stopClashService
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 

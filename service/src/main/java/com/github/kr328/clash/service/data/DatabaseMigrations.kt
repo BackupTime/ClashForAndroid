@@ -189,6 +189,15 @@ object DatabaseMigrations {
                     }
 
                 database.execSQL("DROP TABLE _profiles")
+
+                val uiSp = Global.application
+                    .getSharedPreferences("ui", Context.MODE_PRIVATE)
+                val srvSp = Global.application
+                    .getSharedPreferences("service", Context.MODE_PRIVATE)
+
+                srvSp.edit {
+                    putBoolean("enable_vpn", uiSp.getBoolean("enable_vpn", true))
+                }
             } catch (e: Exception) {
                 Log.e("Migration failure", e)
             }

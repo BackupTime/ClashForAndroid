@@ -10,7 +10,7 @@
     <string name="application_name">Clash for Android</string>
     <string name="auto_update">自动更新 (分钟)</string>
     <string name="behavior">行为</string>
-    <string name="boot">启动</string>
+    <string name="restart">重启</string>
     <string name="bypass_private_network">绕过私有网络</string>
     <string name="bypass_private_network_summary">绕过私有网络地址</string>
     <string name="cancel">取消</string>
@@ -94,8 +94,8 @@
     <string name="show_traffic_summary">在通知中自动刷新流量</string>
     <string name="sort_group">代理组排序</string>
     <string name="sort_proxy">代理排序</string>
-    <string name="start_clash_on_system_boot">在系统启动时启动 Clash</string>
-    <string name="start_on_boot">开机时启动</string>
+    <string name="allow_clash_auto_restart">允许 Clash 自动重启</string>
+    <string name="auto_restart">自动重启</string>
     <string name="start_url_provider_failure">打开 URL 提供程序失败</string>
     <string name="stopped">已停止</string>
     <string name="support">支持</string>

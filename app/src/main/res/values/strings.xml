@@ -106,9 +106,9 @@
     <string name="network">Network</string>
     <string name="interface_">Interface</string>
 
-    <string name="boot">Boot</string>
-    <string name="start_on_boot">Start on Boot</string>
-    <string name="start_clash_on_system_boot">Start Clash on system boot</string>
+    <string name="restart">Restart</string>
+    <string name="auto_restart">Auto Restart</string>
+    <string name="allow_clash_auto_restart">Allow clash auto restart</string>
 
     <string name="notification">Notification</string>
     <string name="show_traffic">Show Traffic</string>

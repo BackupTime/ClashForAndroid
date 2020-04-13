@@ -19,7 +19,7 @@ data class ProfileMetadata(
     val active: Boolean,
     val interval: Long,
     val lastModified: Long
-): Parcelable {
+) : Parcelable {
     enum class Type {
         FILE, URL, EXTERNAL, UNKNOWN
     }

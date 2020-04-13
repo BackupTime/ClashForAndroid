@@ -76,6 +76,8 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
                         commitAsync(id)
                     else
                         ProfileProvider.releaseTemp(self, id)
+
+                    Unit
                 }
             }
 
