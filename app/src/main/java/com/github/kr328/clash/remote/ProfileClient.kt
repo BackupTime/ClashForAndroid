@@ -2,8 +2,8 @@ package com.github.kr328.clash.remote
 
 import android.os.RemoteException
 import com.github.kr328.clash.service.IProfileService
-import com.github.kr328.clash.service.ipc.IStreamCallback
-import com.github.kr328.clash.service.ipc.ParcelableContainer
+import com.github.kr328.clash.service.transact.IStreamCallback
+import com.github.kr328.clash.service.transact.ParcelableContainer
 import com.github.kr328.clash.service.model.ProfileMetadata
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers

@@ -23,8 +23,8 @@ import com.github.kr328.clash.model.LogFile
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager
-import com.github.kr328.clash.service.ipc.IStreamCallback
-import com.github.kr328.clash.service.ipc.ParcelableContainer
+import com.github.kr328.clash.service.transact.IStreamCallback
+import com.github.kr328.clash.service.transact.ParcelableContainer
 import com.github.kr328.clash.utils.format
 import com.github.kr328.clash.utils.logsDir
 import kotlinx.coroutines.*

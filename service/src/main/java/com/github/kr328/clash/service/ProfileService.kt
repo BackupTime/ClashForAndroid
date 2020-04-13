@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.IBinder
 import android.os.RemoteException
 import com.github.kr328.clash.service.data.ProfileDao
-import com.github.kr328.clash.service.ipc.IStreamCallback
+import com.github.kr328.clash.service.transact.IStreamCallback
 import com.github.kr328.clash.service.model.ProfileMetadata
 import com.github.kr328.clash.service.model.toProfileMetadata
 import com.github.kr328.clash.service.util.broadcastProfileChanged

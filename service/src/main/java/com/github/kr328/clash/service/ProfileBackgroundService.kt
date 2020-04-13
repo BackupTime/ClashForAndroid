@@ -17,8 +17,8 @@ import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.service.data.ProfileDao
-import com.github.kr328.clash.service.ipc.IStreamCallback
-import com.github.kr328.clash.service.ipc.ParcelableContainer
+import com.github.kr328.clash.service.transact.IStreamCallback
+import com.github.kr328.clash.service.transact.ParcelableContainer
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

@@ -1,7 +1,6 @@
 package com.github.kr328.clash.service;
 
-import com.github.kr328.clash.service.ipc.IStreamCallback;
-import com.github.kr328.clash.service.transact.ProfileRequest;
+import com.github.kr328.clash.service.transact.IStreamCallback;
 import com.github.kr328.clash.service.model.ProfileMetadata;
 
 interface IProfileService {

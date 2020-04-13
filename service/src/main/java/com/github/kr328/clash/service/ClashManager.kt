@@ -7,8 +7,8 @@ import com.github.kr328.clash.core.model.ProxyGroupList
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.data.SelectedProxyDao
 import com.github.kr328.clash.service.data.SelectedProxyEntity
-import com.github.kr328.clash.service.ipc.IStreamCallback
-import com.github.kr328.clash.service.ipc.ParcelableContainer
+import com.github.kr328.clash.service.transact.IStreamCallback
+import com.github.kr328.clash.service.transact.ParcelableContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

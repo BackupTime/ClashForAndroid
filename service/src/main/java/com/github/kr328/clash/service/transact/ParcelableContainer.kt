@@ -1,4 +1,4 @@
-package com.github.kr328.clash.service.ipc
+package com.github.kr328.clash.service.transact
 
 import android.os.Parcel
 import android.os.Parcelable
