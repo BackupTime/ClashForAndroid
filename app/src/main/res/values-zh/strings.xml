@@ -39,7 +39,6 @@
     <string name="edit">编辑</string>
     <string name="edit_profile">编辑配置</string>
     <string name="empty_name">空名称</string>
-    <string name="enable_ipv6">启用 IPv6 支持 (不建议)</string>
     <string name="exit_without_save">退出而不保存</string>
     <string name="exit_without_save_warning">所有变更将会丢失</string>
     <string name="export">导出</string>
@@ -62,7 +61,6 @@
     <string name="interface_">界面</string>
     <string name="invalid_interval">无效的间隔</string>
     <string name="invalid_url">无效的 URL</string>
-    <string name="ipv6">IPv6</string>
     <string name="language">语言</string>
     <string name="launch_name">Clash</string>
     <string name="log_viewer">日志查看器</string>
@@ -118,12 +116,9 @@
     <string name="clash">Clash</string>
     <string name="clash_for_android">Clash for Android</string>
     <string name="feedback">反馈</string>
-    <string name="email">E-Mail</string>
     <string name="sources">源代码</string>
     <string name="telegram_channel">Telegram 频道</string>
     <string name="github_issues">Github Issues</string>
-    <string name="format_seconds">%d 秒</string>
-    <string name="copied">已复制</string>
     <string name="tips_profile"><![CDATA[仅接受 <strong>Clash 配置文件</strong> <br />其中包含了 <strong>代理, 代理组 和 规则</strong>]]></string>
     <string name="application_broken_description"><![CDATA[这通常意味着您使用来自 <strong>Google Play</strong> 的副本, 但是生成该副本的应用未能正确处理 <strong>分包机制</strong><br />这意味着您获取的是 <strong>应用的一部分</strong>]]></string>
     <string name="learn_more_about_split_apks">了解更多关于分包机制</string>
@@ -133,7 +128,6 @@
     <string name="profile_not_found">配置文件丢失</string>
     <string name="more_than_15_minutes">大于15分钟</string>
     <string name="loading">载入中</string>
-    <string name="clone_profile">复制配置</string>
     <string name="tips_support"><![CDATA[Clash for Android 是一个<strong>免费开源</strong>的项目, <strong>不提供</strong>任何代理服务<br />请务必<strong>不要</strong>反馈非应用自身引起的问题]]></string>
     <string name="donate">捐赠</string>
 </resources>

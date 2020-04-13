@@ -25,7 +25,6 @@
 
     <string name="recently">Recently</string>
 
-    <string name="format_seconds">%d seconds</string>
     <string name="format_minutes">%d minutes</string>
     <string name="format_hours">%d hours</string>
     <string name="format_days">%d days</string>
@@ -69,11 +68,9 @@
     <string name="loading">Loading</string>
 
     <string name="new_profile">New Profile</string>
-    <string name="clone_profile">Clone Profile</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="clash_start_failure">Clash Start Failure</string>
     <string name="refresh">Refresh</string>
-    <string name="copied">Copied</string>
 
     <string name="delay">Delay</string>
     <string name="direct">Direct</string>
@@ -121,8 +118,6 @@
     <string name="routing_via_vpn_service">Routing all system traffic via VpnService</string>
     
     <string name="vpn_service">VPN Service</string>
-    <string name="ipv6">IPv6</string>
-    <string name="enable_ipv6">Enable IPv6 support (not recommend)</string>
     <string name="bypass_private_network">Bypass Private Network</string>
     <string name="bypass_private_network_summary">Bypass private network addresses</string>
     <string name="dns_hijacking">DNS Hijacking</string>
@@ -155,11 +150,9 @@
     <string name="clash_for_android_url" translatable="false">https://github.com/Kr328/ClashForAndroid</string>
 
     <string name="feedback">Feedback</string>
-    <string name="email">E-Mail</string>
     <string name="donate">Donate</string>
     <string name="github_issues">Github Issues</string>
     <string name="telegram_channel">Telegram Channel</string>
-    <string name="email_url" translatable="false">kr328app@outlook.com</string>
     <string name="github_issues_url" translatable="false">https://github.com/Kr328/ClashForAndroid/issues</string>
     <string name="telegram_channel_url" translatable="false">https://t.me/clash_for_android_channel</string>
     
