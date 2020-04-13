@@ -83,7 +83,7 @@ class StaticNotificationModule(private val service: Service) : Module() {
                     .setOnlyAlertOnce(true)
                     .setShowWhen(false)
                     .setGroup(NotificationChannels.CLASH_STATUS)
-                    .setContentTitle(service.getText(R.string.running))
+                    .setContentTitle(service.getText(R.string.loading))
                     .build()
 
             service.startForeground(NotificationIds.CLASH_STATUS, notification)

@@ -16,4 +16,5 @@
     <string name="profile_yaml">配置文件.yaml</string>
     <string name="provider_files">外部引用文件</string>
     <string name="waiting">等待中</string>
+    <string name="loading">载入中</string>
 </resources>
