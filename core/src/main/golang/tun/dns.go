@@ -35,13 +35,11 @@ func InitialResolver() {
 
 	rawResolver := resolver.DefaultResolver
 	if rawResolver == nil {
-		hijackAddress = nil
 		dnsHandler = nil
 		return
 	}
 	r, ok := rawResolver.(*dns.Resolver)
 	if !ok || r == nil {
-		hijackAddress = nil
 		dnsHandler = nil
 		return
 	}
@@ -51,6 +49,10 @@ func InitialResolver() {
 
 func hijackTCPDNS(conn net.Conn, endpoint *binding.Endpoint) bool {
 	if endpoint.Target.Port != 53 {
+		return false
+	}
+
+	if dnsHandler == nil {
 		return false
 	}
 
@@ -100,6 +102,10 @@ func hijackTCPDNS(conn net.Conn, endpoint *binding.Endpoint) bool {
 
 func hijackDNS(payload []byte, endpoint *binding.Endpoint, sender redirect.UDPSender, recycle func([]byte)) bool {
 	if endpoint.Target.Port != 53 {
+		return false
+	}
+
+	if dnsHandler == nil {
 		return false
 	}
 
