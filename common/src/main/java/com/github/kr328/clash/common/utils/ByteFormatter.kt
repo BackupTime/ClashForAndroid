@@ -1,4 +1,4 @@
-package com.github.kr328.clash.core.utils
+package com.github.kr328.clash.common.utils
 
 object ByteFormatter {
     fun byteToString(bytes: Long): String {

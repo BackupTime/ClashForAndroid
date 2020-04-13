@@ -9,10 +9,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.github.kr328.clash.core.model.General
-import com.github.kr328.clash.core.utils.asBytesString
+import com.github.kr328.clash.common.utils.asBytesString
 import com.github.kr328.clash.remote.withClash
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.utils.startClashService
 import com.github.kr328.clash.utils.stopClashService
 import kotlinx.android.synthetic.main.activity_main.*

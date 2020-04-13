@@ -6,7 +6,7 @@ import com.github.kr328.clash.R
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.settings.ServiceSettings
-import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.common.util.intent
 
 class NetworkFragment : BaseSettingFragment() {
     companion object {

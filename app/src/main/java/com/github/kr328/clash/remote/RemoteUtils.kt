@@ -6,7 +6,7 @@ import android.net.Uri
 import com.github.kr328.clash.ApkBrokenActivity
 import com.github.kr328.clash.service.Constants
 import com.github.kr328.clash.service.ServiceStatusProvider
-import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.common.util.intent
 
 object RemoteUtils {
     fun detectClashRunning(context: Context): Boolean {

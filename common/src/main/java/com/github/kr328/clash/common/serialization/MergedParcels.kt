@@ -1,4 +1,4 @@
-package com.github.kr328.clash.core.serialization
+package com.github.kr328.clash.common.serialization
 
 import android.os.Parcel
 import kotlinx.serialization.*

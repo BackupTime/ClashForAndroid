@@ -1,6 +1,6 @@
-package com.github.kr328.clash.core.utils
+package com.github.kr328.clash.common.utils
 
-import com.github.kr328.clash.core.Constants.TAG
+import com.github.kr328.clash.common.Constants.TAG
 
 object Log {
     fun i(message: String, throwable: Throwable? = null) =

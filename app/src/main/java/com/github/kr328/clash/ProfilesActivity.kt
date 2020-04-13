@@ -10,9 +10,9 @@ import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.service.ProfileBackgroundService
 import com.github.kr328.clash.service.data.ProfileEntity
 import com.github.kr328.clash.service.transact.ProfileRequest
-import com.github.kr328.clash.service.util.componentName
-import com.github.kr328.clash.service.util.intent
-import com.github.kr328.clash.service.util.startForegroundServiceCompat
+import com.github.kr328.clash.common.util.componentName
+import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.util.startForegroundServiceCompat
 import com.github.kr328.clash.weight.ProfilesMenu
 import kotlinx.android.synthetic.main.activity_profiles.*
 import kotlinx.coroutines.Job

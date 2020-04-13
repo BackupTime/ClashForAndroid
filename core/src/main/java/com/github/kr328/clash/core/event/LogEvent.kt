@@ -2,7 +2,7 @@ package com.github.kr328.clash.core.event
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.github.kr328.clash.core.serialization.Parcels
+import com.github.kr328.clash.common.serialization.Parcels
 import kotlinx.serialization.Serializable
 
 @Serializable

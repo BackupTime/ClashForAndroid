@@ -14,8 +14,8 @@ import com.github.kr328.clash.adapter.LogFileAdapter
 import com.github.kr328.clash.design.common.Category
 import com.github.kr328.clash.design.view.CommonUiLayout
 import com.github.kr328.clash.model.LogFile
-import com.github.kr328.clash.service.util.intent
-import com.github.kr328.clash.service.util.startForegroundServiceCompat
+import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.util.startForegroundServiceCompat
 import com.github.kr328.clash.utils.format
 import com.github.kr328.clash.utils.logsDir
 import com.google.android.material.bottomsheet.BottomSheetDialog

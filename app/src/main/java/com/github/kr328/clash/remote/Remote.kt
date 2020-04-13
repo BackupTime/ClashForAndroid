@@ -18,7 +18,7 @@ import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager
 import com.github.kr328.clash.service.IProfileService
 import com.github.kr328.clash.service.ProfileService
-import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.common.util.intent
 import com.microsoft.appcenter.crashes.Crashes
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel

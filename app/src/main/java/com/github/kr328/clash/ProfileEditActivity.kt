@@ -8,7 +8,7 @@ import android.text.Html
 import android.view.View
 import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AlertDialog
-import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.design.common.TextInput
 import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.service.data.ProfileEntity

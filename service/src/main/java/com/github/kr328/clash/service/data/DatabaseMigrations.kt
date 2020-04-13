@@ -8,7 +8,7 @@ import androidx.core.database.getStringOrNull
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.github.kr328.clash.common.Global
-import com.github.kr328.clash.core.utils.Log
+import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.service.Constants
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.resolveBaseDir

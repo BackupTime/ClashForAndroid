@@ -6,7 +6,7 @@ import com.github.kr328.clash.OnBootReceiver
 import com.github.kr328.clash.R
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.settings.ServiceSettings
-import com.github.kr328.clash.service.util.componentName
+import com.github.kr328.clash.common.util.componentName
 
 class BehaviorFragment : BaseSettingFragment() {
     companion object {

@@ -10,9 +10,9 @@ import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.PendingIds
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.model.toProfileMetadata
-import com.github.kr328.clash.service.util.componentName
-import com.github.kr328.clash.service.util.intent
-import com.github.kr328.clash.service.util.startForegroundServiceCompat
+import com.github.kr328.clash.common.util.componentName
+import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.util.startForegroundServiceCompat
 
 class ProfileReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -25,14 +25,7 @@ class ProfileReceiver : BroadcastReceiver() {
                 context.startForegroundServiceCompat(intent)
             }
             Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
-                if (initialized)
-                    return
-                initialized = true
-
-                context.startForegroundServiceCompat(
-                    ProfileBackgroundService::class.intent
-                        .setAction(Intents.INTENT_ACTION_PROFILE_SETUP)
-                )
+                tryInitialize(context)
             }
         }
     }
@@ -40,6 +33,18 @@ class ProfileReceiver : BroadcastReceiver() {
     companion object {
         private val requested = mutableMapOf<Long, PendingIntent>()
         private var initialized = false
+
+        @Synchronized
+        fun tryInitialize(context: Context) {
+            if ( initialized )
+                return
+            initialized = true
+
+            context.startForegroundServiceCompat(
+                ProfileBackgroundService::class.intent
+                    .setAction(Intents.INTENT_ACTION_PROFILE_SETUP)
+            )
+        }
 
         suspend fun requestNextUpdate(context: Context, id: Long) {
             val metadata = ProfileDao.queryById(id)?.toProfileMetadata(context) ?: return

@@ -1,4 +1,4 @@
-package com.github.kr328.clash.service.util
+package com.github.kr328.clash.common.util
 
 import android.content.Context
 import android.content.Intent

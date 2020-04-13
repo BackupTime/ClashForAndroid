@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.LiveLogAdapter
 import com.github.kr328.clash.adapter.LogAdapter
 import com.github.kr328.clash.core.event.LogEvent
-import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.common.util.intent
 import kotlinx.android.synthetic.main.activity_log_viewer.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex

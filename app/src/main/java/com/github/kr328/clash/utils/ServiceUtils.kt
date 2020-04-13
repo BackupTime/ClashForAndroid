@@ -7,9 +7,9 @@ import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.service.ClashService
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.service.TunService
-import com.github.kr328.clash.service.util.intent
+import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.service.util.sendBroadcastSelf
-import com.github.kr328.clash.service.util.startForegroundServiceCompat
+import com.github.kr328.clash.common.util.startForegroundServiceCompat
 
 fun Context.startClashService(): Intent? {
     val startTun = UiSettings(this).get(UiSettings.ENABLE_VPN)
