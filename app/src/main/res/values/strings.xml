@@ -154,15 +154,17 @@
     <string name="clash_url" translatable="false">https://github.com/Dreamacro/clash</string>
     <string name="clash_for_android_url" translatable="false">https://github.com/Kr328/ClashForAndroid</string>
 
-    <string name="contacts">Contacts</string>
+    <string name="feedback">Feedback</string>
     <string name="email">E-Mail</string>
+    <string name="donate">Donate</string>
     <string name="github_issues">Github Issues</string>
     <string name="telegram_channel">Telegram Channel</string>
     <string name="email_url" translatable="false">kr328app@outlook.com</string>
     <string name="github_issues_url" translatable="false">https://github.com/Kr328/ClashForAndroid/issues</string>
     <string name="telegram_channel_url" translatable="false">https://t.me/clash_for_android_channel</string>
-
+    
     <string name="tips_profile"><![CDATA[Accept Only <strong>Clash Config</strong> which contains <br /><strong>Proxies, Proxy Groups and Rules</strong>]]></string>
+    <string name="tips_support"><![CDATA[Clash for Android is <strong>free</strong> and <strong>open source</strong> <br /> It does <strong>NOT</strong> provide any proxy services]]></string>
 
     <string name="application_broken_description"><![CDATA[This is usually because you used a copy from <strong>Google Play</strong>, but the app that generated the copy did not handle <strong>Split Apks</strong> correctly <br />This means you get <strong>part of the app</strong>, not all of it]]></string>
     <string name="learn_more_about_split_apks">Learn more about Split Apks</string>

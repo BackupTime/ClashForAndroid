@@ -117,7 +117,7 @@
     <string name="reverse">反转</string>
     <string name="clash">Clash</string>
     <string name="clash_for_android">Clash for Android</string>
-    <string name="contacts">联系我们</string>
+    <string name="feedback">反馈</string>
     <string name="email">E-Mail</string>
     <string name="sources">源代码</string>
     <string name="telegram_channel">Telegram 频道</string>
@@ -134,4 +134,6 @@
     <string name="more_than_15_minutes">大于15分钟</string>
     <string name="loading">载入中</string>
     <string name="clone_profile">复制配置</string>
+    <string name="tips_support"><![CDATA[Clash for Android 是一个<strong>免费开源</strong>的项目, <strong>不提供</strong>任何代理服务<br />请务必<strong>不要</strong>反馈非应用自身引起的问题]]></string>
+    <string name="donate">捐赠</string>
 </resources>
