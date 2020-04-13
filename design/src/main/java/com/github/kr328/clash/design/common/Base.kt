@@ -22,6 +22,9 @@ abstract class Base(val screen: CommonUiScreen) {
         get() = field || (dependOn?.isHidden ?: false)
         set(value) {
             field = value
+
+            reapplyAttribute()
+
             screen.postReapplyAttribute()
         }
 

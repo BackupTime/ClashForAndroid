@@ -91,7 +91,7 @@ class ProfileEditFragment(
                     icon = requireContext().getDrawable(R.drawable.ic_update),
                     hint = getString(R.string.more_than_15_minutes),
                     id = KEY_AUTO_UPDATE,
-                    content = (interval / 1000 / 60).toString()
+                    content = (interval / 1000 / 60).toStringIfNonZero()
                 ) {
                     onDisplayContent {
                         val interval = it.toString().toIntOrNull() ?: 0
@@ -119,6 +119,9 @@ class ProfileEditFragment(
 
                         interval = content.toString().toLong() * 1000 * 60
                     }
+
+                    if ( type == Type.FILE )
+                        isHidden = true
                 }
 
                 screen.restoreState(savedInstanceState)
@@ -176,5 +179,9 @@ class ProfileEditFragment(
         }
 
         return true
+    }
+
+    private fun Long.toStringIfNonZero(): String {
+        return if ( this == 0L ) "" else this.toString()
     }
 }

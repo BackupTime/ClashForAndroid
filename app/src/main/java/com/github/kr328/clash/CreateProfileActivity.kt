@@ -26,6 +26,8 @@ class CreateProfileActivity : BaseActivity() {
         const val REQUEST_CODE = 20000
     }
 
+    private val self = this
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,7 +45,7 @@ class CreateProfileActivity : BaseActivity() {
             mainList.setOnItemClickListener { _, _, position, _ ->
                 val item = providers[position]
 
-                launch {
+                self.launch {
                     val id = withProfile {
                         acquireUnused(item.type)
                     }

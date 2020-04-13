@@ -9,6 +9,7 @@ import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.util.componentName
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.util.startForegroundServiceCompat
+import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.service.ProfileBackgroundService
 import com.github.kr328.clash.service.ProfileProvider
@@ -171,9 +172,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
     override fun onDuplicate(entity: ProfileMetadata) {
         launch {
             withProfile {
-                val newId = acquireCloned(entity.id)
-
-                openProperties(newId)
+                openProperties(acquireCloned(entity.id))
             }
         }
     }

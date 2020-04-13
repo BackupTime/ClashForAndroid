@@ -25,6 +25,10 @@ func InitCore(geoipDatabase[] byte, homeDir string, version string) {
 	mmdb.LoadFromBytes(dataClone)
 	C.SetHomeDir(homeDir)
 	config.ApplicationVersion = version
+
+	Reset()
+
+	log.Infoln("Initialed")
 }
 
 func Reset() {

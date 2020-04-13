@@ -86,7 +86,7 @@ class TileService : TileService() {
                 addAction(Intents.INTENT_ACTION_CLASH_STOPPED)
                 addAction(Intents.INTENT_ACTION_PROFILE_LOADED)
             },
-            Permissions.PERMISSION_ACCESS_CLASH,
+            Permissions.PERMISSION_RECEIVE_BROADCASTS,
             null
         )
 

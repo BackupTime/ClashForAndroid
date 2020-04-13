@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.os.RemoteException
+import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.ipc.IStreamCallback
 import com.github.kr328.clash.service.model.ProfileMetadata
@@ -82,7 +83,8 @@ class ProfileService : BaseService() {
                 return runBlocking {
                     val clonedId = generateNextId()
 
-                    pending[clonedId] = queryMetadataById(id) ?: return@runBlocking -1L
+                    pending[clonedId] = queryMetadataById(id)?.copy(id = clonedId, active = false)
+                        ?: return@runBlocking -1L
 
                     clonedId
                 }
@@ -117,6 +119,8 @@ class ProfileService : BaseService() {
                             it.deleteRecursively()
                         }
                     }
+
+                    service.broadcastProfileChanged()
                 }
             }
 
@@ -147,6 +151,8 @@ class ProfileService : BaseService() {
     override fun onCreate() {
         super.onCreate()
 
+        ProfileReceiver.tryInitialize(this)
+
         launch {
             process()
         }
@@ -173,6 +179,8 @@ class ProfileService : BaseService() {
                 ProfileProcessor.createOrUpdate(service, metadata)
 
                 ctx.value?.complete()
+
+                service.broadcastProfileChanged()
             } catch (e: Exception) {
                 ctx.value?.completeExceptionally(e.message)
             }

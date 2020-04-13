@@ -5,4 +5,5 @@
         android:label="@string/receive_clash_broadcasts"
         android:description="@string/receive_broadcasts_of_clash"
         android:protectionLevel="privileged|signature" />
+    <uses-permission android:name="${applicationId}.permission.RECEIVE_BROADCASTS" />
 </manifest>

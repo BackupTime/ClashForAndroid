@@ -8,7 +8,7 @@
     <string name="append_system_dns_summary">自动追加系统 DNS 到 Clash</string>
     <string name="application_broken">应用损坏</string>
     <string name="application_name">Clash for Android</string>
-    <string name="auto_update">自动更新 (秒)</string>
+    <string name="auto_update">自动更新 (分钟)</string>
     <string name="behavior">行为</string>
     <string name="boot">启动</string>
     <string name="bypass_private_network">绕过私有网络</string>
@@ -96,7 +96,7 @@
     <string name="sort_proxy">代理排序</string>
     <string name="start_clash_on_system_boot">在系统启动时启动 Clash</string>
     <string name="start_on_boot">开机时启动</string>
-    <string name="start_url_provider_failure">打开 URL 提供商 失败</string>
+    <string name="start_url_provider_failure">打开 URL 提供程序失败</string>
     <string name="stopped">已停止</string>
     <string name="support">支持</string>
     <string name="tap_to_start">点此启动</string>
@@ -128,6 +128,6 @@
     <string name="profile_not_found">配置文件丢失</string>
     <string name="more_than_15_minutes">大于15分钟</string>
     <string name="loading">载入中</string>
-    <string name="tips_support"><![CDATA[Clash for Android 是一个<strong>免费开源</strong>的项目, <strong>不提供</strong>任何代理服务<br />请务必<strong>不要</strong>反馈非应用自身引起的问题]]></string>
+    <string name="tips_support"><![CDATA[Clash for Android 是一个<strong>免费开源</strong>的项目<br /> 我们<strong>不提供</strong>任何代理服务<br />请务必<strong>不要</strong>反馈非应用自身引起的问题]]></string>
     <string name="donate">捐赠</string>
 </resources>

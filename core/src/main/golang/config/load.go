@@ -5,36 +5,17 @@ import (
 	"io/ioutil"
 
 	"github.com/Dreamacro/clash/config"
-	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/hub/executor"
 	"github.com/Dreamacro/clash/log"
 	"github.com/kr328/cfa/tun"
 )
-
-const defaultConfig = `
-log: debug
-mode: Direct
-Proxy:
-- name: "broadcast"
-  type: socks5
-  server: 255.255.255.255
-  port: 1080
-
-Proxy Group:
-- name: "select"
-  type: select
-  proxies: [DIRECT]
-
-Rule:
-- 'MATCH,DIRECT'
-`
 
 // LoadDefault - load default configure
 func LoadDefault() {
 	DnsPatch = nil
 	NameServersAppend = make([]string, 0)
 
-	defaultC, err := parseConfig([]byte(defaultConfig), constant.Path.HomeDir())
+	defaultC, err := config.Parse([]byte{})
 	if err != nil {
 		log.Warnln("Load Default Failure " + err.Error())
 		return

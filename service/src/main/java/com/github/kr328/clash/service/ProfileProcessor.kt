@@ -21,6 +21,9 @@ object ProfileProcessor {
         withContext(Dispatchers.IO) {
             metadata.enforceFieldValid()
 
+            context.resolveBaseDir(metadata.id).mkdirs()
+            context.resolveProfileFile(metadata.id).parentFile?.mkdirs()
+
             downloadProfile(
                 context, metadata.uri,
                 context.resolveProfileFile(metadata.id),

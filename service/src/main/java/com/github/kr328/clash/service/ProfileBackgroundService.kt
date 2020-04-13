@@ -91,6 +91,8 @@ class ProfileBackgroundService : BaseService() {
                 requests.onReceive {
                     ProfileReceiver.cancelNextUpdate(self, it)
 
+                    queue.add(it)
+
                     service.commit(it, object : IStreamCallback.Stub() {
                         override fun completeExceptionally(reason: String?) {
                             responses.offer(it to RemoteException(reason))
@@ -106,6 +108,8 @@ class ProfileBackgroundService : BaseService() {
                     false
                 }
                 responses.onReceive {
+                    queue.remove(it.first)
+
                     if (it.second == null)
                         sendUpdateCompleted(it.first)
                     else

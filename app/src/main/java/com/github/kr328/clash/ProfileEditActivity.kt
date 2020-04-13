@@ -1,5 +1,6 @@
 package com.github.kr328.clash
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -107,6 +108,10 @@ class ProfileEditActivity : BaseActivity() {
                     updateMetadata(metadata.id, metadata)
                     commitAsync(metadata.id).await()
                 }
+
+                setResult(Activity.RESULT_OK)
+
+                finish()
             } catch (e: Exception) {
                 showSnackbarException(getString(R.string.download_failure), e.message)
             }

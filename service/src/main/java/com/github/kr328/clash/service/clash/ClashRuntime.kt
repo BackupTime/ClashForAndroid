@@ -66,7 +66,7 @@ class ClashRuntime(private val context: Context) {
                     modules.flatMap { it.receiveBroadcasts }.distinct().forEach {
                         addAction(it)
                     }
-                }, Permissions.PERMISSION_ACCESS_CLASH, null)
+                }, Permissions.PERMISSION_RECEIVE_BROADCASTS, null)
 
                 while (isActive) {
                     tickerEnabled = modules.any { it.enableTicker }

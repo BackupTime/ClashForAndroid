@@ -71,7 +71,7 @@ object Broadcasts {
                     addAction(Intents.INTENT_ACTION_CLASH_STOPPED)
                     addAction(Intents.INTENT_ACTION_CLASH_STARTED)
                     addAction(Intents.INTENT_ACTION_PROFILE_LOADED)
-                }, Permissions.PERMISSION_ACCESS_CLASH, null)
+                }, Permissions.PERMISSION_RECEIVE_BROADCASTS, null)
 
                 val current = RemoteUtils.detectClashRunning(application)
                 if (current != clashRunning) {

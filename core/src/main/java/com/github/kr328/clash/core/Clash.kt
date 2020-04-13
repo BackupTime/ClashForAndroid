@@ -18,7 +18,7 @@ import java.io.InputStream
 object Clash {
     private val logReceivers = mutableMapOf<String, (LogEvent) -> Unit>()
 
-    fun init() {
+    init {
         val context = Global.application
 
         val bytes = context.assets.open("Country.mmdb")

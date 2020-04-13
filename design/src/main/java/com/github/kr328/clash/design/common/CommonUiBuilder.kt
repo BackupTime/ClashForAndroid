@@ -25,9 +25,9 @@ class CommonUiBuilder(val screen: CommonUiScreen) {
         textInput.id = id
         textInput.dependOn = dependOn?.run { screen.requireElement(this) }
 
-        setup(textInput)
-
         screen.addElement(textInput)
+
+        textInput.setup()
     }
 
     fun option(

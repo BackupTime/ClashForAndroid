@@ -62,7 +62,6 @@ class ProfileClient(private val service: IProfileService) {
         service.queryById(id)
     }
 
-
     suspend fun setActive(id: Long) = withContext(Dispatchers.IO) {
         service.setActive(id)
     }

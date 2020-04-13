@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.Intent
 import com.github.kr328.clash.common.Permissions
 import com.github.kr328.clash.common.ids.Intents
+import com.github.kr328.clash.common.utils.Log
+import java.lang.Exception
 
 fun Context.sendBroadcastSelf(intent: Intent) {
     this.sendBroadcast(intent.setPackage(this.packageName),
-        Permissions.PERMISSION_ACCESS_CLASH)
+        Permissions.PERMISSION_RECEIVE_BROADCASTS)
 }
 
 fun Context.broadcastProfileChanged() {
