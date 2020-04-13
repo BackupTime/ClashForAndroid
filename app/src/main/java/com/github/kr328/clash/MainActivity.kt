@@ -40,7 +40,7 @@ class MainActivity : BaseActivity() {
                     if (resolved != null) {
                         startActivityForResult(vpnRequest, REQUEST_CODE)
                     } else {
-                        makeSnackbarException(getString(R.string.missing_vpn_component), null)
+                        showSnackbarException(getString(R.string.missing_vpn_component), null)
                     }
                 }
             }
@@ -101,7 +101,7 @@ class MainActivity : BaseActivity() {
         updateClashStatus()
 
         if (reason != null)
-            makeSnackbarException(getString(R.string.clash_start_failure), reason)
+            showSnackbarException(getString(R.string.clash_start_failure), reason)
     }
 
     override suspend fun onClashProfileLoaded() {

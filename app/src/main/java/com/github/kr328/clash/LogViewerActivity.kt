@@ -102,7 +102,7 @@ class LogViewerActivity : BaseActivity() {
                         .map { LogEvent(LogEvent.Level.valueOf(it[1]), it[2], it[0].toLong()) }
                         .toList()
                 } catch (e: Exception) {
-                    makeSnackbarException(getString(R.string.open_log_failure), e.message)
+                    showSnackbarException(getString(R.string.open_log_failure), e.message)
 
                     throw CancellationException()
                 }

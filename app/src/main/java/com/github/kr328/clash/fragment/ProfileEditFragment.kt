@@ -37,8 +37,6 @@ class ProfileEditFragment(
             .getMimeTypeFromExtension("yaml") ?: "*/*"
     }
 
-    var modified = false
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,7 +60,6 @@ class ProfileEditFragment(
                 ) {
                     onTextChanged {
                         name = content.toString()
-                        modified = true
                     }
                 }
                 textInput(
@@ -87,7 +84,6 @@ class ProfileEditFragment(
                         }
 
                         uri = Uri.parse(content.toString())
-                        modified = true
                     }
                 }
                 textInput(
@@ -122,7 +118,6 @@ class ProfileEditFragment(
                         }
 
                         interval = content.toString().toLong() * 1000 * 60
-                        modified = true
                     }
                 }
 

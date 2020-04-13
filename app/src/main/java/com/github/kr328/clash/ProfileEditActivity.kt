@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class ProfileEditActivity : BaseActivity() {
-    private var modified = false
     private var processing = false
         set(value) {
             field = value
@@ -78,9 +77,6 @@ class ProfileEditActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (!modified)
-            return super.onBackPressed()
-
         if (processing) {
             Snackbar.make(rootView, R.string.processing, Snackbar.LENGTH_LONG).show()
             return
@@ -106,10 +102,16 @@ class ProfileEditActivity : BaseActivity() {
 
     private fun commit(metadata: ProfileMetadata) {
         launch {
-            withProfile {
-                updateMetadata(metadata.id, metadata)
-                commitAsync(metadata.id)
+            try {
+                withProfile {
+                    updateMetadata(metadata.id, metadata)
+                    commitAsync(metadata.id).await()
+                }
+            } catch (e: Exception) {
+                showSnackbarException(getString(R.string.download_failure), e.message)
             }
+
+            processing = false
         }
     }
 }
