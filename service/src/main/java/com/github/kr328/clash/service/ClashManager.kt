@@ -1,6 +1,5 @@
 package com.github.kr328.clash.service
 
-import android.content.Context
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.ProxyGroupList
@@ -12,9 +11,8 @@ import com.github.kr328.clash.service.transact.ParcelableContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class ClashManager(context: Context, parent: CoroutineScope) :
+class ClashManager(parent: CoroutineScope) :
     IClashManager.Stub(), CoroutineScope by parent {
-    private val settings = context.getSharedPreferences("service", Context.MODE_PRIVATE)
 
     override fun setProxyMode(mode: String?) {
         Clash.setProxyMode(requireNotNull(mode))

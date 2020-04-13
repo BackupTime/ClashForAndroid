@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class Base(val screen: CommonUiScreen) {
     val context: Context
         get() = screen.layout.context

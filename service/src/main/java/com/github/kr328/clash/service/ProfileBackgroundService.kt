@@ -173,7 +173,7 @@ class ProfileBackgroundService : BaseService() {
             .setGroup(NotificationChannels.PROFILE_STATUS)
             .build()
 
-        startForeground(NotificationIds.CLASH_VPN, notification)
+        startForeground(NotificationIds.PROFILE_STATUS, notification)
     }
 
     private suspend fun sendUpdateCompleted(id: Long) {

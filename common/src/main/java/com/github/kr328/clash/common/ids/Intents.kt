@@ -22,8 +22,6 @@ object Intents {
 
     const val INTENT_EXTRA_CLASH_STOP_REASON =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.clash.stop.reason"
-    const val INTENT_EXTRA_PROFILE_REQUEST =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.request"
     const val INTENT_EXTRA_PROFILE_ID =
         "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.id"
 }

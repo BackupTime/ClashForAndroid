@@ -2,8 +2,7 @@ package com.github.kr328.clash.common.ids
 
 object NotificationIds {
     const val CLASH_STATUS = 1
-    const val CLASH_VPN = 2
-    const val PROFILE_STATUS = 3
+    const val PROFILE_STATUS = 2
     private val PROFILE_RESULT = 10000..20000
 
     fun generateProfileResultId(profileId: Long): Int {

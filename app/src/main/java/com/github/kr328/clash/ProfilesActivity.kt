@@ -9,7 +9,6 @@ import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.util.componentName
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.util.startForegroundServiceCompat
-import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.service.ProfileBackgroundService
 import com.github.kr328.clash.service.ProfileProvider

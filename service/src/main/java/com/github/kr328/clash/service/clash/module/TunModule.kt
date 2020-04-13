@@ -4,7 +4,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
-import com.github.kr328.clash.common.ids.NotificationIds
+import com.github.kr328.clash.common.ids.PendingIds
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.util.parseCIDR
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +57,7 @@ class TunModule(private val service: VpnService) : Module() {
             builder.setConfigureIntent(
                 PendingIntent.getActivity(
                     service,
-                    NotificationIds.CLASH_VPN,
+                    PendingIds.CLASH_VPN,
                     contentIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )

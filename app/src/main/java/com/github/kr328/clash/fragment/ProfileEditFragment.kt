@@ -154,6 +154,12 @@ class ProfileEditFragment(
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        (view as CommonUiLayout?)?.screen?.saveState(outState)
+    }
+
     private fun openUrlProvider(): Boolean {
         try {
             when (type) {

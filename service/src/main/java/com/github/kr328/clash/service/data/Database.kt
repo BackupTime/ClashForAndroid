@@ -18,7 +18,7 @@ abstract class Database : RoomDatabase() {
     companion object {
         val database = open(Global.application)
 
-        fun open(context: Context): Database {
+        private fun open(context: Context): Database {
             return Room.databaseBuilder(
                 context.applicationContext,
                 Database::class.java,
