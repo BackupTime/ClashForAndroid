@@ -68,6 +68,7 @@
     <string name="loading">Loading</string>
 
     <string name="new_profile">New Profile</string>
+    <string name="clone_profile">Clone Profile</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="clash_start_failure">Clash Start Failure</string>
     <string name="refresh">Refresh</string>

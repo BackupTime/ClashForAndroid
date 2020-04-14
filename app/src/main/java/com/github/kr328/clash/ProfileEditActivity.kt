@@ -40,10 +40,14 @@ class ProfileEditActivity : BaseActivity() {
                 queryById(id)
             } ?: return@launch finish()
 
-            if (metadata.name.isBlank())
-                toolbar.setTitle(R.string.new_profile)
-            else
-                toolbar.setTitle(R.string.edit_profile)
+            when {
+                metadata.lastModified > 0 ->
+                    toolbar.setTitle(R.string.edit_profile)
+                metadata.name.isBlank() ->
+                    toolbar.setTitle(R.string.new_profile)
+                else ->
+                    toolbar.setTitle(R.string.clone_profile)
+            }
 
             val fragment = ProfileEditFragment(
                 metadata.name, metadata.uri, metadata.interval,
