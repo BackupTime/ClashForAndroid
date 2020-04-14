@@ -19,7 +19,7 @@ fun ProfileEntity.asProfile(context: Context): Profile {
         name = name,
         type = type,
         uri = Uri.parse(uri),
-        source = source?.let { Uri.parse(it) },
+        source = source,
         active = active,
         interval = interval,
         lastModified = lastModified
@@ -38,7 +38,7 @@ fun Profile.asEntity(): ProfileEntity {
         name = name,
         type = type,
         uri = uri.toString(),
-        source = source?.toString(),
+        source = source,
         active = active,
         interval = interval,
         id = id

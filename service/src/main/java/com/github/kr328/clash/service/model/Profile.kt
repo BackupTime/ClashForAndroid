@@ -15,7 +15,7 @@ data class Profile(
     val name: String,
     val type: Type,
     val uri: Uri,
-    val source: Uri?,
+    val source: String?,
     val active: Boolean,
     val interval: Long,
     val lastModified: Long

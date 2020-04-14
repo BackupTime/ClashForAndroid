@@ -25,7 +25,7 @@ class ProfileEditFragment(
     var uri: Uri,
     var interval: Long,
     private val type: Type,
-    private val source: Uri?
+    private val source: String?
 ) : Fragment() {
     var isModified = false
 
@@ -176,8 +176,7 @@ class ProfileEditFragment(
                     )
                 Type.EXTERNAL ->
                     startActivityForResult(
-                        Intent.parseUri(source?.toString(), 0)
-                            ?: throw NullPointerException(),
+                        source?.toIntent() ?: return false,
                         REQUEST_CODE
                     )
                 else -> return false
@@ -195,5 +194,13 @@ class ProfileEditFragment(
 
     private fun Long.toStringIfNonZero(): String {
         return if ( this == 0L ) "" else this.toString()
+    }
+
+    private fun String.toIntent(): Intent? {
+        return try {
+            Intent.parseUri(this, 0)
+        } catch (e: Exception) {
+            null
+        }
     }
 }

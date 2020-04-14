@@ -21,7 +21,6 @@ val gKotlinVersion: String by rootExtra
 val gKotlinCoroutineVersion: String by rootExtra
 val gAppCenterVersion: String by rootExtra
 val gAndroidKtxVersion: String by rootExtra
-val gLifecycleVersion: String by rootExtra
 val gRecyclerviewVersion: String by rootExtra
 val gAppCompatVersion: String by rootExtra
 val gMaterialDesignVersion: String by rootExtra
@@ -96,8 +95,6 @@ dependencies {
     implementation(project(":common"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$gKotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$gKotlinCoroutineVersion")
-    implementation("androidx.lifecycle:lifecycle-extensions:$gLifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-common-java8:$gLifecycleVersion")
     implementation("androidx.recyclerview:recyclerview:$gRecyclerviewVersion")
     implementation("androidx.core:core-ktx:$gAndroidKtxVersion")
     implementation("androidx.appcompat:appcompat:$gAppCompatVersion")

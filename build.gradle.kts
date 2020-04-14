@@ -19,7 +19,6 @@ buildscript {
         this["gRoomVersion"] = "2.2.5"
         this["gAppCenterVersion"] = "2.5.1"
         this["gAndroidKtxVersion"] = "1.2.0"
-        this["gLifecycleVersion"] = "2.2.0"
         this["gRecyclerviewVersion"] = "1.1.0"
         this["gAppCompatVersion"] = "1.1.0"
         this["gMaterialDesignVersion"] = "1.1.0"

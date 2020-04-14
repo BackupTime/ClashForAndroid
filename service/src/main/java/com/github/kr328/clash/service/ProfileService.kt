@@ -62,7 +62,7 @@ class ProfileService : BaseService() {
                             name = "",
                             type = Profile.Type.valueOf(type),
                             uri = Uri.EMPTY,
-                            source = source?.let { Uri.parse(it) },
+                            source = source,
                             active = false,
                             interval = 0,
                             lastModified = 0

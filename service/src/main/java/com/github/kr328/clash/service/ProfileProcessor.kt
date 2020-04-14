@@ -1,6 +1,7 @@
 package com.github.kr328.clash.service
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.webkit.URLUtil
 import com.github.kr328.clash.common.utils.Log
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
+import java.lang.Exception
 import java.util.*
 
 object ProfileProcessor {
@@ -79,10 +81,19 @@ object ProfileProcessor {
                 throw IllegalArgumentException("Invalid type")
             !URLUtil.isValidUrl(uri.toString()) ->
                 throw IllegalArgumentException("Invalid uri")
-            source?.let { URLUtil.isValidUrl(it.toString()) } == false ->
+            source?.isValidIntent() == false ->
                 throw IllegalArgumentException("Invalid source")
             interval < 0 ->
                 throw IllegalArgumentException("Invalid interval")
+        }
+    }
+
+    private fun String.isValidIntent(): Boolean {
+        return try {
+            Intent.parseUri(this, 0)
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 }
