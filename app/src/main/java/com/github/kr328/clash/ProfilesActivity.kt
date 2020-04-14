@@ -1,16 +1,15 @@
 package com.github.kr328.clash
 
-import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.ProfileAdapter
 import com.github.kr328.clash.common.util.intent
-import com.github.kr328.clash.common.util.startForegroundServiceCompat
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.service.ProfileProvider
 import com.github.kr328.clash.service.ProfileReceiver
 import com.github.kr328.clash.service.model.Profile
+import com.github.kr328.clash.service.util.sendBroadcastSelf
 import com.github.kr328.clash.weight.ProfilesMenu
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_profiles.*
@@ -27,7 +26,6 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         private const val EDITOR_REQUEST_CODE = 30000
     }
 
-    private val self = this
     private var backgroundJob: Job? = null
     private val reloadMutex = Mutex()
     private val editorStack = Stack<Long>()
@@ -69,12 +67,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
                 val id = editorStack.pop()
 
                 withProfile {
-                    if (resultCode == Activity.RESULT_OK)
-                        commitAsync(id)
-                    else
-                        ProfileProvider.releaseTemp(self, id)
-
-                    Unit
+                    startUpdate(id)
                 }
             }
 
@@ -132,13 +125,15 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
             if (id < 0)
                 throw FileNotFoundException()
 
-            val uri = ProfileProvider.acquireTemp(self, id)
+            val uri = withProfile {
+                acquireTempUri(id)
+            } ?: throw FileNotFoundException()
 
             editorStack.push(id)
 
             startActivityForResult(
                 Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(uri, "text/plain")
+                    .setDataAndType(Uri.parse(uri), "text/plain")
                     .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
                 EDITOR_REQUEST_CODE
             )
@@ -149,7 +144,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
     }
 
     private fun startUpdate(id: Long) {
-        startForegroundServiceCompat(ProfileReceiver.buildUpdateIntentForId(id))
+        sendBroadcastSelf(ProfileReceiver.buildUpdateIntentForId(id))
     }
 
     override fun onOpenEditor(entity: Profile) {

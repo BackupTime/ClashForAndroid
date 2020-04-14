@@ -18,6 +18,10 @@ class ProfileClient(private val service: IProfileService) {
         service.acquireCloned(id)
     }
 
+    suspend fun acquireTempUri(id: Long): String? = withContext(Dispatchers.IO) {
+        service.acquireTempUri(id)
+    }
+
     suspend fun updateMetadata(id: Long, metadata: Profile) = withContext(Dispatchers.IO) {
         service.updateMetadata(id, metadata)
     }
@@ -38,8 +42,8 @@ class ProfileClient(private val service: IProfileService) {
         }
     }
 
-    suspend fun cancel(id: Long) = withContext(Dispatchers.IO) {
-        service.cancel(id)
+    suspend fun release(id: Long) = withContext(Dispatchers.IO) {
+        service.release(id)
     }
 
     suspend fun delete(id: Long) = withContext(Dispatchers.IO) {

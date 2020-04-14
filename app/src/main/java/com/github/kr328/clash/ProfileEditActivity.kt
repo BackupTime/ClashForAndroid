@@ -98,7 +98,7 @@ class ProfileEditActivity : BaseActivity() {
     override fun onDestroy() {
         runBlocking {
             withProfile {
-                cancel(intent.getLongExtra("id", -1))
+                release(intent.getLongExtra("id", -1))
             }
         }
 

@@ -1,20 +1,21 @@
 package com.github.kr328.clash.service;
 
 import com.github.kr328.clash.service.transact.IStreamCallback;
-import com.github.kr328.clash.service.model.ProfileMetadata;
+import com.github.kr328.clash.service.model.Profile;
 
 interface IProfileService {
     long acquireUnused(String type);
     long acquireCloned(long id);
-    void updateMetadata(long id, in ProfileMetadata metadata);
+    String acquireTempUri(long id);
+    void release(long id);
+    void updateMetadata(long id, in Profile metadata);
     void commit(long id, in IStreamCallback callback);
-    void cancel(long id);
     void delete(long id);
     void clear(long id);
 
-    ProfileMetadata queryById(long id);
-    ProfileMetadata[] queryAll();
-    ProfileMetadata queryActive();
+    Profile queryById(long id);
+    Profile[] queryAll();
+    Profile queryActive();
 
     void setActive(long id);
 }

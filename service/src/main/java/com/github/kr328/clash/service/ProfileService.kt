@@ -44,7 +44,7 @@ class ProfileService : BaseService() {
                 }
             }
 
-            override fun cancel(id: Long) {
+            override fun release(id: Long) {
                 launch {
                     lock.withLock {
                         pending.remove(id)
@@ -138,6 +138,26 @@ class ProfileService : BaseService() {
                 }
             }
 
+            override fun acquireTempUri(id: Long): String? {
+                val file = service.resolveProfileFile(id)
+                if ( !file.exists() )
+                    return null
+
+                val tempFile = service.resolveTempProfileFile(id)
+
+                file.copyTo(tempFile)
+
+                val uri = ProfileProvider.resolveUri(service, tempFile)
+
+                return runBlocking {
+                    lock.withLock {
+                        pending[id] = queryMetadataById(id)?.copy(uri = uri) ?: return@withLock
+                    }
+
+                    uri.toString()
+                }
+            }
+
             override fun updateMetadata(id: Long, metadata: Profile?) {
                 launch {
                     lock.withLock {
@@ -164,17 +184,13 @@ class ProfileService : BaseService() {
 
             val ctx = lock.withLock {
                 tasks.entries.firstOrNull()?.also {
-                    tasks.remove(it.key)
+                    tasks[it.key]
                 }
             } ?: continue
 
             try {
                 val metadata = queryMetadataById(ctx.key)
                     ?: throw RemoteException("No such profile")
-
-                lock.withLock {
-                    pending.remove(metadata.id)
-                }
 
                 ProfileProcessor.createOrUpdate(service, metadata)
 
@@ -183,6 +199,11 @@ class ProfileService : BaseService() {
                 service.broadcastProfileChanged()
             } catch (e: Exception) {
                 ctx.value?.completeExceptionally(e.message)
+            }
+            finally {
+                lock.withLock {
+                    tasks.remove(ctx.key)
+                }
             }
 
             request.offer(Unit)
