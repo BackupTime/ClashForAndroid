@@ -115,7 +115,7 @@ class ProfileBackgroundService : BaseService() {
                     false
                 }
                 if (queue.isEmpty()) {
-                    launch { delay(1000 * 10) }.onJoin {
+                    launch { delay(1000 * 5) }.onJoin {
                         true
                     }
                 }
