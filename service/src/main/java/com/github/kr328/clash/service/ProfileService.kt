@@ -52,7 +52,7 @@ class ProfileService : BaseService() {
                 }
             }
 
-            override fun acquireUnused(type: String): Long {
+            override fun acquireUnused(type: String, source: String?): Long {
                 return runBlocking {
                     lock.withLock {
                         val id = generateNextId()
@@ -62,7 +62,7 @@ class ProfileService : BaseService() {
                             name = "",
                             type = Profile.Type.valueOf(type),
                             uri = Uri.EMPTY,
-                            source = null,
+                            source = source?.let { Uri.parse(it) },
                             active = false,
                             interval = 0,
                             lastModified = 0
@@ -152,7 +152,7 @@ class ProfileService : BaseService() {
                 return ProfileProvider.resolveUri(service, tempFile).toString()
             }
 
-            override fun updateMetadata(id: Long, metadata: Profile?) {
+            override fun update(id: Long, metadata: Profile?) {
                 launch {
                     lock.withLock {
                         pending[id] = metadata ?: return@launch

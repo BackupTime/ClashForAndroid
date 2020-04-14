@@ -9,16 +9,16 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import androidx.core.content.edit
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ProcessLifecycleOwner
 import com.github.kr328.clash.ApkBrokenActivity
 import com.github.kr328.clash.Constants
+import com.github.kr328.clash.common.Global
 import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager
 import com.github.kr328.clash.service.IProfileService
 import com.github.kr328.clash.service.ProfileService
+import com.github.kr328.clash.utils.ApplicationObserver
 import com.microsoft.appcenter.crashes.Crashes
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -82,60 +82,63 @@ object Remote {
         }
     }
 
-    fun init(application: Application) {
-        val handler = Handler()
+    private val handler = Handler()
+    private val observer = ApplicationObserver {
+        Log.d("Remote Connection State = $it")
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStart(owner: LifecycleOwner) {
-                handler.removeMessages(0)
+        val application = Global.application
 
-                GlobalScope.launch {
-                    val valid = withContext(Dispatchers.IO) {
-                        verifyApk(application)
-                    }
+        if ( it ) {
+            handler.removeMessages(0)
 
-                    if (!valid) {
-                        application.startActivity(
-                            ApkBrokenActivity::class.intent
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                        return@launch
-                    }
+            GlobalScope.launch {
+                val valid = withContext(Dispatchers.IO) {
+                    verifyApk(application)
+                }
 
-                    clashConnection = ClashConnection().apply {
-                        application.bindService(
-                            ClashManagerService::class.intent,
-                            this,
-                            Context.BIND_AUTO_CREATE
-                        )
-                    }
+                if (!valid) {
+                    application.startActivity(
+                        ApkBrokenActivity::class.intent
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                    return@launch
+                }
 
-                    profileConnection = ProfileConnection().apply {
-                        application.bindService(
-                            ProfileService::class.intent,
-                            this,
-                            Context.BIND_AUTO_CREATE
-                        )
-                    }
+                clashConnection = ClashConnection().apply {
+                    application.bindService(
+                        ClashManagerService::class.intent,
+                        this,
+                        Context.BIND_AUTO_CREATE
+                    )
+                }
+
+                profileConnection = ProfileConnection().apply {
+                    application.bindService(
+                        ProfileService::class.intent,
+                        this,
+                        Context.BIND_AUTO_CREATE
+                    )
                 }
             }
+        } else {
+            handler.postDelayed({
+                clashConnection?.also {
+                    application.unbindService(it)
+                    it.onServiceDisconnected(null)
+                }
+                profileConnection?.also {
+                    application.unbindService(it)
+                    it.onServiceDisconnected(null)
+                }
 
-            override fun onStop(owner: LifecycleOwner) {
-                handler.postDelayed({
-                    clashConnection?.also {
-                        application.unbindService(it)
-                        it.onServiceDisconnected(null)
-                    }
-                    profileConnection?.also {
-                        application.unbindService(it)
-                        it.onServiceDisconnected(null)
-                    }
+                clashConnection = null
+                profileConnection = null
+            }, 5000)
+        }
+    }
 
-                    clashConnection = null
-                    profileConnection = null
-                }, 5000)
-            }
-        })
+    fun init(application: Application) {
+        observer.register(application)
     }
 
     private fun verifyApk(application: Application): Boolean {

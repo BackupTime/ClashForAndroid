@@ -118,7 +118,7 @@ class ProfileEditActivity : BaseActivity() {
         launch {
             try {
                 withProfile {
-                    updateMetadata(metadata.id, metadata)
+                    update(metadata.id, metadata)
                     commitAsync(metadata.id).await()
                 }
 

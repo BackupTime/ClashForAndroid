@@ -67,7 +67,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
                 val profile = editorStack.pop()
 
                 withProfile {
-                    updateMetadata(profile.id, profile)
+                    update(profile.id, profile)
                     startUpdate(profile.id)
                 }
             }

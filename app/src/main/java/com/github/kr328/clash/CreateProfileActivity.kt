@@ -15,6 +15,7 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.remote.withProfile
+import com.github.kr328.clash.service.model.Profile
 import com.github.kr328.clash.service.model.Profile.Type
 import kotlinx.android.synthetic.main.activity_create_profile.*
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +48,7 @@ class CreateProfileActivity : BaseActivity() {
 
                 self.launch {
                     val id = withProfile {
-                        acquireUnused(item.type)
+                        acquireUnused(item.type, item.intent?.toUri(0))
                     }
 
                     startActivityForResult(

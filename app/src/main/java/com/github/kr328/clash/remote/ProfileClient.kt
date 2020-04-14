@@ -10,8 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class ProfileClient(private val service: IProfileService) {
-    suspend fun acquireUnused(type: Profile.Type) = withContext(Dispatchers.IO) {
-        service.acquireUnused(type.name)
+    suspend fun acquireUnused(type: Profile.Type, source: String?) = withContext(Dispatchers.IO) {
+        service.acquireUnused(type.name, source)
     }
 
     suspend fun acquireCloned(id: Long) = withContext(Dispatchers.IO) {
@@ -22,8 +22,8 @@ class ProfileClient(private val service: IProfileService) {
         service.acquireTempUri(id)
     }
 
-    suspend fun updateMetadata(id: Long, metadata: Profile) = withContext(Dispatchers.IO) {
-        service.updateMetadata(id, metadata)
+    suspend fun update(id: Long, metadata: Profile) = withContext(Dispatchers.IO) {
+        service.update(id, metadata)
     }
 
     suspend fun commitAsync(id: Long) = withContext(Dispatchers.IO) {
