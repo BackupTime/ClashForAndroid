@@ -58,15 +58,15 @@ class ClashRuntime(private val context: Context) {
             try {
                 Clash.start()
 
-                modules.forEach {
-                    it.onStart()
-                }
-
                 context.registerReceiver(receiver, IntentFilter().apply {
                     modules.flatMap { it.receiveBroadcasts }.distinct().forEach {
                         addAction(it)
                     }
                 }, Permissions.PERMISSION_RECEIVE_BROADCASTS, null)
+
+                modules.forEach {
+                    it.onStart()
+                }
 
                 while (isActive) {
                     tickerEnabled = modules.any { it.enableTicker }

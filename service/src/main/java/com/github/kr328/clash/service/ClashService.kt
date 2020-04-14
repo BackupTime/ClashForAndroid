@@ -40,7 +40,7 @@ class ClashService : BaseService() {
 
                         stopSelf()
                     } else {
-                        broadcastProfileLoaded()
+                        service.broadcastProfileLoaded()
                     }
                 }
             }

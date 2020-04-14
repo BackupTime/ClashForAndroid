@@ -1,6 +1,5 @@
 package com.github.kr328.clash.service.data
 
-import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
