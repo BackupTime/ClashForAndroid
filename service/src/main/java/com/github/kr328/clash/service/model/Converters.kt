@@ -5,16 +5,16 @@ import android.net.Uri
 import com.github.kr328.clash.service.data.ProfileEntity
 import com.github.kr328.clash.service.util.resolveProfileFile
 
-fun ProfileEntity.toProfileMetadata(context: Context): ProfileMetadata {
+fun ProfileEntity.asProfile(context: Context): Profile {
     val type = when (this.type) {
-        ProfileEntity.TYPE_FILE -> ProfileMetadata.Type.FILE
-        ProfileEntity.TYPE_URL -> ProfileMetadata.Type.URL
-        ProfileEntity.TYPE_EXTERNAL -> ProfileMetadata.Type.EXTERNAL
-        else -> ProfileMetadata.Type.EXTERNAL
+        ProfileEntity.TYPE_FILE -> Profile.Type.FILE
+        ProfileEntity.TYPE_URL -> Profile.Type.URL
+        ProfileEntity.TYPE_EXTERNAL -> Profile.Type.EXTERNAL
+        else -> Profile.Type.EXTERNAL
     }
     val lastModified = context.resolveProfileFile(id).lastModified()
 
-    return ProfileMetadata(
+    return Profile(
         id = id,
         name = name,
         type = type,
@@ -26,12 +26,12 @@ fun ProfileEntity.toProfileMetadata(context: Context): ProfileMetadata {
     )
 }
 
-fun ProfileMetadata.toProfileEntity(): ProfileEntity {
+fun Profile.asEntity(): ProfileEntity {
     val type = when (this.type) {
-        ProfileMetadata.Type.FILE -> ProfileEntity.TYPE_FILE
-        ProfileMetadata.Type.URL -> ProfileEntity.TYPE_URL
-        ProfileMetadata.Type.EXTERNAL -> ProfileEntity.TYPE_EXTERNAL
-        ProfileMetadata.Type.UNKNOWN -> ProfileEntity.TYPE_UNKNOWN
+        Profile.Type.FILE -> ProfileEntity.TYPE_FILE
+        Profile.Type.URL -> ProfileEntity.TYPE_URL
+        Profile.Type.EXTERNAL -> ProfileEntity.TYPE_EXTERNAL
+        Profile.Type.UNKNOWN -> ProfileEntity.TYPE_UNKNOWN
     }
 
     return ProfileEntity(

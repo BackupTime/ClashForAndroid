@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
-data class ProfileMetadata(
+data class Profile(
     val id: Long,
     val name: String,
     val type: Type,
@@ -32,12 +32,12 @@ data class ProfileMetadata(
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<ProfileMetadata> {
-        override fun createFromParcel(parcel: Parcel): ProfileMetadata {
+    companion object CREATOR : Parcelable.Creator<Profile> {
+        override fun createFromParcel(parcel: Parcel): Profile {
             return Parcels.load(serializer(), parcel)
         }
 
-        override fun newArray(size: Int): Array<ProfileMetadata?> {
+        override fun newArray(size: Int): Array<Profile?> {
             return arrayOfNulls(size)
         }
     }

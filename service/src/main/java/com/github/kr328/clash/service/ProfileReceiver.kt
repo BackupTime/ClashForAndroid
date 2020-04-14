@@ -12,7 +12,7 @@ import com.github.kr328.clash.common.ids.PendingIds
 import com.github.kr328.clash.common.util.componentName
 import com.github.kr328.clash.common.util.startForegroundServiceCompat
 import com.github.kr328.clash.service.data.ProfileDao
-import com.github.kr328.clash.service.model.toProfileMetadata
+import com.github.kr328.clash.service.model.asProfile
 import kotlinx.coroutines.sync.Mutex
 
 class ProfileReceiver : BroadcastReceiver() {
@@ -42,7 +42,7 @@ class ProfileReceiver : BroadcastReceiver() {
         }
 
         suspend fun requestNextUpdate(context: Context, id: Long) {
-            val metadata = ProfileDao.queryById(id)?.toProfileMetadata(context) ?: return
+            val metadata = ProfileDao.queryById(id)?.asProfile(context) ?: return
             val service = context.getSystemService<AlarmManager>() ?: return
 
             if (metadata.interval <= 0)

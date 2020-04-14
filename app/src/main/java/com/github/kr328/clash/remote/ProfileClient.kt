@@ -4,13 +4,13 @@ import android.os.RemoteException
 import com.github.kr328.clash.service.IProfileService
 import com.github.kr328.clash.service.transact.IStreamCallback
 import com.github.kr328.clash.service.transact.ParcelableContainer
-import com.github.kr328.clash.service.model.ProfileMetadata
+import com.github.kr328.clash.service.model.Profile
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class ProfileClient(private val service: IProfileService) {
-    suspend fun acquireUnused(type: ProfileMetadata.Type) = withContext(Dispatchers.IO) {
+    suspend fun acquireUnused(type: Profile.Type) = withContext(Dispatchers.IO) {
         service.acquireUnused(type.name)
     }
 
@@ -18,7 +18,7 @@ class ProfileClient(private val service: IProfileService) {
         service.acquireCloned(id)
     }
 
-    suspend fun updateMetadata(id: Long, metadata: ProfileMetadata) = withContext(Dispatchers.IO) {
+    suspend fun updateMetadata(id: Long, metadata: Profile) = withContext(Dispatchers.IO) {
         service.updateMetadata(id, metadata)
     }
 
@@ -50,15 +50,15 @@ class ProfileClient(private val service: IProfileService) {
         service.clear(id)
     }
 
-    suspend fun queryAll(): Array<ProfileMetadata> = withContext(Dispatchers.IO) {
+    suspend fun queryAll(): Array<Profile> = withContext(Dispatchers.IO) {
         service.queryAll()
     }
 
-    suspend fun queryActive(): ProfileMetadata? = withContext(Dispatchers.IO) {
+    suspend fun queryActive(): Profile? = withContext(Dispatchers.IO) {
         service.queryActive()
     }
 
-    suspend fun queryById(id: Long): ProfileMetadata? = withContext(Dispatchers.IO) {
+    suspend fun queryById(id: Long): Profile? = withContext(Dispatchers.IO) {
         service.queryById(id)
     }
 

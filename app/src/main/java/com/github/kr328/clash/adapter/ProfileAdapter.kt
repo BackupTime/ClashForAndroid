@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.R
-import com.github.kr328.clash.service.model.ProfileMetadata
+import com.github.kr328.clash.service.model.Profile
 import com.github.kr328.clash.utils.IntervalUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,12 +17,12 @@ import kotlinx.coroutines.withContext
 class ProfileAdapter(private val context: Context, private val callback: Callback) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     interface Callback {
-        fun onProfileClicked(entity: ProfileMetadata)
-        fun onMenuClicked(entity: ProfileMetadata)
+        fun onProfileClicked(entity: Profile)
+        fun onMenuClicked(entity: Profile)
         fun onNewProfile()
     }
 
-    private var entities: List<ProfileMetadata> = emptyList()
+    private var entities: List<Profile> = emptyList()
 
     class EntityHolder(view: View) : RecyclerView.ViewHolder(view) {
         val root: View = view.findViewById(R.id.root)
@@ -37,7 +37,7 @@ class ProfileAdapter(private val context: Context, private val callback: Callbac
         val root: View = view.findViewById(R.id.root)
     }
 
-    suspend fun setEntitiesAsync(new: List<ProfileMetadata>) {
+    suspend fun setEntitiesAsync(new: List<Profile>) {
         val old = withContext(Dispatchers.Main) {
             entities
         }
@@ -118,13 +118,13 @@ class ProfileAdapter(private val context: Context, private val callback: Callbac
         }
     }
 
-    private fun getTypeName(type: ProfileMetadata.Type): CharSequence {
+    private fun getTypeName(type: Profile.Type): CharSequence {
         return when (type) {
-            ProfileMetadata.Type.FILE ->
+            Profile.Type.FILE ->
                 context.getText(R.string.file)
-            ProfileMetadata.Type.URL ->
+            Profile.Type.URL ->
                 context.getText(R.string.url)
-            ProfileMetadata.Type.EXTERNAL ->
+            Profile.Type.EXTERNAL ->
                 context.getText(R.string.external)
             else ->
                 context.getText(R.string.unknown)

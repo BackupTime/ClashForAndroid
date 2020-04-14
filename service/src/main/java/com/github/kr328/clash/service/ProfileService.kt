@@ -5,8 +5,8 @@ import android.net.Uri
 import android.os.IBinder
 import android.os.RemoteException
 import com.github.kr328.clash.service.data.ProfileDao
-import com.github.kr328.clash.service.model.ProfileMetadata
-import com.github.kr328.clash.service.model.toProfileMetadata
+import com.github.kr328.clash.service.model.Profile
+import com.github.kr328.clash.service.model.asProfile
 import com.github.kr328.clash.service.transact.IStreamCallback
 import com.github.kr328.clash.service.util.broadcastProfileChanged
 import com.github.kr328.clash.service.util.resolveBaseDir
@@ -20,7 +20,7 @@ import kotlinx.coroutines.sync.withLock
 class ProfileService : BaseService() {
     private val service = this
     private val lock = Mutex()
-    private val pending = mutableMapOf<Long, ProfileMetadata>()
+    private val pending = mutableMapOf<Long, Profile>()
     private val tasks = mutableMapOf<Long, IStreamCallback?>()
     private val request = Channel<Unit>(Channel.CONFLATED)
 
@@ -57,10 +57,10 @@ class ProfileService : BaseService() {
                     lock.withLock {
                         val id = generateNextId()
 
-                        pending[id] = ProfileMetadata(
+                        pending[id] = Profile(
                             id = id,
                             name = "",
-                            type = ProfileMetadata.Type.valueOf(type),
+                            type = Profile.Type.valueOf(type),
                             uri = Uri.EMPTY,
                             source = null,
                             active = false,
@@ -89,9 +89,9 @@ class ProfileService : BaseService() {
                 }
             }
 
-            override fun queryActive(): ProfileMetadata? {
+            override fun queryActive(): Profile? {
                 return runBlocking {
-                    ProfileDao.queryActive()?.toProfileMetadata(service)
+                    ProfileDao.queryActive()?.asProfile(service)
                 }
             }
 
@@ -123,13 +123,13 @@ class ProfileService : BaseService() {
                 }
             }
 
-            override fun queryAll(): Array<ProfileMetadata> {
+            override fun queryAll(): Array<Profile> {
                 return runBlocking {
-                    ProfileDao.queryAll().map { it.toProfileMetadata(service) }.toTypedArray()
+                    ProfileDao.queryAll().map { it.asProfile(service) }.toTypedArray()
                 }
             }
 
-            override fun queryById(id: Long): ProfileMetadata? {
+            override fun queryById(id: Long): Profile? {
                 return runBlocking {
                     lock.withLock {
                         queryMetadataById(id)
@@ -137,7 +137,7 @@ class ProfileService : BaseService() {
                 }
             }
 
-            override fun updateMetadata(id: Long, metadata: ProfileMetadata?) {
+            override fun updateMetadata(id: Long, metadata: Profile?) {
                 launch {
                     lock.withLock {
                         pending[id] = metadata ?: return@launch
@@ -188,8 +188,8 @@ class ProfileService : BaseService() {
         }
     }
 
-    private suspend fun queryMetadataById(id: Long): ProfileMetadata? {
-        return pending[id] ?: ProfileDao.queryById(id)?.toProfileMetadata(service)
+    private suspend fun queryMetadataById(id: Long): Profile? {
+        return pending[id] ?: ProfileDao.queryById(id)?.asProfile(service)
     }
 
     private suspend fun generateNextId(): Long {

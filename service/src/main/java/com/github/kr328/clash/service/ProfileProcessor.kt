@@ -5,9 +5,9 @@ import android.net.Uri
 import android.webkit.URLUtil
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ProfileDao
-import com.github.kr328.clash.service.model.ProfileMetadata
-import com.github.kr328.clash.service.model.ProfileMetadata.Type
-import com.github.kr328.clash.service.model.toProfileEntity
+import com.github.kr328.clash.service.model.Profile
+import com.github.kr328.clash.service.model.Profile.Type
+import com.github.kr328.clash.service.model.asEntity
 import com.github.kr328.clash.service.util.resolveBaseDir
 import com.github.kr328.clash.service.util.resolveProfileFile
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +17,7 @@ import java.io.FileNotFoundException
 import java.util.*
 
 object ProfileProcessor {
-    suspend fun createOrUpdate(context: Context, metadata: ProfileMetadata) =
+    suspend fun createOrUpdate(context: Context, metadata: Profile) =
         withContext(Dispatchers.IO) {
             metadata.enforceFieldValid()
 
@@ -36,9 +36,9 @@ object ProfileProcessor {
                         context,
                         context.resolveProfileFile(metadata.id)
                     )
-                ).toProfileEntity()
+                ).asEntity()
             else
-                metadata.toProfileEntity()
+                metadata.asEntity()
 
             if (ProfileDao.queryById(metadata.id) == null)
                 ProfileDao.insert(entity)
@@ -66,7 +66,7 @@ object ProfileProcessor {
         }.await()
     }
 
-    private fun ProfileMetadata.enforceFieldValid() {
+    private fun Profile.enforceFieldValid() {
         when {
             id < 0 ->
                 throw IllegalArgumentException("Invalid id")

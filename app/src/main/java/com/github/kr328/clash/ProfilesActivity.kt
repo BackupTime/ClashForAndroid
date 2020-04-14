@@ -5,15 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.ProfileAdapter
-import com.github.kr328.clash.common.ids.Intents
-import com.github.kr328.clash.common.util.componentName
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.util.startForegroundServiceCompat
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.service.ProfileBackgroundService
 import com.github.kr328.clash.service.ProfileProvider
 import com.github.kr328.clash.service.ProfileReceiver
-import com.github.kr328.clash.service.model.ProfileMetadata
+import com.github.kr328.clash.service.model.Profile
 import com.github.kr328.clash.weight.ProfilesMenu
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_profiles.*
@@ -104,7 +101,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         reloadMutex.unlock()
     }
 
-    override fun onProfileClicked(entity: ProfileMetadata) {
+    override fun onProfileClicked(entity: Profile) {
         launch {
             withProfile {
                 setActive(entity.id)
@@ -112,7 +109,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         }
     }
 
-    override fun onMenuClicked(entity: ProfileMetadata) {
+    override fun onMenuClicked(entity: Profile) {
         ProfilesMenu(this, entity, this).show()
     }
 
@@ -155,19 +152,19 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         startForegroundServiceCompat(ProfileReceiver.buildUpdateIntentForId(id))
     }
 
-    override fun onOpenEditor(entity: ProfileMetadata) {
+    override fun onOpenEditor(entity: Profile) {
         openEditor(entity.id)
     }
 
-    override fun onUpdate(entity: ProfileMetadata) {
+    override fun onUpdate(entity: Profile) {
         startUpdate(entity.id)
     }
 
-    override fun onOpenProperties(entity: ProfileMetadata) {
+    override fun onOpenProperties(entity: Profile) {
         openProperties(entity.id)
     }
 
-    override fun onDuplicate(entity: ProfileMetadata) {
+    override fun onDuplicate(entity: Profile) {
         launch {
             withProfile {
                 openProperties(acquireCloned(entity.id))
@@ -175,7 +172,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         }
     }
 
-    override fun onResetProvider(entity: ProfileMetadata) {
+    override fun onResetProvider(entity: Profile) {
         launch {
             withProfile {
                 clear(entity.id)
@@ -183,7 +180,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         }
     }
 
-    override fun onDelete(entity: ProfileMetadata) {
+    override fun onDelete(entity: Profile) {
         launch {
             withProfile {
                 delete(entity.id)

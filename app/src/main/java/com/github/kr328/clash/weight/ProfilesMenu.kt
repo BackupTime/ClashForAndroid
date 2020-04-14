@@ -6,21 +6,21 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import com.github.kr328.clash.R
 import com.github.kr328.clash.design.view.CommonUiLayout
-import com.github.kr328.clash.service.model.ProfileMetadata
+import com.github.kr328.clash.service.model.Profile
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class ProfilesMenu(
     context: Context,
-    private val entity: ProfileMetadata,
+    private val entity: Profile,
     private val callback: Callback
 ) : BottomSheetDialog(context) {
     interface Callback {
-        fun onOpenEditor(entity: ProfileMetadata)
-        fun onUpdate(entity: ProfileMetadata)
-        fun onOpenProperties(entity: ProfileMetadata)
-        fun onDuplicate(entity: ProfileMetadata)
-        fun onResetProvider(entity: ProfileMetadata)
-        fun onDelete(entity: ProfileMetadata)
+        fun onOpenEditor(entity: Profile)
+        fun onUpdate(entity: Profile)
+        fun onOpenProperties(entity: Profile)
+        fun onDuplicate(entity: Profile)
+        fun onResetProvider(entity: Profile)
+        fun onDelete(entity: Profile)
     }
 
     init {
@@ -38,7 +38,7 @@ class ProfilesMenu(
         }
 
         menu.build {
-            if (entity.type != ProfileMetadata.Type.FILE) {
+            if (entity.type != Profile.Type.FILE) {
                 option(
                     title = context.getString(R.string.update),
                     icon = context.getDrawable(R.drawable.ic_update)

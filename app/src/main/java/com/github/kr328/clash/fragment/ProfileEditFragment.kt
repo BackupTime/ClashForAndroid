@@ -16,7 +16,7 @@ import com.github.kr328.clash.Constants
 import com.github.kr328.clash.R
 import com.github.kr328.clash.design.common.TextInput
 import com.github.kr328.clash.design.view.CommonUiLayout
-import com.github.kr328.clash.service.model.ProfileMetadata.Type
+import com.github.kr328.clash.service.model.Profile.Type
 import com.google.android.material.snackbar.Snackbar
 
 class ProfileEditFragment(

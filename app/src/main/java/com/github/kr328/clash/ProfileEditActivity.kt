@@ -6,7 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.github.kr328.clash.fragment.ProfileEditFragment
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.service.model.ProfileMetadata
+import com.github.kr328.clash.service.model.Profile
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_profile_edit.*
 import kotlinx.coroutines.launch
@@ -101,7 +101,7 @@ class ProfileEditActivity : BaseActivity() {
         super.onDestroy()
     }
 
-    private fun commit(metadata: ProfileMetadata) {
+    private fun commit(metadata: Profile) {
         launch {
             try {
                 withProfile {
