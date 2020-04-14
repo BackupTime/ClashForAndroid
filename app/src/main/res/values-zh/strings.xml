@@ -84,8 +84,8 @@
     <string name="recently">近期</string>
     <string name="refresh">刷新</string>
     <string name="reset_provider">重置外部引用</string>
-    <string name="route_system_traffic">路由系统流量</string>
-    <string name="routing_via_vpn_service">通过 VpnService 路由所有系统流量</string>
+    <string name="route_system_traffic">自动路由系统流量</string>
+    <string name="routing_via_vpn_service">通过 VpnService 自动路由所有系统流量</string>
     <string name="rule">规则</string>
     <string name="rule_mode">规则模式</string>
     <string name="running">运行中</string>
