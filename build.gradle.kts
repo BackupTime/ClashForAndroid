@@ -10,8 +10,8 @@ buildscript {
         this["gMinSdkVersion"] = 24
         this["gTargetSdkVersion"] = 29
 
-        this["gVersionCode"] = 10200
-        this["gVersionName"] = "1.2.0"
+        this["gVersionCode"] = 10201
+        this["gVersionName"] = "1.2.1"
 
         this["gKotlinVersion"] = kotlinVersion
         this["gKotlinCoroutineVersion"] = "1.3.5"

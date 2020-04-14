@@ -137,13 +137,13 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         override val allowApplications: List<String>
             get() {
                 return if (settings.get(ServiceSettings.ACCESS_CONTROL_MODE) == ServiceSettings.ACCESS_CONTROL_MODE_WHITELIST) {
-                    settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toList()
+                    (settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES) + packageName).toList()
                 } else emptyList()
             }
         override val disallowApplication: List<String>
             get() {
                 return if (settings.get(ServiceSettings.ACCESS_CONTROL_MODE) == ServiceSettings.ACCESS_CONTROL_MODE_BLACKLIST) {
-                    settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES).toList()
+                    (settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES) - packageName).toList()
                 } else emptyList()
             }
     }

@@ -31,17 +31,6 @@ var client = &http.Client{
 
 			tunnel.Add(inbound.NewSocket(socks5.ParseAddr(address), server, constant.HTTP, constant.TCP))
 
-			go func() {
-				if ctx == nil || ctx.Done() == nil {
-					return
-				}
-
-				<-ctx.Done()
-
-				_ = client.Close()
-				_ = server.Close()
-			}()
-
 			return client, nil
 		},
 	},
