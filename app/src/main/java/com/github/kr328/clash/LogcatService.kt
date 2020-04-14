@@ -15,8 +15,8 @@ import android.os.IInterface
 import androidx.collection.CircularArray
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.github.kr328.clash.common.util.createLanguageConfigurationContext
-import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.createLanguageConfigurationContext
+import com.github.kr328.clash.common.utils.intent
 import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.model.LogFile

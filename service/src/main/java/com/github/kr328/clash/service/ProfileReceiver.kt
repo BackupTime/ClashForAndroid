@@ -9,8 +9,8 @@ import android.net.Uri
 import androidx.core.content.getSystemService
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.PendingIds
-import com.github.kr328.clash.common.util.componentName
-import com.github.kr328.clash.common.util.startForegroundServiceCompat
+import com.github.kr328.clash.common.utils.componentName
+import com.github.kr328.clash.common.utils.startForegroundServiceCompat
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.model.asProfile
 import kotlinx.coroutines.sync.Mutex

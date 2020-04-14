@@ -3,7 +3,7 @@ package com.github.kr328.clash.settings
 import android.content.pm.PackageManager
 import android.os.Bundle
 import com.github.kr328.clash.R
-import com.github.kr328.clash.common.util.componentName
+import com.github.kr328.clash.common.utils.componentName
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.RestartReceiver
 import com.github.kr328.clash.service.settings.ServiceSettings

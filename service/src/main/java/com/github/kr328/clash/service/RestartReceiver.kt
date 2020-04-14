@@ -3,8 +3,8 @@ package com.github.kr328.clash.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.github.kr328.clash.common.util.intent
-import com.github.kr328.clash.common.util.startForegroundServiceCompat
+import com.github.kr328.clash.common.utils.intent
+import com.github.kr328.clash.common.utils.startForegroundServiceCompat
 import com.github.kr328.clash.service.util.startClashService
 
 class RestartReceiver : BroadcastReceiver() {

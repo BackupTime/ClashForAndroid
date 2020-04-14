@@ -11,8 +11,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.LogFileAdapter
-import com.github.kr328.clash.common.util.intent
-import com.github.kr328.clash.common.util.startForegroundServiceCompat
+import com.github.kr328.clash.common.utils.intent
+import com.github.kr328.clash.common.utils.startForegroundServiceCompat
 import com.github.kr328.clash.design.common.Category
 import com.github.kr328.clash.design.view.CommonUiLayout
 import com.github.kr328.clash.model.LogFile

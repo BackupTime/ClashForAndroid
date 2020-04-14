@@ -33,8 +33,6 @@ object ProfileProcessor {
                 context.resolveBaseDir(metadata.id)
             )
 
-            Log.d("${metadata.uri}")
-
             val entity = if (metadata.type == Type.FILE)
                 metadata.copy(
                     uri = ProfileProvider.resolveUri(

@@ -3,7 +3,7 @@ package com.github.kr328.clash.settings
 import android.os.Bundle
 import com.github.kr328.clash.PackagesActivity
 import com.github.kr328.clash.R
-import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.intent
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.service.settings.ServiceSettings
 

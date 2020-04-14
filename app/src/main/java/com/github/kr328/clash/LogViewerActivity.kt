@@ -10,7 +10,7 @@ import androidx.core.net.toFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.LiveLogAdapter
 import com.github.kr328.clash.adapter.LogAdapter
-import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.intent
 import com.github.kr328.clash.core.event.LogEvent
 import kotlinx.android.synthetic.main.activity_log_viewer.*
 import kotlinx.coroutines.*

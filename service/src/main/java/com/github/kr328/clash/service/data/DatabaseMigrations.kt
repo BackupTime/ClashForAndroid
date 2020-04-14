@@ -201,6 +201,7 @@ object DatabaseMigrations {
                     deleteNotificationChannel("profile_service_result")
                 }
 
+                Log.i("Database Migrated 2 -> 3")
             } catch (e: Exception) {
                 Log.e("Migration failure", e)
             }

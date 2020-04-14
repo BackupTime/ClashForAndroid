@@ -12,7 +12,7 @@ import androidx.core.content.edit
 import com.github.kr328.clash.ApkBrokenActivity
 import com.github.kr328.clash.Constants
 import com.github.kr328.clash.common.Global
-import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.intent
 import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.service.ClashManagerService
 import com.github.kr328.clash.service.IClashManager

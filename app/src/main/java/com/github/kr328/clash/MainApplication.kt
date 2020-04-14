@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.github.kr328.clash.common.Global
-import com.github.kr328.clash.common.util.componentName
+import com.github.kr328.clash.common.utils.componentName
 import com.github.kr328.clash.dump.LogcatDumper
 import com.github.kr328.clash.remote.Broadcasts
 import com.github.kr328.clash.remote.Remote

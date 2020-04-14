@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.github.kr328.clash.common.util.createLanguageConfigurationContext
+import com.github.kr328.clash.common.utils.createLanguageConfigurationContext
 import com.github.kr328.clash.preference.UiSettings
 import com.github.kr328.clash.remote.Broadcasts
 import com.google.android.material.snackbar.Snackbar

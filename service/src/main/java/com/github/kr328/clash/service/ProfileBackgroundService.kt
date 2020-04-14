@@ -18,7 +18,7 @@ import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
 import com.github.kr328.clash.common.ids.PendingIds
-import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.intent
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.transact.IStreamCallback
 import com.github.kr328.clash.service.transact.ParcelableContainer

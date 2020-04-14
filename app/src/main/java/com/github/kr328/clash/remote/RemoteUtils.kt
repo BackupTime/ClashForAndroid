@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.github.kr328.clash.ApkBrokenActivity
-import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.intent
 import com.github.kr328.clash.service.Constants
 import com.github.kr328.clash.service.ServiceStatusProvider
 

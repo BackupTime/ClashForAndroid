@@ -1,4 +1,4 @@
-package com.github.kr328.clash.common.util
+package com.github.kr328.clash.common.utils
 
 import android.content.Context
 import android.content.res.Configuration

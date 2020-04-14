@@ -1,7 +1,7 @@
 package com.github.kr328.clash
 
 import android.os.Bundle
-import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.intent
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : BaseActivity() {

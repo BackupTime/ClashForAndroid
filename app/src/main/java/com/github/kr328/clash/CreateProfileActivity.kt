@@ -13,9 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.utils.intent
 import com.github.kr328.clash.remote.withProfile
-import com.github.kr328.clash.service.model.Profile
 import com.github.kr328.clash.service.model.Profile.Type
 import kotlinx.android.synthetic.main.activity_create_profile.*
 import kotlinx.coroutines.Dispatchers
