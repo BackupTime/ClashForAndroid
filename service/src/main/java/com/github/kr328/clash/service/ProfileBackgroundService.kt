@@ -2,6 +2,7 @@ package com.github.kr328.clash.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -12,9 +13,11 @@ import android.os.IBinder
 import android.os.RemoteException
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.github.kr328.clash.common.Global
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
+import com.github.kr328.clash.common.ids.PendingIds
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.transact.IStreamCallback
@@ -157,6 +160,7 @@ class ProfileBackgroundService : BaseService() {
             .setContentText(content)
             .setColor(getColor(R.color.colorAccentService))
             .setSmallIcon(R.drawable.ic_notification)
+            .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setGroup(NotificationChannels.PROFILE_STATUS)
             .build()
@@ -167,6 +171,13 @@ class ProfileBackgroundService : BaseService() {
     private suspend fun sendUpdateCompleted(id: Long) {
         val entity = ProfileDao.queryById(id) ?: return
 
+        val intent = PendingIntent.getActivity(
+            this,
+            PendingIds.generateProfileResultId(id),
+            Global.openProfileIntent(id),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         val notification = NotificationCompat.Builder(this, NotificationChannels.PROFILE_RESULT)
             .setContentTitle(getText(R.string.process_result))
             .setContentText(getString(R.string.format_update_complete, entity.name))
@@ -174,6 +185,8 @@ class ProfileBackgroundService : BaseService() {
             .setSmallIcon(R.drawable.ic_notification)
             .setOnlyAlertOnce(true)
             .setGroup(NotificationChannels.PROFILE_RESULT)
+            .setAutoCancel(true)
+            .setContentIntent(intent)
             .build()
 
         NotificationManagerCompat.from(this)
@@ -183,6 +196,13 @@ class ProfileBackgroundService : BaseService() {
     private suspend fun sendUpdateFailed(id: Long, reason: String) {
         val entity = ProfileDao.queryById(id) ?: return
 
+        val intent = PendingIntent.getActivity(
+            this,
+            PendingIds.generateProfileResultId(id),
+            Global.openProfileIntent(id),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         val notification = NotificationCompat.Builder(this, NotificationChannels.PROFILE_RESULT)
             .setContentTitle(getString(R.string.format_update_failure, entity.name))
             .setColor(getColor(R.color.colorAccentService))
@@ -190,6 +210,8 @@ class ProfileBackgroundService : BaseService() {
             .setStyle(NotificationCompat.BigTextStyle().bigText(reason))
             .setOnlyAlertOnce(true)
             .setGroup(NotificationChannels.PROFILE_RESULT)
+            .setAutoCancel(true)
+            .setContentIntent(intent)
             .build()
 
         NotificationManagerCompat.from(this)

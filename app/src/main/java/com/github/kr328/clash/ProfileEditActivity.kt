@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class ProfileEditActivity : BaseActivity() {
+    private var editor: ProfileEditFragment? = null
     private var processing = false
         set(value) {
             field = value
@@ -34,7 +35,7 @@ class ProfileEditActivity : BaseActivity() {
         toolbar.setTitle(R.string.loading)
 
         launch {
-            val id = intent.getLongExtra("id", -1)
+            val id = intent.data?.schemeSpecificPart?.toLongOrNull() ?: return@launch finish()
 
             val metadata = withProfile {
                 queryById(id)
@@ -50,9 +51,12 @@ class ProfileEditActivity : BaseActivity() {
             }
 
             val fragment = ProfileEditFragment(
+                metadata.id,
                 metadata.name, metadata.uri, metadata.interval,
                 metadata.type, metadata.source
             )
+
+            editor = fragment
 
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment, fragment)
@@ -87,6 +91,9 @@ class ProfileEditActivity : BaseActivity() {
             return
         }
 
+        if ( editor?.isModified != true)
+            return finish()
+
         AlertDialog.Builder(this)
             .setTitle(R.string.exit_without_save)
             .setMessage(R.string.exit_without_save_warning)
@@ -98,7 +105,9 @@ class ProfileEditActivity : BaseActivity() {
     override fun onDestroy() {
         runBlocking {
             withProfile {
-                release(intent.getLongExtra("id", -1))
+                val id = editor?.id ?: return@withProfile
+
+                release(id)
             }
         }
 

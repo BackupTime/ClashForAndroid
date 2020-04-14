@@ -51,7 +51,13 @@ class CreateProfileActivity : BaseActivity() {
                     }
 
                     startActivityForResult(
-                        ProfileEditActivity::class.intent.putExtra("id", id),
+                        ProfileEditActivity::class.intent.setData(
+                            Uri.fromParts(
+                                "id",
+                                id.toString(),
+                                null
+                            )
+                        ),
                         REQUEST_CODE
                     )
                 }

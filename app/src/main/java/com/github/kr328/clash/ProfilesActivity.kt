@@ -112,13 +112,10 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
     }
 
     private fun openProperties(id: Long) {
-        if (id < 0) {
-            Snackbar.make(rootView, getText(R.string.profile_not_found), Snackbar.LENGTH_LONG)
-                .show()
-            return
-        }
-
-        startActivity(ProfileEditActivity::class.intent.putExtra("id", id))
+        startActivity(
+            ProfileEditActivity::class.intent
+                .setData(Uri.fromParts("id", id.toString(), null))
+        )
     }
 
     private fun openEditor(profile: Profile) = launch {

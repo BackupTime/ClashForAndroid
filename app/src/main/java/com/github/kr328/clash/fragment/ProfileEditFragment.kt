@@ -20,12 +20,15 @@ import com.github.kr328.clash.service.model.Profile.Type
 import com.google.android.material.snackbar.Snackbar
 
 class ProfileEditFragment(
+    val id: Long,
     var name: String,
     var uri: Uri,
     var interval: Long,
     private val type: Type,
     private val source: Uri?
 ) : Fragment() {
+    var isModified = false
+
     companion object {
         private const val REQUEST_CODE = 10000
 
@@ -60,6 +63,7 @@ class ProfileEditFragment(
                 ) {
                     onTextChanged {
                         name = content.toString()
+                        isModified = true
                     }
                 }
                 textInput(
@@ -84,6 +88,7 @@ class ProfileEditFragment(
                         }
 
                         uri = Uri.parse(content.toString())
+                        isModified = true
                     }
                 }
                 textInput(
@@ -118,6 +123,7 @@ class ProfileEditFragment(
                         }
 
                         interval = content.toString().toLong() * 1000 * 60
+                        isModified = true
                     }
 
                     if ( type == Type.FILE )

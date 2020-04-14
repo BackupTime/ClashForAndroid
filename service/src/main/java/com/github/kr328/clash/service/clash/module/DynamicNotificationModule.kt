@@ -5,6 +5,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+import com.github.kr328.clash.common.Global
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.NotificationChannels
 import com.github.kr328.clash.common.ids.NotificationIds
@@ -23,11 +24,6 @@ class DynamicNotificationModule(private val service: Service) : Module() {
             Intent.ACTION_SCREEN_OFF,
             Intents.INTENT_ACTION_PROFILE_LOADED
         )
-    private val contentIntent = Intent(Intent.ACTION_MAIN)
-        .addCategory(Intent.CATEGORY_DEFAULT)
-        .addCategory(Intent.CATEGORY_LAUNCHER)
-        .setPackage(service.packageName)
-        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
     private val builder = NotificationCompat.Builder(service, NotificationChannels.CLASH_STATUS)
         .setSmallIcon(R.drawable.ic_notification)
         .setOngoing(true)
@@ -39,7 +35,7 @@ class DynamicNotificationModule(private val service: Service) : Module() {
             PendingIntent.getActivity(
                 service,
                 NotificationIds.CLASH_STATUS,
-                contentIntent,
+                Global.openMainIntent(),
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
         )

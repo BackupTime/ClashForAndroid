@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
+import com.github.kr328.clash.common.Global
 import com.github.kr328.clash.common.ids.PendingIds
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.util.parseCIDR
@@ -22,12 +23,6 @@ class TunModule(private val service: VpnService) : Module() {
         val allowApplications: List<String>
         val disallowApplication: List<String>
     }
-
-    private val contentIntent = Intent(Intent.ACTION_MAIN)
-        .addCategory(Intent.CATEGORY_DEFAULT)
-        .addCategory(Intent.CATEGORY_LAUNCHER)
-        .setPackage(service.packageName)
-        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
     var configure: Configure? = null
 
@@ -58,7 +53,7 @@ class TunModule(private val service: VpnService) : Module() {
                 PendingIntent.getActivity(
                     service,
                     PendingIds.CLASH_VPN,
-                    contentIntent,
+                    Global.openMainIntent(),
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
             )
