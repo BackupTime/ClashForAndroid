@@ -1,8 +1,10 @@
 package com.github.kr328.clash.service.data
 
+import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
 import androidx.core.database.getStringOrNull
 import androidx.room.migration.Migration
@@ -193,6 +195,13 @@ object DatabaseMigrations {
                 srvSp.edit {
                     putBoolean("enable_vpn", uiSp.getBoolean("enable_vpn", true))
                 }
+
+                NotificationManagerCompat.from(Global.application).apply {
+                    deleteNotificationChannel("clash_status_channel")
+                    deleteNotificationChannel("profile_service_status")
+                    deleteNotificationChannel("profile_service_result")
+                }
+
             } catch (e: Exception) {
                 Log.e("Migration failure", e)
             }
