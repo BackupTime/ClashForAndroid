@@ -10,7 +10,7 @@ fun ProfileEntity.asProfile(context: Context): Profile {
         ProfileEntity.TYPE_FILE -> Profile.Type.FILE
         ProfileEntity.TYPE_URL -> Profile.Type.URL
         ProfileEntity.TYPE_EXTERNAL -> Profile.Type.EXTERNAL
-        else -> Profile.Type.EXTERNAL
+        else -> Profile.Type.UNKNOWN
     }
     val lastModified = context.resolveProfileFile(id).lastModified()
 
