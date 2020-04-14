@@ -20,6 +20,10 @@ github.com/kr328/tun2socket v0.0.0-20200414143005-3c2b6a0e2baa h1:0kdJd6G6eMhU/b
 github.com/kr328/tun2socket v0.0.0-20200414143005-3c2b6a0e2baa/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
 github.com/kr328/tun2socket v0.0.0-20200414144428-a5c90c3acc29 h1:grdaTKqrP64fflliNWnQIysryupmk3dN0a0saMs37+w=
 github.com/kr328/tun2socket v0.0.0-20200414144428-a5c90c3acc29/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
+github.com/kr328/tun2socket v0.0.0-20200414155624-6b35632fb37e h1:YPjlJAVa9mLx01rTfDPrDCNo3ql3AKklxqIrUHXpTlA=
+github.com/kr328/tun2socket v0.0.0-20200414155624-6b35632fb37e/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
+github.com/kr328/tun2socket v0.0.0-20200414165956-abd6279de46b h1:Ou/ti6JuIgI0p99LdkKsO3IC0g5eOcpQdSFgQjwcwDQ=
+github.com/kr328/tun2socket v0.0.0-20200414165956-abd6279de46b/go.mod h1:FWfSixjrLgtK+dHkDoN6lHMNhvER24gnjUZd/wt8Z9o=
 github.com/miekg/dns v1.1.29 h1:xHBEhR+t5RzcFJjBLJlax2daXOrTYtr9z4WdKEfWFzg=
 github.com/miekg/dns v1.1.29/go.mod h1:KNUDUusw/aVsxyTYZM1oqvCicbwhgbNgztCETuNZ7xM=
 github.com/oschwald/geoip2-golang v1.4.0 h1:5RlrjCgRyIGDz/mBmPfnAF4h8k0IAcRv9PvrpOfz+Ug=
