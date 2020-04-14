@@ -3,6 +3,7 @@ package com.github.kr328.clash.service
 import android.content.Context
 import android.net.Uri
 import android.webkit.URLUtil
+import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.model.Profile
@@ -29,6 +30,8 @@ object ProfileProcessor {
                 context.resolveProfileFile(metadata.id),
                 context.resolveBaseDir(metadata.id)
             )
+
+            Log.d("${metadata.uri}")
 
             val entity = if (metadata.type == Type.FILE)
                 metadata.copy(

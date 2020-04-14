@@ -145,17 +145,11 @@ class ProfileService : BaseService() {
 
                 val tempFile = service.resolveTempProfileFile(id)
 
-                file.copyTo(tempFile)
+                tempFile.parentFile?.mkdirs()
 
-                val uri = ProfileProvider.resolveUri(service, tempFile)
+                file.copyTo(tempFile, overwrite = true)
 
-                return runBlocking {
-                    lock.withLock {
-                        pending[id] = queryMetadataById(id)?.copy(uri = uri) ?: return@withLock
-                    }
-
-                    uri.toString()
-                }
+                return ProfileProvider.resolveUri(service, tempFile).toString()
             }
 
             override fun updateMetadata(id: Long, metadata: Profile?) {

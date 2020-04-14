@@ -28,7 +28,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
 
     private var backgroundJob: Job? = null
     private val reloadMutex = Mutex()
-    private val editorStack = Stack<Long>()
+    private val editorStack = Stack<Profile>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,10 +64,11 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EDITOR_REQUEST_CODE) {
             launch {
-                val id = editorStack.pop()
+                val profile = editorStack.pop()
 
                 withProfile {
-                    startUpdate(id)
+                    updateMetadata(profile.id, profile)
+                    startUpdate(profile.id)
                 }
             }
 
@@ -120,16 +121,13 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
         startActivity(ProfileEditActivity::class.intent.putExtra("id", id))
     }
 
-    private fun openEditor(id: Long) = launch {
+    private fun openEditor(profile: Profile) = launch {
         try {
-            if (id < 0)
-                throw FileNotFoundException()
-
             val uri = withProfile {
-                acquireTempUri(id)
+                acquireTempUri(profile.id)
             } ?: throw FileNotFoundException()
 
-            editorStack.push(id)
+            editorStack.push(profile.copy(uri = Uri.parse(uri)))
 
             startActivityForResult(
                 Intent(Intent.ACTION_VIEW)
@@ -148,7 +146,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
     }
 
     override fun onOpenEditor(entity: Profile) {
-        openEditor(entity.id)
+        openEditor(entity)
     }
 
     override fun onUpdate(entity: Profile) {
