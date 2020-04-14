@@ -27,5 +27,5 @@ fun Context.startClashService(): Intent? {
 }
 
 fun Context.stopClashService() {
-    sendBroadcastSelf(Intent(Intents.INTENT_ACTION_REQUEST_STOP))
+    sendBroadcastSelf(Intent(Intents.INTENT_ACTION_CLASH_REQUEST_STOP))
 }

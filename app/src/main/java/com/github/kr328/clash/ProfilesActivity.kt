@@ -12,6 +12,7 @@ import com.github.kr328.clash.common.util.startForegroundServiceCompat
 import com.github.kr328.clash.remote.withProfile
 import com.github.kr328.clash.service.ProfileBackgroundService
 import com.github.kr328.clash.service.ProfileProvider
+import com.github.kr328.clash.service.ProfileReceiver
 import com.github.kr328.clash.service.model.ProfileMetadata
 import com.github.kr328.clash.weight.ProfilesMenu
 import com.google.android.material.snackbar.Snackbar
@@ -151,11 +152,7 @@ class ProfilesActivity : BaseActivity(), ProfileAdapter.Callback, ProfilesMenu.C
     }
 
     private fun startUpdate(id: Long) {
-        val intent = Intent(Intents.INTENT_ACTION_PROFILE_REQUEST_UPDATE)
-            .setComponent(ProfileBackgroundService::class.componentName)
-            .putExtra(Intents.INTENT_EXTRA_PROFILE_ID, id)
-
-        startForegroundServiceCompat(intent)
+        startForegroundServiceCompat(ProfileReceiver.buildUpdateIntentForId(id))
     }
 
     override fun onOpenEditor(entity: ProfileMetadata) {

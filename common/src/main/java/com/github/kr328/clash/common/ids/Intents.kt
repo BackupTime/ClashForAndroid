@@ -4,24 +4,20 @@ import com.github.kr328.clash.common.BuildConfig
 
 object Intents {
     const val INTENT_ACTION_CLASH_STARTED =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.clash.started"
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.clash.STARTED"
     const val INTENT_ACTION_CLASH_STOPPED =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.clash.stopped"
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.clash.STOPPED"
+    const val INTENT_ACTION_CLASH_REQUEST_STOP =
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.clash.REQUEST_STOP"
     const val INTENT_ACTION_PROFILE_CHANGED =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.changed"
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.CHANGED"
     const val INTENT_ACTION_PROFILE_REQUEST_UPDATE =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.enqueue.request"
-    const val INTENT_ACTION_PROFILE_SETUP =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.setup"
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.REQUEST_UPDATE"
     const val INTENT_ACTION_PROFILE_LOADED =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.loaded"
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.profile.LOADED"
     const val INTENT_ACTION_NETWORK_CHANGED =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.network.changed"
-    const val INTENT_ACTION_REQUEST_STOP =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.request.stop"
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.action.network.CHANGED"
 
     const val INTENT_EXTRA_CLASH_STOP_REASON =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.clash.stop.reason"
-    const val INTENT_EXTRA_PROFILE_ID =
-        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.profile.id"
+        "${BuildConfig.LIBRARY_PACKAGE_NAME}.intent.extra.clash.STOP_REASON"
 }

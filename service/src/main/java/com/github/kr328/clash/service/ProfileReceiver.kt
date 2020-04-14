@@ -5,14 +5,15 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.core.content.getSystemService
 import com.github.kr328.clash.common.ids.Intents
 import com.github.kr328.clash.common.ids.PendingIds
 import com.github.kr328.clash.common.util.componentName
-import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.util.startForegroundServiceCompat
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.model.toProfileMetadata
+import kotlinx.coroutines.sync.Mutex
 
 class ProfileReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -24,26 +25,20 @@ class ProfileReceiver : BroadcastReceiver() {
                 intent.component = ProfileBackgroundService::class.componentName
                 context.startForegroundServiceCompat(intent)
             }
-            Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
-                tryInitialize(context)
-            }
         }
     }
 
     companion object {
-        private val requested = mutableMapOf<Long, PendingIntent>()
-        private var initialized = false
+        private val initialized = Mutex()
 
         @Synchronized
-        fun tryInitialize(context: Context) {
-            if (initialized)
+        suspend fun initialize(context: Context) {
+            if ( !initialized.tryLock() )
                 return
-            initialized = true
 
-            context.startForegroundServiceCompat(
-                ProfileBackgroundService::class.intent
-                    .setAction(Intents.INTENT_ACTION_PROFILE_SETUP)
-            )
+            ProfileDao.queryAllIds().forEach {
+                requestNextUpdate(context, it)
+            }
         }
 
         suspend fun requestNextUpdate(context: Context, id: Long) {
@@ -53,29 +48,37 @@ class ProfileReceiver : BroadcastReceiver() {
             if (metadata.interval <= 0)
                 return
 
-            cancelNextUpdate(context, id)
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                PendingIds.generateProfileResultId(id),
-                Intent(Intents.INTENT_ACTION_PROFILE_REQUEST_UPDATE)
-                    .setComponent(ProfileReceiver::class.componentName)
-                    .putExtra(Intents.INTENT_EXTRA_PROFILE_ID, id),
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
+            val pendingIntent = cancelNextUpdate(context, id)
 
             service.set(
                 AlarmManager.RTC,
                 metadata.lastModified + metadata.interval,
                 pendingIntent
             )
-
-            requested[id] = pendingIntent
         }
 
-        fun cancelNextUpdate(context: Context, id: Long) {
-            val service = context.getSystemService<AlarmManager>() ?: return
-            service.cancel(requested.remove(id) ?: return)
+        fun cancelNextUpdate(context: Context, id: Long): PendingIntent {
+            val intent = buildUpdatePendingIntent(context, id)
+            val service = context.getSystemService<AlarmManager>() ?: return intent
+
+            service.cancel(intent)
+
+            return intent
+        }
+
+        fun buildUpdateIntentForId(id: Long): Intent {
+            return Intent(Intents.INTENT_ACTION_PROFILE_REQUEST_UPDATE)
+                .setComponent(ProfileReceiver::class.componentName)
+                .setData(Uri.fromParts("id", id.toString(), null))
+        }
+
+        private fun buildUpdatePendingIntent(context: Context, id: Long): PendingIntent {
+            return PendingIntent.getBroadcast(
+                context,
+                PendingIds.generateProfileResultId(id),
+                buildUpdateIntentForId(id),
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
         }
     }
 }

@@ -62,16 +62,10 @@ class ProfileBackgroundService : BaseService() {
 
         when (intent?.action) {
             Intents.INTENT_ACTION_PROFILE_REQUEST_UPDATE -> {
-                val id = intent.getLongExtra(Intents.INTENT_EXTRA_PROFILE_ID, -1)
-                if (id < 0)
-                    return START_NOT_STICKY
+                val id = intent.data?.schemeSpecificPart?.toLongOrNull()
+                    ?: return START_NOT_STICKY
 
                 requests.offer(id)
-            }
-            Intents.INTENT_ACTION_PROFILE_SETUP -> {
-                launch {
-                    setup()
-                }
             }
         }
 
@@ -130,12 +124,6 @@ class ProfileBackgroundService : BaseService() {
         }
 
         stopSelf()
-    }
-
-    private suspend fun setup() {
-        for (id in ProfileDao.queryAllIds()) {
-            ProfileReceiver.requestNextUpdate(this, id)
-        }
     }
 
     private fun createNotificationChannels() {

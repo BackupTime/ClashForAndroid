@@ -44,6 +44,8 @@ object ProfileProcessor {
                 ProfileDao.insert(entity)
             else
                 ProfileDao.update(entity)
+
+            ProfileReceiver.requestNextUpdate(context, metadata.id)
         }
 
     private suspend fun downloadProfile(

@@ -151,6 +151,8 @@ class ProfileService : BaseService() {
         super.onCreate()
 
         launch {
+            ProfileReceiver.initialize(service)
+
             process()
         }
     }
