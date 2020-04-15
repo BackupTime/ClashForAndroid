@@ -83,8 +83,12 @@ class ProfileService : BaseService() {
                     val clonedId = generateNextId()
 
                     pending[clonedId] =
-                        queryMetadataById(id)?.copy(id = clonedId, active = false, lastModified = 0)
-                            ?: return@runBlocking -1L
+                        queryMetadataById(id)?.copy(
+                            id = clonedId,
+                            active = false,
+                            lastModified = 0,
+                            type = Profile.Type.FILE
+                        ) ?: return@runBlocking -1L
 
                     clonedId
                 }
