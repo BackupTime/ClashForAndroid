@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.github.kr328.clash.common.Global
+import com.github.kr328.clash.service.data.DatabaseMigrations.VERSION_1_2
+import com.github.kr328.clash.service.data.DatabaseMigrations.VERSION_2_3
+import com.github.kr328.clash.service.data.DatabaseMigrations.VERSION_3_4
 import androidx.room.Database as DatabaseMetadata
 
 @DatabaseMetadata(
-    version = 3,
+    version = 4,
     exportSchema = false,
     entities = [ProfileEntity::class, SelectedProxyEntity::class]
 )
@@ -23,9 +26,7 @@ abstract class Database : RoomDatabase() {
                 context.applicationContext,
                 Database::class.java,
                 "clash-config"
-            )
-                .addMigrations(DatabaseMigrations.VERSION_1_2, DatabaseMigrations.VERSION_2_3)
-                .build()
+            ).addMigrations(VERSION_1_2, VERSION_2_3, VERSION_3_4).build()
         }
     }
 }
