@@ -148,9 +148,11 @@ object DatabaseMigrations {
     val VERSION_2_3 = object : Migration(2, 3) {
         override fun migrate(database: SupportSQLiteDatabase) {
             try {
-                database.execSQL("ALTER TABLE profile_select_proxies RENAME TO selected_proxies")
+                database.execSQL("ALTER TABLE profile_select_proxies RENAME TO _selected_proxies")
                 database.execSQL("ALTER TABLE profiles RENAME TO _profiles")
+
                 database.execSQL("CREATE TABLE IF NOT EXISTS `profiles` (`name` TEXT NOT NULL, `type` INTEGER NOT NULL, `uri` TEXT NOT NULL, `source` TEXT, `active` INTEGER NOT NULL, `interval` INTEGER NOT NULL, `id` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `selected_proxies` (`profile_id` INTEGER NOT NULL, `proxy` TEXT NOT NULL, `selected` TEXT NOT NULL, PRIMARY KEY(`profile_id`, `proxy`), FOREIGN KEY(`profile_id`) REFERENCES `profiles`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )")
 
                 database.query("SELECT name, type, uri, source, active, update_interval, id FROM _profiles")
                     .use { cursor ->
@@ -184,7 +186,30 @@ object DatabaseMigrations {
                         }
                     }
 
+                database.query("SELECT profile_id, proxy, selected FROM _selected_proxies")
+                    .use { cursor ->
+                        cursor.moveToFirst()
+                        while (!cursor.isAfterLast) {
+                            // just copy
+                            // profile_id, proxy, selected
+                            val profileId = cursor.getLong(0)
+                            val proxy = cursor.getString(1)
+                            val selected = cursor.getShort(2)
+
+                            database.insert("selected_proxies",
+                                SQLiteDatabase.CONFLICT_REPLACE,
+                                ContentValues().apply {
+                                    put("profile_id", profileId)
+                                    put("proxy", proxy)
+                                    put("selected", selected)
+                                })
+
+                            cursor.moveToNext()
+                        }
+                    }
+
                 database.execSQL("DROP TABLE _profiles")
+                database.execSQL("DROP TABLE _selected_proxies")
 
                 val uiSp = Global.application
                     .getSharedPreferences("ui", Context.MODE_PRIVATE)
