@@ -101,7 +101,8 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string) error {
 		pkt := &udpPacket{
 			payload:  payload,
 			endpoint: endpoint,
-			sender:   sender,
+			send:     sender,
+			recycle:  udpRecycle,
 		}
 
 		tunnel.AddPacket(adapters.NewPacket(addr, pkt, C.SOCKS))

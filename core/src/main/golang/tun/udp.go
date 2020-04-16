@@ -10,7 +10,8 @@ import (
 type udpPacket struct {
 	payload  []byte
 	endpoint *binding.Endpoint
-	sender   redirect.UDPSender
+	send     redirect.UDPSender
+	recycle  func([]byte)
 }
 
 func (conn *udpPacket) Data() []byte {
@@ -39,11 +40,7 @@ func (conn *udpPacket) WriteBack(b []byte, addr net.Addr) (n int, err error) {
 		Target: conn.endpoint.Source,
 	}
 
-	return len(b), conn.sender(b, ep)
-}
-
-func (conn *udpPacket) Close() error {
-	return nil
+	return len(b), conn.send(b, ep)
 }
 
 func (conn *udpPacket) LocalAddr() net.Addr {
@@ -52,4 +49,8 @@ func (conn *udpPacket) LocalAddr() net.Addr {
 		Port: int(conn.endpoint.Source.Port),
 		Zone: "",
 	}
+}
+
+func (conn *udpPacket) Drop() {
+	conn.recycle(conn.payload)
 }

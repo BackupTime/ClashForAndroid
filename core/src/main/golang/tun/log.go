@@ -2,7 +2,7 @@ package tun
 
 import "github.com/Dreamacro/clash/log"
 
-type ClashLogger struct {}
+type ClashLogger struct{}
 
 func (c *ClashLogger) D(format string, args ...interface{}) {
 	log.Debugln(format, args)
@@ -19,4 +19,3 @@ func (c *ClashLogger) W(format string, args ...interface{}) {
 func (c *ClashLogger) E(format string, args ...interface{}) {
 	log.Errorln(format, args)
 }
-
