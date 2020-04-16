@@ -1,7 +1,6 @@
 package com.github.kr328.clash.service.clash.module
 
 import android.app.PendingIntent
-import android.content.Intent
 import android.net.VpnService
 import android.os.Build
 import com.github.kr328.clash.common.Global
@@ -20,8 +19,8 @@ class TunModule(private val service: VpnService) : Module() {
         val route: List<String>
         val dnsAddress: String
         val dnsHijacking: Boolean
-        val allowApplications: List<String>
-        val disallowApplication: List<String>
+        val allowApplications: Collection<String>
+        val disallowApplication: Collection<String>
 
         fun onCreateTunFailure()
     }

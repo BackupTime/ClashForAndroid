@@ -134,17 +134,17 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             get() = PRIVATE_VLAN_DNS
         override val dnsHijacking: Boolean
             get() = settings.get(ServiceSettings.DNS_HIJACKING)
-        override val allowApplications: List<String>
+        override val allowApplications: Collection<String>
             get() {
                 return if (settings.get(ServiceSettings.ACCESS_CONTROL_MODE) == ServiceSettings.ACCESS_CONTROL_MODE_WHITELIST) {
-                    (settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES) + packageName).toList()
-                } else emptyList()
+                    (settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES) + packageName)
+                } else emptySet()
             }
-        override val disallowApplication: List<String>
+        override val disallowApplication: Collection<String>
             get() {
                 return if (settings.get(ServiceSettings.ACCESS_CONTROL_MODE) == ServiceSettings.ACCESS_CONTROL_MODE_BLACKLIST) {
-                    (settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES) - packageName).toList()
-                } else emptyList()
+                    (settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES) - packageName)
+                } else emptySet()
             }
 
         override fun onCreateTunFailure() {
