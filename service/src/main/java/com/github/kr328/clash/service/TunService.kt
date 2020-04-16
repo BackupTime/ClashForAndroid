@@ -146,5 +146,11 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                     (settings.get(ServiceSettings.ACCESS_CONTROL_PACKAGES) - packageName).toList()
                 } else emptyList()
             }
+
+        override fun onCreateTunFailure() {
+            reason = "Start VPN is rejected by the system"
+
+            stopSelf()
+        }
     }
 }

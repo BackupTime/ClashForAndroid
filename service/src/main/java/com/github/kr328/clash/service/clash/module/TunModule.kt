@@ -22,6 +22,8 @@ class TunModule(private val service: VpnService) : Module() {
         val dnsHijacking: Boolean
         val allowApplications: List<String>
         val disallowApplication: List<String>
+
+        fun onCreateTunFailure()
     }
 
     var configure: Configure? = null
@@ -62,7 +64,8 @@ class TunModule(private val service: VpnService) : Module() {
                 builder.setMetered(false)
             }
 
-            val fd = builder.establish() ?: throw NullPointerException("Unable to create vpn")
+            val fd = builder.establish()
+                ?: return@withContext c.onCreateTunFailure()
 
             if (c.dnsHijacking) {
                 Clash.startTunDevice(
