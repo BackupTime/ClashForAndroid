@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.IBinder
 import androidx.core.content.edit
 import com.github.kr328.clash.ApkBrokenActivity
+import com.github.kr328.clash.BuildConfig
 import com.github.kr328.clash.Constants
 import com.github.kr328.clash.common.Global
 import com.github.kr328.clash.common.utils.intent
@@ -151,6 +152,9 @@ object Remote {
 
             if (sp.getLong(Constants.PREFERENCE_KEY_LAST_INSTALL, 0) == pkg.lastUpdateTime)
                 return true
+
+            if ( application.packageName != BuildConfig.APPLICATION_ID )
+                return false
 
             val info = application.applicationInfo
             val sources =
