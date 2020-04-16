@@ -27,6 +27,8 @@ class ProfileEditFragment(
     private val type: Type,
     private val source: String?
 ) : Fragment() {
+    private var root: CommonUiLayout? = null
+
     var isModified = false
 
     companion object {
@@ -46,6 +48,7 @@ class ProfileEditFragment(
         savedInstanceState: Bundle?
     ): View? {
         return CommonUiLayout(requireContext()).apply {
+            root = this
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
 
             build {
@@ -143,16 +146,16 @@ class ProfileEditFragment(
             if (resultCode != Activity.RESULT_OK || data == null)
                 return
 
-            val layout = view as CommonUiLayout
+            root?.apply {
+                data.data?.apply {
+                    screen.requireElement<TextInput>(KEY_URL).content = this.toString()
+                }
 
-            data.data?.apply {
-                layout.screen.requireElement<TextInput>(KEY_URL).content = this.toString()
-            }
-
-            data.getStringExtra(Constants.URL_PROVIDER_INTENT_EXTRA_NAME)?.also {
-                layout.screen.requireElement<TextInput>(KEY_NAME).apply {
-                    if (content.isBlank())
-                        content = it
+                data.getStringExtra(Constants.URL_PROVIDER_INTENT_EXTRA_NAME)?.also {
+                    screen.requireElement<TextInput>(KEY_NAME).apply {
+                        if (content.isBlank())
+                            content = it
+                    }
                 }
             }
         }
@@ -163,7 +166,9 @@ class ProfileEditFragment(
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        (view as CommonUiLayout?)?.screen?.saveState(outState)
+        root?.apply {
+            screen.saveState(outState)
+        }
     }
 
     private fun openUrlProvider(): Boolean {
@@ -182,11 +187,13 @@ class ProfileEditFragment(
                 else -> return false
             }
         } catch (e: Exception) {
-            Snackbar.make(
-                view as ViewGroup,
-                R.string.start_url_provider_failure,
-                Snackbar.LENGTH_LONG
-            ).show()
+            root?.apply {
+                Snackbar.make(
+                    this,
+                    R.string.start_url_provider_failure,
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
         }
 
         return true
