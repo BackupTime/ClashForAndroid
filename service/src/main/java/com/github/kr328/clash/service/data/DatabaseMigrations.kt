@@ -223,7 +223,6 @@ object DatabaseMigrations {
                 }
 
                 NotificationManagerCompat.from(Global.application).apply {
-                    deleteNotificationChannel("clash_status_channel")
                     deleteNotificationChannel("profile_service_status")
                     deleteNotificationChannel("profile_service_result")
                 }
