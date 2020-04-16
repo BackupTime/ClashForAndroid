@@ -77,6 +77,6 @@ repositories {
 }
 
 afterEvaluate {
-    tasks["clean"].dependsOn(tasks["resetGolangMode"])
+    tasks["clean"].dependsOn(tasks["resetGolangPathMode"])
     tasks["preBuild"].dependsOn(tasks["extractSources"], tasks["downloadGeoipDatabase"])
 }

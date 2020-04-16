@@ -145,7 +145,7 @@ task("generateClashBindSources") {
     }
 }
 
-task("bindClashCore") {
+task("assembleClashCore") {
     dependsOn(tasks["generateClashBindSources"])
 
     onlyIf {
@@ -169,14 +169,8 @@ task("bindClashCore") {
 }
 
 task("extractSources", type = Copy::class) {
-    dependsOn(tasks["bindClashCore"])
+    dependsOn(tasks["assembleClashCore"])
 
-    doFirst {
-        buildDir.resolve(Constants.OUTPUT_PATH).apply {
-            resolve("jniLibs").deleteRecursively()
-            resolve("classes").deleteRecursively()
-        }
-    }
     from(zipTree(buildDir.resolve(Constants.GOLANG_OUTPUT))) {
         include("**/*.so")
         eachFile {
@@ -192,6 +186,8 @@ task("extractSources", type = Copy::class) {
 }
 
 task("downloadGeoipDatabase") {
+    dependsOn(tasks["extractSources"])
+
     onlyIf {
         val file = buildDir.resolve(Constants.OUTPUT_PATH).resolve("assets/Country.mmdb")
 
@@ -211,7 +207,7 @@ task("downloadGeoipDatabase") {
     }
 }
 
-task("resetGolangMode", type = Exec::class) {
+task("resetGolangPathMode", type = Exec::class) {
     onlyIf {
         !Os.isFamily(Os.FAMILY_WINDOWS)
     }
