@@ -4,10 +4,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import com.github.kr328.clash.service.clash.ClashRuntime
-import com.github.kr328.clash.service.clash.module.CloseModule
-import com.github.kr328.clash.service.clash.module.DynamicNotificationModule
-import com.github.kr328.clash.service.clash.module.ReloadModule
-import com.github.kr328.clash.service.clash.module.StaticNotificationModule
+import com.github.kr328.clash.service.clash.module.*
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.broadcastClashStarted
 import com.github.kr328.clash.service.util.broadcastClashStopped
@@ -36,9 +33,7 @@ class ClashService : BaseService() {
             runtime.install(ReloadModule(service)) {
                 onLoaded {
                     if (it != null) {
-                        reason = it.message
-
-                        stopSelf()
+                        service.stopSelfForReason(it.message)
                     } else {
                         service.broadcastProfileLoaded()
                     }
@@ -46,9 +41,7 @@ class ClashService : BaseService() {
             }
             runtime.install(CloseModule()) {
                 onClosed {
-                    reason = null
-
-                    stopSelf()
+                    service.stopSelfForReason(null)
                 }
             }
 
@@ -77,5 +70,11 @@ class ClashService : BaseService() {
         service.broadcastClashStopped(reason)
 
         super.onDestroy()
+    }
+
+    private fun stopSelfForReason(reason: String?) {
+        this.reason = reason
+
+        stopSelf()
     }
 }

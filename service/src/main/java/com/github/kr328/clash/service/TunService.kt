@@ -19,6 +19,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
         private const val PRIVATE_VLAN4_MIRROR = "172.31.255.254"
         private const val PRIVATE_VLAN_DNS = "198.18.0.1"
+        private const val VLAN_ANY = "0.0.0.0/0"
     }
 
     private val service = this
@@ -47,25 +48,15 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             runtime.install(ReloadModule(service)) {
                 onLoaded {
                     if (it != null) {
-                        reason = it.message
-
-                        stopSelf()
-
-                        TunModule.requestStop()
+                        service.stopSelfForReason(it.message)
                     } else {
-                        broadcastProfileLoaded()
+                        service.broadcastProfileLoaded()
                     }
                 }
             }
             runtime.install(CloseModule()) {
                 onClosed {
-                    launch {
-                        reason = null
-
-                        stopSelf()
-
-                        TunModule.requestStop()
-                    }
+                    service.stopSelfForReason(null)
                 }
             }
 
@@ -99,7 +90,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        broadcastClashStarted()
+        service.broadcastClashStarted()
 
         return super.onStartCommand(intent, flags, startId)
     }
@@ -107,7 +98,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     override fun onDestroy() {
         ServiceStatusProvider.serviceRunning = false
 
-        broadcastClashStopped(reason)
+        service.broadcastClashStopped(reason)
 
         cancel()
 
@@ -128,7 +119,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 return if (settings.get(ServiceSettings.BYPASS_PRIVATE_NETWORK))
                     resources.getStringArray(R.array.bypass_private_route).toList()
                 else
-                    listOf("0.0.0.0/0")
+                    listOf(VLAN_ANY)
             }
         override val dnsAddress: String
             get() = PRIVATE_VLAN_DNS
@@ -148,9 +139,15 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
             }
 
         override fun onCreateTunFailure() {
-            reason = "Start VPN is rejected by the system"
-
-            stopSelf()
+            stopSelfForReason("Start VPN rejected by the system")
         }
+    }
+
+    private fun stopSelfForReason(reason: String?) {
+        this.reason = reason
+
+        stopSelf()
+
+        TunModule.requestStop()
     }
 }
