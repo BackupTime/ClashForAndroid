@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.kr328.clash.adapter.LogFileAdapter
 import com.github.kr328.clash.common.utils.intent
 import com.github.kr328.clash.common.utils.startForegroundServiceCompat
+import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.design.common.Category
 import com.github.kr328.clash.design.view.CommonUiLayout
 import com.github.kr328.clash.model.LogFile
@@ -24,12 +25,15 @@ import kotlinx.android.synthetic.main.activity_logs.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.FileInputStream
+import java.text.SimpleDateFormat
 import java.util.*
 
 class LogsActivity : BaseActivity() {
     companion object {
         const val REQUEST_CODE = 50000
+
+        private val LOG_EXPORT_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+        private val LOG_EXPORT_TIME_FORMAT = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
     }
 
     private var lastWriteFile: LogFile? = null
@@ -102,9 +106,31 @@ class LogsActivity : BaseActivity() {
 
                 launch {
                     withContext(Dispatchers.IO) {
-                        contentResolver.openOutputStream(url)?.use { output ->
-                            FileInputStream(logsDir.resolve(file.fileName)).use { input ->
-                                input.copyTo(output)
+                        contentResolver.openOutputStream(url)?.bufferedWriter()?.use { output ->
+                            output.write("# Logcat on " + LOG_EXPORT_DATE_FORMAT.format(Date(file.date)) + "\n")
+
+                            logsDir.resolve(file.fileName).bufferedReader().useLines { lines ->
+                                lines.map { it.trim() }
+                                    .filter { it.isNotEmpty() && !it.startsWith("#") }
+                                    .map { it.split(" ", limit = 3) }
+                                    .filter { it.size == 3 }
+                                    .map {
+                                        LogEvent(
+                                            LogEvent.Level.valueOf(it[1]),
+                                            it[2],
+                                            it[0].toLong()
+                                        )
+                                    }
+                                    .forEach {
+                                        output.write(
+                                            String.format(
+                                                "%s |%s| %s\n",
+                                                LOG_EXPORT_TIME_FORMAT.format(Date(it.time)),
+                                                it.level.toString(),
+                                                it.message
+                                            )
+                                        )
+                                    }
                             }
                         }
                     }

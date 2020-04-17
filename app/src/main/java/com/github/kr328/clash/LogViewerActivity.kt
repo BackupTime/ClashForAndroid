@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.activity_log_viewer.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import java.io.File
-import kotlin.streams.toList
 
 class LogViewerActivity : BaseActivity() {
     private val pauseMutex = Mutex()
@@ -92,15 +91,15 @@ class LogViewerActivity : BaseActivity() {
         launch {
             val items = withContext(Dispatchers.IO) {
                 try {
-                    file.readText()
-                        .split("\n")
-                        .parallelStream()
-                        .map { it.trim() }
-                        .filter { it.isNotEmpty() && !it.startsWith("#") }
-                        .map { it.split(" ", limit = 3) }
-                        .filter { it.size == 3 }
-                        .map { LogEvent(LogEvent.Level.valueOf(it[1]), it[2], it[0].toLong()) }
-                        .toList()
+                    file.bufferedReader().useLines { lines ->
+                        lines
+                            .map { it.trim() }
+                            .filter { it.isNotEmpty() && !it.startsWith("#") }
+                            .map { it.split(" ", limit = 3) }
+                            .filter { it.size == 3 }
+                            .map { LogEvent(LogEvent.Level.valueOf(it[1]), it[2], it[0].toLong()) }
+                            .toList()
+                    }
                 } catch (e: Exception) {
                     showSnackbarException(getString(R.string.open_log_failure), e.message)
 
