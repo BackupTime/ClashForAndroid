@@ -31,7 +31,7 @@ if applicable, add logs to help detect problem
  - Device: [e.g. Pixel 4]
  - ROM: [e.g: AOSP]
  - ROM Version:
- - Android Version [e.g. Oreo]
+ - Android Version [e.g. 10]
 
 **Application Info (please complete the following information):**
 
