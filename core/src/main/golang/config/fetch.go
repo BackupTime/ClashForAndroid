@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"syscall"
 
@@ -36,13 +37,22 @@ var client = &http.Client{
 	},
 }
 
-func fetchRemote(url string) ([]byte, error) {
-	request, err := http.NewRequest("GET", url, nil)
+func fetchRemote(sUrl string) ([]byte, error) {
+	uri, err := url.Parse(sUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest("GET", uri.String(), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	request.Header.Set("User-Agent", "ClashForAndroid/"+ApplicationVersion)
+	if user := uri.User; user != nil {
+		password, _ := user.Password()
+		request.SetBasicAuth(user.Username(), password)
+	}
 
 	response, err := client.Do(request)
 	if err != nil {
