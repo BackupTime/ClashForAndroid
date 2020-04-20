@@ -56,7 +56,7 @@ func hijackTCPDNS(conn net.Conn, endpoint *binding.Endpoint) bool {
 		return false
 	}
 
-	if !hijackAddress.Equal(net.IPv4zero) && !hijackAddress.Equal(net.IPv6zero) && !hijackAddress.Equal(endpoint.Target.IP) {
+	if !hijackAddress.Equal(net.IPv4zero) && !hijackAddress.Equal(endpoint.Target.IP) {
 		return false
 	}
 
