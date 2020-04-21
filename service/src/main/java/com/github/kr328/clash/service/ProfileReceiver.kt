@@ -45,10 +45,10 @@ class ProfileReceiver : BroadcastReceiver() {
             val metadata = ProfileDao.queryById(id)?.asProfile(context) ?: return
             val service = context.getSystemService<AlarmManager>() ?: return
 
+            val pendingIntent = cancelNextUpdate(context, id)
+
             if (metadata.interval <= 0)
                 return
-
-            val pendingIntent = cancelNextUpdate(context, id)
 
             service.set(
                 AlarmManager.RTC,
