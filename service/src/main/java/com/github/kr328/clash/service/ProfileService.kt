@@ -108,6 +108,8 @@ class ProfileService : BaseService() {
                         ProfileDao.remove(id)
                     }
 
+                    ProfileReceiver.cancelNextUpdate(service, id)
+
                     service.resolveProfileFile(id).delete()
                     service.resolveTempProfileFile(id).delete()
                     service.resolveBaseDir(id).deleteRecursively()
