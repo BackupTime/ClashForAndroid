@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    val kotlinVersion = "1.3.71"
+    val kotlinVersion = "1.3.72"
 
     rootProject.extra.apply {
         this["gBuildToolsVersion"] = "29.0.3"
@@ -10,8 +10,8 @@ buildscript {
         this["gMinSdkVersion"] = 24
         this["gTargetSdkVersion"] = 29
 
-        this["gVersionCode"] = 10206
-        this["gVersionName"] = "1.2.6"
+        this["gVersionCode"] = 10207
+        this["gVersionName"] = "1.2.7"
 
         this["gKotlinVersion"] = kotlinVersion
         this["gKotlinCoroutineVersion"] = "1.3.5"
