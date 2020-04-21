@@ -20,12 +20,14 @@ func init() {
 	dialer.ListenConfigHook = onNewListenConfig
 }
 
-func onNewDialer(dialer *net.Dialer) {
+func onNewDialer(dialer *net.Dialer) error {
 	dialer.Control = onNewSocket
+	return nil
 }
 
-func onNewListenConfig(listen *net.ListenConfig) {
+func onNewListenConfig(listen *net.ListenConfig) error {
 	listen.Control = onNewSocket
+	return nil
 }
 
 func onNewSocket(_, _ string, c syscall.RawConn) error {
