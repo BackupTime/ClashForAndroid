@@ -114,12 +114,14 @@ class ProfileEditFragment(
 
                         if (s.isBlank()) {
                             content = ""
+                            interval = 0
                             return@onTextChanged
                         }
 
                         val value = s.toIntOrNull()
                         if (value == null || value < 15) {
                             content = ""
+                            interval = 0
                             Snackbar.make(view, R.string.invalid_interval, Snackbar.LENGTH_LONG)
                                 .show()
                             return@onTextChanged
