@@ -10,6 +10,7 @@ import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.util.parseCIDR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.lang.NullPointerException
 
 class TunModule(private val service: VpnService) : Module() {
     interface Configure {
@@ -66,8 +67,12 @@ class TunModule(private val service: VpnService) : Module() {
                 builder.setMetered(false)
             }
 
-            val fd = builder.establish()
-                ?: return@withContext c.onCreateTunFailure()
+            val fd = try {
+                builder.establish() ?: throw NullPointerException()
+            }
+            catch (e: Exception) {
+                return@withContext c.onCreateTunFailure()
+            }
 
             if (c.dnsHijacking) {
                 Clash.startTunDevice(
