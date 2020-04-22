@@ -2,7 +2,6 @@ package com.github.kr328.clash.service
 
 import android.content.Intent
 import android.net.VpnService
-import android.os.Process
 import com.github.kr328.clash.service.clash.ClashRuntime
 import com.github.kr328.clash.service.clash.module.*
 import com.github.kr328.clash.service.settings.ServiceSettings
@@ -14,9 +13,9 @@ import kotlinx.coroutines.launch
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
-        private const val VPN_MTU = 9000
-        private const val PRIVATE_VLAN_DNS = "198.18.0.1"
-        private const val VLAN_ANY = "0.0.0.0/0"
+        private const val TUN_MTU = 9000
+        private const val TUN_DNS = "198.18.0.1"
+        private const val IPV4_ANY = "0.0.0.0/0"
     }
 
     private val service = this
@@ -108,7 +107,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         override val builder: Builder
             get() = Builder()
         override val mtu: Int
-            get() = VPN_MTU
+            get() = TUN_MTU
         override val gateway: String = network.copyOf().apply {
                 this[3] = (this[3] + 1).toByte()
             }.asAddressString("/30")
@@ -120,10 +119,10 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 return if (settings.get(ServiceSettings.BYPASS_PRIVATE_NETWORK))
                     resources.getStringArray(R.array.bypass_private_route).toList()
                 else
-                    listOf(VLAN_ANY)
+                    listOf(IPV4_ANY)
             }
         override val dnsAddress: String
-            get() = PRIVATE_VLAN_DNS
+            get() = TUN_DNS
         override val dnsHijacking: Boolean
             get() = settings.get(ServiceSettings.DNS_HIJACKING)
         override val allowApplications: Collection<String>
