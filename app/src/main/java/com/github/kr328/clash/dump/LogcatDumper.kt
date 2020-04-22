@@ -4,7 +4,7 @@ object LogcatDumper {
     fun dump(): List<String> {
         return try {
             val process =
-                Runtime.getRuntime().exec(arrayOf("logcat", "-d", "-s", "-v", "raw", "Go"))
+                Runtime.getRuntime().exec(arrayOf("logcat", "-d", "-s", "-v", "raw", "Go", "AndroidRuntime"))
 
             val result = process.inputStream.bufferedReader().useLines {
                 var list = mutableListOf<String>()
