@@ -5,6 +5,7 @@ import android.net.VpnService
 import android.os.Build
 import com.github.kr328.clash.common.Global
 import com.github.kr328.clash.common.ids.PendingIds
+import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.util.parseCIDR
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,8 @@ class TunModule(private val service: VpnService) : Module() {
             val c = configure ?: throw IllegalArgumentException("Configure required")
 
             val builder = c.builder
+
+            Log.i("Tun start at ${c.gateway}, mirror at ${c.mirror}")
 
             parseCIDR(c.gateway).let {
                 builder.addAddress(it.ip, it.prefix)

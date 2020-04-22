@@ -2,6 +2,7 @@ package com.github.kr328.clash.service
 
 import android.content.Intent
 import android.net.VpnService
+import android.os.Process
 import com.github.kr328.clash.service.clash.ClashRuntime
 import com.github.kr328.clash.service.clash.module.*
 import com.github.kr328.clash.service.settings.ServiceSettings
@@ -13,11 +14,7 @@ import kotlinx.coroutines.launch
 
 class TunService : VpnService(), CoroutineScope by MainScope() {
     companion object {
-        // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
         private const val VPN_MTU = 9000
-        private const val PRIVATE_VLAN4_SUBNET = 30
-        private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
-        private const val PRIVATE_VLAN4_MIRROR = "172.31.255.254"
         private const val PRIVATE_VLAN_DNS = "198.18.0.1"
         private const val VLAN_ANY = "0.0.0.0/0"
     }
@@ -106,14 +103,18 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private inner class TunConfigure(private val settings: ServiceSettings) : TunModule.Configure {
+        private val network = generateTunNetwork()
+
         override val builder: Builder
             get() = Builder()
         override val mtu: Int
             get() = VPN_MTU
-        override val gateway: String
-            get() = "$PRIVATE_VLAN4_CLIENT/$PRIVATE_VLAN4_SUBNET"
-        override val mirror: String
-            get() = PRIVATE_VLAN4_MIRROR
+        override val gateway: String = network.copyOf().apply {
+                this[3] = (this[3] + 1).toByte()
+            }.asAddressString("/30")
+        override val mirror: String = network.copyOf().apply {
+                this[3] = (this[3] + 2).toByte()
+            }.asAddressString()
         override val route: List<String>
             get() {
                 return if (settings.get(ServiceSettings.BYPASS_PRIVATE_NETWORK))
@@ -140,6 +141,29 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
 
         override fun onCreateTunFailure() {
             stopSelfForReason("Start VPN rejected by the system")
+        }
+
+        private fun generateTunNetwork(): ByteArray {
+            val result = ByteArray(4)
+
+            // 18 bit namespace
+            val offset = UserUtils.currentUserId % 0x40000
+            val network = (0x3FFFF - offset) shl 2
+
+            result[0] = (172 or (network shr 24) and 0xFF).toByte()
+            result[1] = (16 or (network shr 16) and 0xFF).toByte()
+            result[2] = (0 or (network shr 8) and 0xFF).toByte()
+            result[3] = (0 or (network shr 0) and 0xFF).toByte()
+
+            return result
+        }
+
+        private fun ByteArray.asAddressString(suffix: String = ""): String {
+            return "${this[0].toUnsignedString()}.${this[1].toUnsignedString()}.${this[2].toUnsignedString()}.${this[3].toUnsignedString()}$suffix"
+        }
+
+        private fun Byte.toUnsignedString(): String {
+            return (this.toInt() and 0xFF).toString()
         }
     }
 
