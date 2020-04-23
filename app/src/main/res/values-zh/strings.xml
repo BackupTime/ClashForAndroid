@@ -131,4 +131,7 @@
     <string name="tips_support"><![CDATA[Clash for Android 是一个<strong>免费开源</strong>的项目<br /> 我们<strong>不提供</strong>任何代理服务<br />请务必<strong>不要</strong>反馈非应用自身引起的问题]]></string>
     <string name="donate">捐赠</string>
     <string name="clone_profile">复制配置</string>
+    <string name="upload_logcat">上传日志</string>
+    <string name="upload_logcat_summary">上传日志以帮助我们侦测问题</string>
+    <string name="upload_logcat_warn">请注意, 上传的日志可能包含个人敏感信息, 仍要继续吗?</string>
 </resources>

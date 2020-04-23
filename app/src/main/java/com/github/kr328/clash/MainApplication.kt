@@ -42,7 +42,7 @@ class MainApplication : Application() {
                     if (!report.stackTrace.contains("DeadObjectException"))
                         return mutableListOf()
 
-                    val logcat = LogcatDumper.dump()
+                    val logcat = LogcatDumper.dumpCrash()
 
                     return mutableListOf(
                         ErrorAttachmentLog.attachmentWithText(logcat, "logcat.txt")

@@ -173,4 +173,8 @@
     <string name="missing_vpn_component">Missing VPN Components</string>
 
     <string name="profile_not_found">Profile not found</string>
+
+    <string name="upload_logcat">Upload Logcat</string>
+    <string name="upload_logcat_summary">Upload logcat to help us detect issues</string>
+    <string name="upload_logcat_warn">Please note that the uploaded logs may contain personally sensitive information, do you still want to continue?</string>
 </resources>

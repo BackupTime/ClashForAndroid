@@ -4,9 +4,18 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
+import androidx.appcompat.app.AlertDialog
+import com.github.kr328.clash.dump.LogcatDumper
+import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import kotlinx.android.synthetic.main.activity_support.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SupportActivity : BaseActivity() {
+    class UserRequestTrackException: Exception()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -47,6 +56,20 @@ class SupportActivity : BaseActivity() {
             category(text = getString(R.string.feedback))
 
             option(
+                title = getString(R.string.upload_logcat),
+                summary = getString(R.string.upload_logcat_summary)
+            ) {
+                onClick {
+                    AlertDialog.Builder(this@SupportActivity)
+                        .setTitle(R.string.upload_logcat)
+                        .setMessage(R.string.upload_logcat_warn)
+                        .setNegativeButton(R.string.cancel) {_, _ -> }
+                        .setPositiveButton(R.string.ok) {_, _ -> upload() }
+                        .show()
+                }
+            }
+
+            option(
                 title = getString(R.string.github_issues),
                 summary = getString(R.string.github_issues_url)
             ) {
@@ -74,6 +97,17 @@ class SupportActivity : BaseActivity() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun upload() {
+        launch {
+            withContext(Dispatchers.IO) {
+                val attachment = ErrorAttachmentLog
+                    .attachmentWithText(LogcatDumper.dumpAll(), "logcat.txt")
+
+                Crashes.trackError(UserRequestTrackException(), null, listOf(attachment))
             }
         }
     }
