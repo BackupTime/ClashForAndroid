@@ -87,8 +87,14 @@ class ClashRuntime(private val context: Context) {
                     }
                 }
             } finally {
-                modules.reversed().forEach {
-                    it.onStop()
+                runCatching {
+                    modules.reversed().forEach {
+                        it.onStop()
+                    }
+                }
+
+                runCatching {
+                    context.unregisterReceiver(receiver)
                 }
 
                 Clash.stop()

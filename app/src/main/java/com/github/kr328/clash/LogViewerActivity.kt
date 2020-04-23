@@ -19,7 +19,6 @@ import java.io.File
 
 class LogViewerActivity : BaseActivity() {
     private val pauseMutex = Mutex()
-    private var pollingThread: Thread? = null
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             finish()
@@ -48,12 +47,6 @@ class LogViewerActivity : BaseActivity() {
             startFileMode(file.toFile())
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        pollingThread?.interrupt()
-    }
-
     override fun onStop() {
         super.onStop()
 
@@ -78,6 +71,7 @@ class LogViewerActivity : BaseActivity() {
         mainList.itemAnimator?.removeDuration = 100
 
         stop.setOnClickListener {
+            unbindService(connection)
             stopService(LogcatService::class.intent)
             finish()
         }
