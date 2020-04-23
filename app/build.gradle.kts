@@ -1,4 +1,5 @@
 import java.util.*
+import java.security.*
 
 plugins {
     id("com.android.application")
@@ -121,6 +122,18 @@ task("injectAppCenterKey") {
     }
 }
 
+task("injectPackageNameBase64") {
+    doFirst {
+        val packageName = android.defaultConfig.applicationId ?: return@doFirst
+
+        val base64 = Base64.getEncoder().encodeToString(packageName.toByteArray(Charsets.UTF_8))
+
+        android.buildTypes.forEach {
+            it.buildConfigField("String", "PACKAGE_NAME_BASE64", "\"$base64\"")
+        }
+    }
+}
+
 afterEvaluate {
-    tasks["preBuild"].dependsOn(tasks["injectAppCenterKey"])
+    tasks["preBuild"].dependsOn(tasks["injectAppCenterKey"], tasks["injectPackageNameBase64"])
 }
