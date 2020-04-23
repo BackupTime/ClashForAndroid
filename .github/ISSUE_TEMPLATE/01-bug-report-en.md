@@ -7,6 +7,10 @@ assignees: ''
 
 ---
 
+<!-- Be sure to put a clear title after [BUG] above -->
+<!-- Be sure to put a clear title after [BUG] above -->
+<!-- Be sure to put a clear title after [BUG] above -->
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
