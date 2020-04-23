@@ -7,9 +7,9 @@ assignees: ''
 
 ---
 
-<!-- Be sure to put a clear title after [BUG] above -->
-<!-- Be sure to put a clear title after [BUG] above -->
-<!-- Be sure to put a clear title after [BUG] above -->
+<!-- Be sure to put a clear title after [BUG] in the text box above -->
+<!-- Be sure to put a clear title after [BUG] in the text box above -->
+<!-- Be sure to put a clear title after [BUG] in the text box above -->
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -27,9 +27,6 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Logs**
-if applicable, add logs to help detect problem
-
 **Device Info (please complete the following information):**
 
  - Device: [e.g. Pixel 4]
@@ -45,3 +42,10 @@ if applicable, add logs to help detect problem
 
 **Additional context**
 Add any other context about the problem here.
+
+<!--
+*Logs*
+if applicable, upload logs to help detect problem
+
+`Open App` -> `Support` -> `Feedback` -> `Upload Logcat`
+-->
