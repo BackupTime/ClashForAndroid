@@ -109,7 +109,9 @@ class SupportActivity : BaseActivity() {
                     .attachmentWithText(LogcatDumper.dumpAll(), "logcat.txt")
 
                 Crashes.trackError(UserRequestTrackException(), null, listOf(attachment))
+            }
 
+            withContext(Dispatchers.Main) {
                 Snackbar.make(rootView, R.string.uploaded, Snackbar.LENGTH_LONG).show()
             }
         }
