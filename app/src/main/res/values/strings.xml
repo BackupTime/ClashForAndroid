@@ -177,4 +177,5 @@
     <string name="upload_logcat">Upload Logcat</string>
     <string name="upload_logcat_summary">Upload logcat to help us detect issues</string>
     <string name="upload_logcat_warn">Please note that the uploaded logs may contain personally sensitive information, do you still want to continue?</string>
+    <string name="uploaded">Uploaded</string>
 </resources>

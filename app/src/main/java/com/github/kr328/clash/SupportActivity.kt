@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Html
 import androidx.appcompat.app.AlertDialog
 import com.github.kr328.clash.dump.LogcatDumper
+import com.google.android.material.snackbar.Snackbar
 import com.microsoft.appcenter.crashes.Crashes
 import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import kotlinx.android.synthetic.main.activity_support.*
@@ -108,6 +109,8 @@ class SupportActivity : BaseActivity() {
                     .attachmentWithText(LogcatDumper.dumpAll(), "logcat.txt")
 
                 Crashes.trackError(UserRequestTrackException(), null, listOf(attachment))
+
+                Snackbar.make(rootView, R.string.uploaded, Snackbar.LENGTH_LONG).show()
             }
         }
     }
