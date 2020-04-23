@@ -92,6 +92,8 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
     }
 
     override fun onDestroy() {
+        TunModule.requestStop()
+
         ServiceStatusProvider.serviceRunning = false
 
         service.broadcastClashStopped(reason)
