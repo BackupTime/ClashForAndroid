@@ -30,7 +30,7 @@ var client = &http.Client{
 
 			client, server := net.Pipe()
 
-			tunnel.Add(inbound.NewSocket(socks5.ParseAddr(address), server, constant.HTTP, constant.TCP))
+			tunnel.Add(inbound.NewSocket(socks5.ParseAddr(address), server, constant.HTTP))
 
 			return client, nil
 		},
@@ -97,13 +97,9 @@ func PullLocal(fd int, output, baseDir string) error {
 }
 
 func save(data []byte, output, baseDir string) error {
-	cfg, err := parseConfig(data, baseDir)
+	_, err := parseConfig(data, baseDir)
 	if err != nil {
 		return err
-	}
-
-	for _, v := range cfg.Providers {
-		_ = v.Destroy()
 	}
 
 	return ioutil.WriteFile(output, data, defaultFileMode)

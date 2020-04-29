@@ -81,7 +81,7 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string) error {
 			Zone: "",
 		})
 
-		tunnel.Add(adapters.NewSocket(addr, conn, C.SOCKS, C.TCP))
+		tunnel.Add(adapters.NewSocket(addr, conn, C.SOCKS))
 	})
 	adapter.SetUDPHandler(func(payload []byte, endpoint *binding.Endpoint, sender redirect.UDPSender) {
 		if gatewayNet.Contains(endpoint.Target.IP) {
