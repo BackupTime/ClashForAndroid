@@ -122,9 +122,24 @@ func SetSelectedProxy(name, proxy string) bool {
 		return false
 	}
 
+	selected := selector.Now()
+	if selected == proxy {
+		log.Infoln("Set " + name + " -> " + proxy)
+		return true
+	}
+
 	if err := selector.Set(proxy); err != nil {
 		log.Infoln("Set %s: %s", name, err.Error())
 		return false
+	}
+
+	for _, conn := range tunnel.DefaultManager.Snapshot().Connections {
+		for _, p := range conn.Chain() {
+			if p == proxy {
+				_ = conn.Close()
+				break
+			}
+		}
 	}
 
 	log.Infoln("Set " + name + " -> " + proxy)
