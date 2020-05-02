@@ -121,7 +121,7 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
                 return if (settings.get(ServiceSettings.BYPASS_PRIVATE_NETWORK))
                     resources.getStringArray(R.array.bypass_private_route).toList()
                 else
-                    listOf(VLAN_ANY)
+                    resources.getStringArray(R.array.bypass_local_route).toList()
             }
         override val dnsAddress: String
             get() = PRIVATE_VLAN_DNS
