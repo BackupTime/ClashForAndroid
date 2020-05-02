@@ -135,7 +135,7 @@ func SetSelectedProxy(name, proxy string) bool {
 
 	for _, conn := range tunnel.DefaultManager.Snapshot().Connections {
 		for _, p := range conn.Chain() {
-			if p == proxy {
+			if p == name {
 				_ = conn.Close()
 				break
 			}
