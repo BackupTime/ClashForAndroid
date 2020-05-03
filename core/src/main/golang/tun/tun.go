@@ -36,6 +36,7 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string) error {
 	}
 
 	gatewayIP, gatewayNet, err := net.ParseCIDR(gateway)
+	_, ipv4Loopback, _ := net.ParseCIDR("127.0.0.0/8")
 	mirrorIP := net.ParseIP(mirror)
 
 	if err != nil || mirrorIP == nil || !gatewayNet.Contains(mirrorIP) {
@@ -67,7 +68,8 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string) error {
 		return make([]byte, length)
 	})
 	adapter.SetTCPHandler(func(conn net.Conn, endpoint *binding.Endpoint) {
-		if gatewayNet.Contains(endpoint.Target.IP) {
+		if gatewayNet.Contains(endpoint.Target.IP) || ipv4Loopback.Contains(endpoint.Target.IP) {
+			_ = conn.Close()
 			return
 		}
 
@@ -84,7 +86,7 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string) error {
 		tunnel.Add(adapters.NewSocket(addr, conn, C.SOCKS))
 	})
 	adapter.SetUDPHandler(func(payload []byte, endpoint *binding.Endpoint, sender redirect.UDPSender) {
-		if gatewayNet.Contains(endpoint.Target.IP) {
+		if gatewayNet.Contains(endpoint.Target.IP) || ipv4Loopback.Contains(endpoint.Target.IP) {
 			udpRecycle(payload)
 			return
 		}
