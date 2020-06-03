@@ -1,4 +1,4 @@
-apply(from = "clash.gradle.kts")
+import android.databinding.tool.ext.toCamelCase
 
 plugins {
     id("com.android.library")
@@ -6,6 +6,8 @@ plugins {
     id("kotlin-android-extensions")
     id("kotlinx-serialization")
 }
+
+apply(from = "clash.gradle.kts")
 
 val rootExtra = rootProject.extra
 
@@ -23,7 +25,10 @@ val gKotlinCoroutineVersion: String by rootExtra
 val gKotlinSerializationVersion: String by rootExtra
 val gAndroidKtxVersion: String by rootExtra
 
-val clashCoreOutput = buildDir.resolve("extraSources")
+val geoipOutput = buildDir.resolve("outputs/geoip")
+val golangSource = file("src/main/golang")
+val golangOutput = buildDir.resolve("outputs/golang")
+val nativeAbis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 
 android {
     compileSdkVersion(gCompileSdkVersion)
@@ -37,6 +42,13 @@ android {
         versionName = gVersionName
 
         consumerProguardFiles("consumer-rules.pro")
+
+        externalNativeBuild {
+            cmake {
+                abiFilters(*nativeAbis.toTypedArray())
+                arguments("-DCLASH_OUTPUT=$golangOutput", "-DCLASH_SOURCE=$golangSource")
+            }
+        }
     }
 
     buildTypes {
@@ -48,9 +60,8 @@ android {
 
     sourceSets {
         maybeCreate("main").apply {
-            assets.srcDir(clashCoreOutput.resolve("assets"))
-            jniLibs.srcDir(clashCoreOutput.resolve("jniLibs"))
-            java.srcDir(clashCoreOutput.resolve("classes"))
+            assets.srcDir(geoipOutput)
+            jniLibs.srcDir(golangOutput)
         }
     }
 
@@ -61,6 +72,12 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+        }
     }
 }
 
@@ -77,6 +94,10 @@ repositories {
 }
 
 afterEvaluate {
-    tasks["clean"].dependsOn(tasks["resetGolangPathMode"])
-    tasks["preBuild"].dependsOn(tasks["extractSources"], tasks["downloadGeoipDatabase"])
+    android.buildTypes.forEach {
+        val cName = it.name.toCamelCase()
+
+        tasks["externalNativeBuild${cName}"].dependsOn(tasks["compileClashCore"])
+        tasks["package${cName}Assets"].dependsOn(tasks["downloadGeoipDatabase"])
+    }
 }
