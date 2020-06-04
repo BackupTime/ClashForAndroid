@@ -1,8 +1,9 @@
 package com.github.kr328.clash.core
 
-import bridge.Bridge
-import bridge.TunCallback
+import android.os.ParcelFileDescriptor
 import com.github.kr328.clash.common.Global
+import com.github.kr328.clash.common.utils.Log
+import com.github.kr328.clash.core.bridge.Bridge
 import com.github.kr328.clash.core.event.LogEvent
 import com.github.kr328.clash.core.model.General
 import com.github.kr328.clash.core.model.Proxy
@@ -12,8 +13,11 @@ import com.github.kr328.clash.core.transact.DoneCallbackImpl
 import com.github.kr328.clash.core.transact.ProxyCollectionImpl
 import com.github.kr328.clash.core.transact.ProxyGroupCollectionImpl
 import kotlinx.coroutines.CompletableDeferred
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.io.File
 import java.io.InputStream
+import kotlin.concurrent.thread
 
 object Clash {
     private val logReceivers = mutableMapOf<String, (LogEvent) -> Unit>()
@@ -24,7 +28,7 @@ object Clash {
         val bytes = context.assets.open("Country.mmdb")
             .use(InputStream::readBytes)
 
-        Bridge.initCore(bytes, context.cacheDir.absolutePath, BuildConfig.VERSION_NAME)
+        Bridge.initialize(bytes, context.cacheDir.absolutePath, BuildConfig.VERSION_NAME)
         Bridge.reset()
     }
 
@@ -45,27 +49,39 @@ object Clash {
         onNewSocket: (Int) -> Boolean,
         onTunStop: () -> Unit
     ) {
-        Bridge.startTunDevice(fd.toLong(), mtu.toLong(), gateway, mirror, dns, object: TunCallback {
-            override fun onCreateSocket(fd: Long) {
-                onNewSocket(fd.toInt())
+        val sockets = ParcelFileDescriptor.createSocketPair()
+
+        thread {
+            val input = DataInputStream(ParcelFileDescriptor.AutoCloseInputStream(sockets[0]))
+            val output = DataOutputStream(ParcelFileDescriptor.AutoCloseOutputStream(sockets[0]))
+
+            runCatching {
+                while (true) {
+                    val s = input.readInt()
+
+                    onNewSocket(s)
+
+                    output.writeInt(s)
+                }
             }
 
-            override fun onStop() {
-                onTunStop()
-            }
-        })
+            onTunStop()
+
+            Log.i("Tun Closed")
+
+            sockets[0].close()
+            sockets[1].close()
+        }
+
+        Bridge.startTunDevice(fd, mtu, gateway, mirror, dns, sockets[1].detachFd())
     }
 
     fun stopTunDevice() {
         Bridge.stopTunDevice()
     }
 
-    fun appendDns(dns: List<String>) {
-        Bridge.resetDnsAppend(dns.joinToString(","))
-    }
-
-    fun setDnsOverrideEnabled(enabled: Boolean) {
-        Bridge.setDnsOverrideEnabled(enabled)
+    fun setDnsOverride(dnsOverride: Boolean, appendNameservers: List<String>) {
+        Bridge.setDnsOverride(dnsOverride, appendNameservers.joinToString(","))
     }
 
     fun loadProfile(path: File, baseDir: File): CompletableDeferred<Unit> {
@@ -117,24 +133,15 @@ object Clash {
     }
 
     fun queryGeneral(): General {
-        val t = Bridge.queryGeneral()
-
-        return General(
-            General.Mode.fromString(t.mode),
-            t.httpPort.toInt(), t.socksPort.toInt(), t.redirectPort.toInt()
-        )
+        return Bridge.queryGeneral()
     }
 
-    fun queryTraffic(): Traffic {
-        val data = Bridge.queryTraffic()
-
-        return Traffic(data.upload, data.download)
+    fun querySpeed(): Traffic {
+        return Bridge.querySpeed()
     }
 
     fun queryBandwidth(): Traffic {
-        val data = Bridge.queryBandwidth()
-
-        return Traffic(data.upload, data.download)
+        return Bridge.queryBandwidth()
     }
 
     fun registerLogReceiver(key: String, receiver: (LogEvent) -> Unit) {

@@ -1,9 +1,10 @@
 package com.github.kr328.clash.core.model
 
+import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Proxy(
+data class Proxy @Keep constructor(
     val name: String,
     val type: Type,
     val delay: Long
