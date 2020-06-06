@@ -2,6 +2,10 @@
 
 #include <stdint.h>
 
+#if __cplusplus
+extern "C" {
+#endif
+
 typedef struct buffer_t {
     void *buffer;
     int length;
@@ -13,3 +17,7 @@ typedef struct const_buffer_t {
 } const_buffer_t;
 
 typedef const char *const_string_t;
+
+#if __cplusplus
+};
+#endif

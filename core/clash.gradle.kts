@@ -93,7 +93,9 @@ fun generateGolangBuildEnvironment(abi: String): Map<String, String> {
         "LD" to compilerBase.resolve(linker).absolutePath,
         "GOOS" to "android",
         "GOARCH" to golangArch,
-        "CGO_ENABLED" to "1"
+        "CGO_ENABLED" to "1",
+        "LDFLAGS" to "-lpthread",
+        "CFLAGS" to "-O3"
     )
 }
 

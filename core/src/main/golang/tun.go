@@ -3,21 +3,20 @@ package main
 //#include "buffer.h"
 import "C"
 import (
-	"encoding/binary"
 	"github.com/Dreamacro/clash/component/dialer"
 	"github.com/kr328/cfa/tun"
-	"io"
 	"net"
-	"os"
 	"sync"
 	"syscall"
+	"unsafe"
 )
 
 var lock sync.Mutex
-var oldNewSocketPipe *os.File = nil
 
 //export startTunDevice
-func startTunDevice(fd, mtu int, gateway, mirror, dns C.const_string_t, newSocket int) *C.char {
+func startTunDevice(fd, mtu int, gateway, mirror, dns C.const_string_t, onNewSocket nativeCcall, onStop nativeCcall) *C.char {
+	stopTunDevice()
+
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -25,36 +24,37 @@ func startTunDevice(fd, mtu int, gateway, mirror, dns C.const_string_t, newSocke
 	m := C.GoString(mirror)
 	d := C.GoString(dns)
 
-	err := tun.StartTunDevice(fd, mtu, g, m, d)
-	if err != nil {
-		return C.CString(err.Error())
-	}
+	l := &sync.Mutex{}
+	c := false
+	closed := &c
 
-	if pipe := oldNewSocketPipe ; pipe != nil {
-		_ = pipe.Close()
-	}
-
-	_ = syscall.SetNonblock(newSocket, true)
-	pipe := os.NewFile(uintptr(newSocket), "socket")
-	oldNewSocketPipe = pipe
-
-	dialer.DialerHook = func(dialer *net.Dialer) error {
-		dialer.Control = func(network, address string, c syscall.RawConn) error {
+	dialer.DialerHook = func(d *net.Dialer) error {
+		d.Control = func(network, address string, c syscall.RawConn) error {
 			return c.Control(func(fd uintptr) {
-				lock.Lock()
-				defer lock.Unlock()
+				l.Lock()
+				defer l.Unlock()
 
-				if pipe := oldNewSocketPipe ; pipe != nil {
-					var fdBytes [4]byte
-
-					binary.BigEndian.PutUint32(fdBytes[:], uint32(fd))
-
-					_, _ = pipe.Write(fdBytes[:])
-					_, _ = io.ReadFull(pipe, fdBytes[:])
+				if *closed {
+					return
 				}
+
+				//noinspection GoVetUnsafePointer
+				callCcall(onNewSocket, unsafe.Pointer(fd))
 			})
 		}
 		return nil
+	}
+
+	err := tun.StartTunDevice(fd, mtu, g, m, d, func() {
+		l.Lock()
+		defer l.Unlock()
+
+		*closed = true
+
+		callCcall(onStop, nil)
+	})
+	if err != nil {
+		return C.CString(err.Error())
 	}
 
 	return nil
@@ -66,10 +66,4 @@ func stopTunDevice() {
 	defer lock.Unlock()
 
 	tun.StopTunDevice()
-
-	if pipe := oldNewSocketPipe ; pipe != nil {
-		_ = pipe.Close()
-	}
-
-	oldNewSocketPipe = nil
 }

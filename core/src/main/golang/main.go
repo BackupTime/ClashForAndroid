@@ -13,7 +13,7 @@ import "C"
 func main() {}
 
 //export initialize
-func initialize(database *C.buffer_t, home, version C.const_string_t) {
+func initialize(database *C.const_buffer_t, home, version C.const_string_t) {
 	databaseData := C.GoBytes(database.buffer, database.length)
 	homeData := C.GoString(home)
 	versionData := C.GoString(version)
