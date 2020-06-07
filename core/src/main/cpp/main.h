@@ -11,23 +11,49 @@ public:
     class Context;
 
 public:
-    Master(JNIEnv *env);
+    Master(JavaVM *vm, JNIEnv *env);
 
 public:
-    template <class R>
-    static R runWithContext(JNIEnv *env, const std::function<R (Context *)>& func);
+    template <class R> static R runWithContext(JNIEnv *env, const std::function<R (Context *)>& func);
+    template <class R> static R runWithAttached(const std::function<R (JNIEnv *)> &func);
 
 private:
     jclass cClashException;
     jclass cTraffic;
     jclass cGeneral;
     jclass cCompletableFuture;
+    jclass cProxyGroup;
+    jclass cProxy;
+    jclass iTunCallback;
     jmethodID cClashExceptionConstructor;
     jmethodID cTrafficConstructor;
     jmethodID cGeneralConstructor;
     jmethodID cCompletableFutureConstructor;
+    jmethodID cProxyGroupConstructor;
+    jmethodID cProxyConstructor;
     jmethodID mCompletableFutureComplete;
     jmethodID mCompletableFutureCompleteExceptionally;
+    jmethodID mTunCallbackOnNewSocket;
+    jmethodID mTunCallbackOnStop;
+
+private:
+    jstring sDirect;
+    jstring sReject;
+    jstring sShadowsocks;
+    jstring sSnell;
+    jstring sSocks5;
+    jstring sHttp;
+    jstring sVmess;
+    jstring sTrojan;
+    jstring sRelay;
+    jstring sSelector;
+    jstring sFallback;
+    jstring sURLTest;
+    jstring sLoadBalance;
+    jstring sUnknown;
+
+private:
+    JavaVM *vm;
 
 private:
     static Master *master;
@@ -37,6 +63,7 @@ private:
 };
 
 class Master::Context {
+public:
 public:
     Context(JNIEnv *env);
 
@@ -56,10 +83,14 @@ public:
 public:
     bool completeCompletableFuture(jobject completable, jobject object);
     bool completeExceptionallyCompletableFuture(jobject completable, jthrowable throwable);
+    void tunCallbackNewSocket(jobject callback, int fd);
+    void tunCallbackStop(jobject callback);
 
 public:
-    buffer_t createBufferFromByteArray(jbyteArray array);
-    void releaseBufferFromByteArray(jbyteArray array, buffer_t &buffer);
+    jobject createProxy(std::string const &name, proxy_type_t type, long delay);
+    jobject createProxyGroup(std::string const &name, proxy_type_t type, std::string const &current, jobjectArray proxies);
+    jobjectArray createProxyArray(int size, jobject elements[]);
+    jobjectArray createProxyGroupArray(int size, jobject elements[]);
     const_buffer_t createConstBufferFromByteArray(jbyteArray array);
     void releaseConstBufferFromByteArray(jbyteArray array, const_buffer_t &buffer);
     const char *getString(jstring str);
@@ -74,4 +105,18 @@ R Master::runWithContext(JNIEnv *env, const std::function<R (Master::Context *)>
     Master::Context context(env);
 
     return func(&context);
+}
+
+template <class R> R Master::runWithAttached(const std::function<R (JNIEnv *)> &func) {
+    Master *m = Master::master;
+
+    JNIEnv *env;
+
+    m->vm->AttachCurrentThread(&env, nullptr);
+
+    R result = func(env);
+
+    m->vm->DetachCurrentThread();
+
+    return result;
 }

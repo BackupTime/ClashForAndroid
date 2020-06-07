@@ -50,7 +50,7 @@ class ReloadModule(private val context: Context) : Module() {
             ).await()
 
             val remove = SelectedProxyDao.querySelectedForProfile(active.id)
-                .filterNot { Clash.setSelectedProxy(it.proxy, it.selected) }
+                .filterNot { Clash.setSelector(it.proxy, it.selected) }
                 .map { it.selected }
 
             SelectedProxyDao.removeSelectedForProfile(active.id, remove)

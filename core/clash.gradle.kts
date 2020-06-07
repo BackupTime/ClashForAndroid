@@ -94,8 +94,7 @@ fun generateGolangBuildEnvironment(abi: String): Map<String, String> {
         "GOOS" to "android",
         "GOARCH" to golangArch,
         "CGO_ENABLED" to "1",
-        "LDFLAGS" to "-lpthread",
-        "CFLAGS" to "-O3"
+        "CFLAGS" to "-O3 -Werror"
     )
 }
 
@@ -128,7 +127,7 @@ fun String.exec(pwd: File = buildDir, env: Map<String, String> = System.getenv()
 task("compileClashCore") {
     onlyIf {
         val sourceModified = golangSource.walk()
-            .filter { it.extension == "go" || it.name == "go.mod" }
+            .filter { it.extension == "go" || it.extension == "c" || it.extension == "h" || it.name == "go.mod" }
             .map { it.lastModified() }
             .max() ?: Long.MAX_VALUE
         val targetModified = golangOutput.walk()

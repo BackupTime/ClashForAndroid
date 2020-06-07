@@ -4,11 +4,14 @@ import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Proxy @Keep constructor(
+data class Proxy constructor(
     val name: String,
     val type: Type,
     val delay: Long
 ) {
+    @Keep
+    constructor(name: String, type: String, delay: Long): this(name, Type.fromString(type), delay)
+
     enum class Type(val text: String, val group: Boolean) {
         DIRECT("Direct", false),
         REJECT("Reject", false),

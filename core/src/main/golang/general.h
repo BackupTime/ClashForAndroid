@@ -4,6 +4,7 @@
 extern "C" {
 #endif
 
+static const int MODE_UNKNOWN = -1;
 static const int MODE_DIRECT = 0;
 static const int MODE_GLOBAL = 1;
 static const int MODE_RULE = 2;

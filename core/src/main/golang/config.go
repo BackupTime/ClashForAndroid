@@ -1,6 +1,7 @@
 package main
 
 //#include "config.h"
+//#include "buffer.h"
 import "C"
 
 import (
@@ -10,18 +11,18 @@ import (
 
 //export setDnsOverride
 func setDnsOverride(override *C.dns_override_t) {
-	dnsOverride := override.override_dns != 0
-	appendNameservers := C.GoString(override.append_nameservers)
+	overrideDns := override.override_dns != 0
+	appendDns := C.GoString(override.append_dns)
 
-	if dnsOverride {
+	if overrideDns {
 		config.DnsPatch = config.OptionalDnsPatch
 	} else {
 		config.DnsPatch = nil
 	}
 
-	if len(appendNameservers) == 0 {
+	if len(appendDns) == 0 {
 		config.NameServersAppend = make([]string, 0)
 	} else {
-		config.NameServersAppend = strings.Split(appendNameservers, ",")
+		config.NameServersAppend = strings.Split(appendDns, ",")
 	}
 }

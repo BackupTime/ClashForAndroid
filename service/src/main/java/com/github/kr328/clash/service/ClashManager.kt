@@ -2,7 +2,7 @@ package com.github.kr328.clash.service
 
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.model.General
-import com.github.kr328.clash.core.model.ProxyGroupList
+import com.github.kr328.clash.core.model.ProxyGroupWrapper
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.data.SelectedProxyDao
 import com.github.kr328.clash.service.data.SelectedProxyEntity
@@ -18,8 +18,8 @@ class ClashManager(parent: CoroutineScope) :
         Clash.setProxyMode(requireNotNull(mode))
     }
 
-    override fun queryAllProxies(): ProxyGroupList {
-        return ProxyGroupList(Clash.queryProxyGroups())
+    override fun queryAllProxies(): ProxyGroupWrapper {
+        return ProxyGroupWrapper(Clash.queryProxyGroups())
     }
 
     override fun queryGeneral(): General {
@@ -35,7 +35,7 @@ class ClashManager(parent: CoroutineScope) :
             SelectedProxyDao.setSelectedForProfile(SelectedProxyEntity(current.id, proxy, selected))
         }
 
-        return Clash.setSelectedProxy(proxy, selected)
+        return Clash.setSelector(proxy, selected)
     }
 
     override fun queryBandwidth(): Long {
@@ -47,7 +47,7 @@ class ClashManager(parent: CoroutineScope) :
     override fun startHealthCheck(group: String?, callback: IStreamCallback?) {
         require(group != null && callback != null)
 
-        Clash.startHealthCheck(group).invokeOnCompletion { u ->
+        Clash.performHealthCheck(group).invokeOnCompletion { u ->
             if (u != null)
                 callback.completeExceptionally(u.message)
             else
