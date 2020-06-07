@@ -31,7 +31,7 @@ public final class Bridge {
 
     public static native void setDnsOverride(boolean overrideDns, String appendNameservers);
     public static native void setProxyMode(String mode);
-    public static native void setSelector(String group, String selected);
+    public static native boolean setSelector(String group, String selected);
 
     public static native CompletableFuture<Object> downloadProfile(String url, String base, String output);
     public static native CompletableFuture<Object> downloadProfile(int fd, String base, String output);

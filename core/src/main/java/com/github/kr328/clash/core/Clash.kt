@@ -2,6 +2,7 @@ package com.github.kr328.clash.core
 
 import android.os.ParcelFileDescriptor
 import com.github.kr328.clash.common.Global
+import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.core.bridge.Bridge
 import com.github.kr328.clash.core.bridge.TunCallback
 import com.github.kr328.clash.core.event.LogEvent
@@ -13,8 +14,6 @@ import java.io.InputStream
 import java.util.concurrent.CompletableFuture
 
 object Clash {
-    private val logReceivers = mutableMapOf<String, (LogEvent) -> Unit>()
-
     init {
         val context = Global.application
 
@@ -23,6 +22,8 @@ object Clash {
 
         Bridge.initialize(bytes, context.cacheDir.absolutePath, BuildConfig.VERSION_NAME)
         Bridge.reset()
+
+        Log.i("Clash core initialized")
     }
 
     fun start() {
@@ -76,7 +77,7 @@ object Clash {
         return Bridge.queryProxyGroups().toList()
     }
 
-    fun setSelector(name: String, selected: String) {
+    fun setSelector(name: String, selected: String): Boolean {
         return Bridge.setSelector(name, selected)
     }
 
@@ -101,27 +102,10 @@ object Clash {
     }
 
     fun registerLogReceiver(key: String, receiver: (LogEvent) -> Unit) {
-        synchronized(logReceivers) {
-            logReceivers[key] = receiver
 
-            Bridge.setLogCallback(this::onLogEvent)
-        }
     }
 
     fun unregisterLogReceiver(key: String) {
-        synchronized(logReceivers) {
-            logReceivers.remove(key)
 
-            if (logReceivers.isEmpty())
-                Bridge.setLogCallback(null)
-        }
-    }
-
-    private fun onLogEvent(level: String, payload: String) {
-        synchronized(logReceivers) {
-            logReceivers.forEach {
-                it.value(LogEvent(LogEvent.Level.fromString(level), payload))
-            }
-        }
     }
 }

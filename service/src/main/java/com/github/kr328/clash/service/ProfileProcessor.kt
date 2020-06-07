@@ -13,10 +13,12 @@ import com.github.kr328.clash.service.model.asEntity
 import com.github.kr328.clash.service.util.resolveBaseDir
 import com.github.kr328.clash.service.util.resolveProfileFile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.lang.Exception
+import java.lang.NullPointerException
 import java.util.*
 
 object ProfileProcessor {
@@ -56,14 +58,17 @@ object ProfileProcessor {
         source: Uri,
         target: File,
         baseDir: File
-    ) = withContext(Dispatchers.IO) {
+    ) {
         when (source.scheme?.toLowerCase(Locale.getDefault())) {
             "http", "https" ->
                 Clash.downloadProfile(source.toString(), target, baseDir)
             "content", "file", "resource" -> {
-                val fd = context.contentResolver.openFileDescriptor(source, "r")
-                    ?: throw FileNotFoundException("$source not found")
-                Clash.downloadProfile(fd.detachFd(), target, baseDir)
+                val fd = withContext(Dispatchers.IO) {
+                    @Suppress("BlockingMethodInNonBlockingContext")
+                    context.contentResolver.openFileDescriptor(source, "r")
+                } ?: throw FileNotFoundException("$source not found")
+
+                Clash.downloadProfile(fd, target, baseDir)
             }
             else -> throw IllegalArgumentException("Invalid uri type")
         }.await()

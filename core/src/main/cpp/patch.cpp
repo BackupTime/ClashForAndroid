@@ -51,18 +51,20 @@ Java_com_github_kr328_clash_core_bridge_Bridge_setDnsOverride(JNIEnv *env, jclas
 }
 
 extern "C"
-JNIEXPORT void JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_github_kr328_clash_core_bridge_Bridge_setSelector(JNIEnv *env, jclass clazz, jstring group,
                                                            jstring selected) {
     UNUSED(clazz);
 
-    Master::runWithContext<void>(env, [&](Master::Context *context) {
+    return Master::runWithContext<bool>(env, [&](Master::Context *context) -> bool {
         const char *g = context->getString(group);
         const char *s = context->getString(selected);
 
-        setSelector(g, s);
+        int r = setSelector(g, s);
 
         context->releaseString(group, g);
         context->releaseString(selected, s);
+
+        return r == 0;
     });
 }

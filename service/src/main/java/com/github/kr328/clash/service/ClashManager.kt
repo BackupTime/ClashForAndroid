@@ -18,7 +18,7 @@ class ClashManager(parent: CoroutineScope) :
         Clash.setProxyMode(requireNotNull(mode))
     }
 
-    override fun queryAllProxies(): ProxyGroupWrapper {
+    override fun queryProxyGroups(): ProxyGroupWrapper {
         return ProxyGroupWrapper(Clash.queryProxyGroups())
     }
 
@@ -26,7 +26,7 @@ class ClashManager(parent: CoroutineScope) :
         return Clash.queryGeneral()
     }
 
-    override fun setSelectProxy(proxy: String?, selected: String?): Boolean {
+    override fun setSelector(proxy: String?, selected: String?) {
         require(proxy != null && selected != null)
 
         launch {
@@ -35,7 +35,7 @@ class ClashManager(parent: CoroutineScope) :
             SelectedProxyDao.setSelectedForProfile(SelectedProxyEntity(current.id, proxy, selected))
         }
 
-        return Clash.setSelector(proxy, selected)
+        Clash.setSelector(proxy, selected)
     }
 
     override fun queryBandwidth(): Long {
@@ -44,10 +44,10 @@ class ClashManager(parent: CoroutineScope) :
         return data.download + data.upload
     }
 
-    override fun startHealthCheck(group: String?, callback: IStreamCallback?) {
+    override fun performHealthCheck(group: String?, callback: IStreamCallback?) {
         require(group != null && callback != null)
 
-        Clash.performHealthCheck(group).invokeOnCompletion { u ->
+        Clash.performHealthCheck(group).whenComplete { _, u ->
             if (u != null)
                 callback.completeExceptionally(u.message)
             else

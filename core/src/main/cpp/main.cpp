@@ -2,16 +2,21 @@
 
 Master *Master::master = nullptr;
 
+template <class T>
+inline T g(JNIEnv *env, T object) {
+    return reinterpret_cast<T>(env->NewGlobalRef(object));
+}
+
 Master::Master(JavaVM *vm, JNIEnv *env): vm(vm) {
     master = this;
 
-    cClashException = env->FindClass("com/github/kr328/clash/core/bridge/ClashException");
-    cTraffic = env->FindClass("com/github/kr328/clash/core/model/Traffic");
-    cGeneral = env->FindClass("com/github/kr328/clash/core/model/General");
-    cCompletableFuture = env->FindClass("java/util/concurrent/CompletableFuture");
-    cProxyGroup = env->FindClass("com/github/kr328/clash/core/model/ProxyGroup");
-    cProxy = env->FindClass("com/github/kr328/clash/core/model/Proxy");
-    iTunCallback = env->FindClass("com/github/kr328/clash/core/bridge/TunCallback");
+    cClashException = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/bridge/ClashException"));
+    cTraffic = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/model/Traffic"));
+    cGeneral = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/model/General"));
+    cCompletableFuture = g<jclass>(env, env->FindClass("java/util/concurrent/CompletableFuture"));
+    cProxyGroup = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/model/ProxyGroup"));
+    cProxy = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/model/Proxy"));
+    iTunCallback = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/bridge/TunCallback"));
     cClashExceptionConstructor = env->GetMethodID(cClashException, "<init>",
                                                   "(Ljava/lang/String;)V");
     cTrafficConstructor = env->GetMethodID(cTraffic, "<init>", "(JJ)V");
@@ -27,20 +32,20 @@ Master::Master(JavaVM *vm, JNIEnv *env): vm(vm) {
     mTunCallbackOnNewSocket = env->GetMethodID(iTunCallback, "onNewSocket", "(I)V");
     mTunCallbackOnStop = env->GetMethodID(iTunCallback, "onStop", "()V");
 
-    sDirect = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Direct")));
-    sReject = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Reject")));
-    sShadowsocks = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Shadowsocks")));
-    sSnell = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Snell")));
-    sSocks5 = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Socks5")));
-    sHttp = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Http")));
-    sVmess = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Vmess")));
-    sTrojan = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Trojan")));
-    sRelay = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Relay")));
-    sSelector = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Selector")));
-    sFallback = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Fallback")));
-    sURLTest = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("URLTest")));
-    sLoadBalance = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("LoadBalance")));
-    sUnknown = reinterpret_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("Unknown")));
+    sDirect = g<jstring>(env, env->NewStringUTF("Direct"));
+    sReject = g<jstring>(env, env->NewStringUTF("Reject"));
+    sShadowsocks = g<jstring>(env, env->NewStringUTF("Shadowsocks"));
+    sSnell = g<jstring>(env, env->NewStringUTF("Snell"));
+    sSocks5 = g<jstring>(env, env->NewStringUTF("Socks5"));
+    sHttp = g<jstring>(env, env->NewStringUTF("Http"));
+    sVmess = g<jstring>(env, env->NewStringUTF("Vmess"));
+    sTrojan = g<jstring>(env, env->NewStringUTF("Trojan"));
+    sRelay = g<jstring>(env, env->NewStringUTF("Relay"));
+    sSelector = g<jstring>(env, env->NewStringUTF("Selector"));
+    sFallback = g<jstring>(env, env->NewStringUTF("Fallback"));
+    sURLTest = g<jstring>(env, env->NewStringUTF("URLTest"));
+    sLoadBalance = g<jstring>(env, env->NewStringUTF("LoadBalance"));
+    sUnknown = g<jstring>(env, env->NewStringUTF("Unknown"));
 }
 
 Master::Context::Context(JNIEnv *env) {

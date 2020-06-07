@@ -32,6 +32,8 @@ func init() {
 		sub := log.Subscribe()
 		defer log.UnSubscribe(sub)
 
+		close(r)
+
 		for item := range sub {
 			msg := item.(*log.Event)
 
@@ -56,8 +58,6 @@ func init() {
 
 			C.free(unsafe.Pointer(cPayload))
 		}
-
-		r <- struct{}{}
 	}()
 
 	<- r

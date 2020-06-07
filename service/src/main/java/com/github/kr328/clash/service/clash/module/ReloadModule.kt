@@ -9,6 +9,7 @@ import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.data.SelectedProxyDao
 import com.github.kr328.clash.service.util.resolveBaseDir
 import com.github.kr328.clash.service.util.resolveProfileFile
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.sync.Mutex
 
 class ReloadModule(private val context: Context) : Module() {

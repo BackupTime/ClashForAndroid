@@ -16,7 +16,7 @@ import (
 #include <malloc.h>
 
 static proxy_group_list_t *new_proxy_group_list_t(int size) {
-	proxy_group_list_t *result = malloc(sizeof(proxy_group_list_t) + size * sizeof(proxy_group_t*));
+	proxy_group_list_t *result = (proxy_group_list_t *) malloc(sizeof(proxy_group_list_t) + size * sizeof(proxy_group_t*));
 
 	result->size = size;
 
@@ -24,7 +24,7 @@ static proxy_group_list_t *new_proxy_group_list_t(int size) {
 }
 
 static proxy_group_t *new_proxy_group_t(int proxies_size) {
-	proxy_group_t *result = malloc(sizeof(proxy_group_t) + proxies_size * sizeof(proxy_t));
+	proxy_group_t *result = (proxy_group_t *) malloc(sizeof(proxy_group_t) + proxies_size * sizeof(proxy_t));
 
 	result->proxies_size = proxies_size;
 
@@ -42,7 +42,7 @@ static void proxy_group_list_set(proxy_group_list_t *list, int index, proxy_grou
 import "C"
 
 //export setSelector
-func setSelector(group C.const_string_t, selected C.const_string_t) {
+func setSelector(group C.const_string_t, selected C.const_string_t) C.int {
 	g := C.GoString(group)
 	s := C.GoString(selected)
 
@@ -50,37 +50,39 @@ func setSelector(group C.const_string_t, selected C.const_string_t) {
 	if p == nil {
 		log.Warnln("Set selector failure: %s not found", g)
 
-		return
+		return -1
 	}
 
 	pw, ok := p.(*outbound.Proxy)
 	if !ok {
 		log.Warnln("Set selector failure: %s not valid group", g)
 
-		return
+		return -1
 	}
 
 	adapter, ok := pw.ProxyAdapter.(outboundgroup.ProxyGroup)
 	if !ok {
 		log.Warnln("Set selector failure: %s not valid group", g)
 
-		return
+		return -1
 	}
 
 	selector, ok := adapter.(*outboundgroup.Selector)
 	if !ok {
 		log.Warnln("Set selector failure: %s not selector", g)
 
-		return
+		return -1
 	}
 
 	if err := selector.Set(s); err != nil {
 		log.Warnln("Set selector failure: %s not in %s", s, g)
 
-		return
+		return -1
 	}
 
 	log.Infoln("Set %s -> %s", g, s)
+
+	return 0
 }
 
 //export queryProxyGroups
