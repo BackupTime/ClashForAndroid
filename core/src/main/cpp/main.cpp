@@ -66,10 +66,10 @@ jobject Master::Context::newTraffic(long upload, long download) {
     return env->NewObject(master->cTraffic, master->cTrafficConstructor, upload, download);
 }
 
-jobject Master::Context::newGeneral(std::string const &mode, int http, int socks, int redirect,
+jobject Master::Context::newGeneral(char const *mode, int http, int socks, int redirect,
                                     int mixed) {
     return env->NewObject(master->cGeneral, master->cGeneralConstructor,
-                          env->NewStringUTF(mode.c_str()), http, socks, redirect, mixed);
+                          env->NewStringUTF(mode), http, socks, redirect, mixed);
 }
 
 jobject Master::Context::newCompletableFuture() {
@@ -141,7 +141,7 @@ jobjectArray Master::Context::createProxyArray(int size, jobject elements[]) {
     return result;
 }
 
-jobject Master::Context::createProxy(std::string const &name, proxy_type_t type, long delay) {
+jobject Master::Context::createProxy(char const *name, proxy_type_t type, long delay) {
     jstring ts = nullptr;
 
     switch (type) {
@@ -191,11 +191,11 @@ jobject Master::Context::createProxy(std::string const &name, proxy_type_t type,
             ts = master->sUnknown;
     }
 
-    return env->NewObject(master->cProxy, master->cProxyConstructor, env->NewStringUTF(name.c_str()), ts, delay);
+    return env->NewObject(master->cProxy, master->cProxyConstructor, env->NewStringUTF(name), ts, delay);
 }
 
-jobject Master::Context::createProxyGroup(std::string const &name, proxy_type_t type,
-                                          std::string const &current, jobjectArray proxies) {
+jobject Master::Context::createProxyGroup(char const *name, proxy_type_t type,
+                                          char const *current, jobjectArray proxies) {
     jstring ts = nullptr;
 
     switch (type) {
@@ -221,7 +221,7 @@ jobject Master::Context::createProxyGroup(std::string const &name, proxy_type_t 
             ts = master->sUnknown;
     }
 
-    return env->NewObject(master->cProxyGroup, master->cProxyGroupConstructor, env->NewStringUTF(name.c_str()), ts, env->NewStringUTF(current.c_str()), proxies);
+    return env->NewObject(master->cProxyGroup, master->cProxyGroupConstructor, env->NewStringUTF(name), ts, env->NewStringUTF(current), proxies);
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *unused) {

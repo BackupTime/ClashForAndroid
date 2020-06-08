@@ -71,30 +71,29 @@ Java_com_github_kr328_clash_core_bridge_Bridge_queryProxyGroups(JNIEnv *env, jcl
         auto *jgroups = new jobject[list->size];
 
         for (int group_index = 0 ; group_index < list->size ; group_index++ ) {
-            std::string now;
+            char const * now = "";
             proxy_group_t *group = list->groups[group_index];
             auto *jproxies = new jobject[group->proxies_size];
+            const char *group_name = &list->string_pool[group->base.name_index];
 
             for ( int proxy_index = 0 ; proxy_index < group->proxies_size ; proxy_index++ ) {
                 proxy_t *proxy = &group->proxies[proxy_index];
+                const char *name = &list->string_pool[proxy->name_index];
 
-                jproxies[proxy_index] = context->createProxy(proxy->name, proxy->proxy_type, proxy->delay);
+                jproxies[proxy_index] = context->createProxy(name, proxy->proxy_type, proxy->delay);
 
                 if ( proxy_index == group->now )
-                    now = proxy->name;
-
-                free(proxy->name);
+                    now = name;
             }
 
             jgroups[group_index] = context->createProxyGroup(
-                    group->base.name,
+                    group_name,
                     group->base.proxy_type,
                     now,
                     context->createProxyArray(group->proxies_size, jproxies));
 
             delete[] jproxies;
 
-            free(group->base.name);
             free(group);
         }
 
@@ -102,6 +101,7 @@ Java_com_github_kr328_clash_core_bridge_Bridge_queryProxyGroups(JNIEnv *env, jcl
 
         delete[] jgroups;
 
+        free(list->string_pool);
         free(list);
 
         return result;

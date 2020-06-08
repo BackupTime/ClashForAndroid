@@ -9,7 +9,7 @@ typedef enum proxy_type_t {
 } proxy_type_t;
 
 typedef struct proxy_t {
-    char *name;
+    long name_index;
     proxy_type_t proxy_type;
     long delay;
 } proxy_t;
@@ -23,6 +23,7 @@ typedef struct proxy_group_t {
 
 typedef struct proxy_group_list_t {
     int size;
+    char *string_pool;
     proxy_group_t *groups[];
 } proxy_group_list_t;
 

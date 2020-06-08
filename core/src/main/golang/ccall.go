@@ -9,7 +9,6 @@ import "C"
 import (
 	"runtime"
 	"sync"
-	"sync/atomic"
 	"unsafe"
 )
 
@@ -21,9 +20,10 @@ type ccallContext struct {
 	argument unsafe.Pointer
 }
 
-var ccallQueue chan *ccallContext
+var ccallQueue = make(chan *ccallContext)
 var ccallMap sync.Map
 var currentIndex uint64
+var indexLock sync.Mutex
 
 func init() {
 	C.initialize_ccall(C.int(runtime.NumCPU()))
@@ -45,9 +45,12 @@ func callCcall(call nativeCcall, argument unsafe.Pointer) {
 func nextCcall(ccall *nativeCcall, argument *unsafe.Pointer, index *uint64) {
 	ctx := <- ccallQueue
 
-	*index = atomic.AddUint64(&currentIndex, 1)
+	indexLock.Lock()
+	currentIndex++
+	*index = currentIndex
 	*ccall = ctx.call
 	*argument = ctx.argument
+	indexLock.Unlock()
 
 	ccallMap.Store(*index, ctx)
 }

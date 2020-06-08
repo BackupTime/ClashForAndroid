@@ -70,7 +70,7 @@ public:
 public:
     jthrowable newClashException(std::string const &message);
     jobject newTraffic(long upload, long download);
-    jobject newGeneral(std::string const &mode, int http, int socks, int redirect, int mixed);
+    jobject newGeneral(char const *mode, int http, int socks, int redirect, int mixed);
     jobject newCompletableFuture();
 
 public:
@@ -87,8 +87,8 @@ public:
     void tunCallbackStop(jobject callback);
 
 public:
-    jobject createProxy(std::string const &name, proxy_type_t type, long delay);
-    jobject createProxyGroup(std::string const &name, proxy_type_t type, std::string const &current, jobjectArray proxies);
+    jobject createProxy(char const *name, proxy_type_t type, long delay);
+    jobject createProxyGroup(char const *name, proxy_type_t type, char const *current, jobjectArray proxies);
     jobjectArray createProxyArray(int size, jobject elements[]);
     jobjectArray createProxyGroupArray(int size, jobject elements[]);
     const_buffer_t createConstBufferFromByteArray(jbyteArray array);

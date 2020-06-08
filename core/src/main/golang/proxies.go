@@ -6,38 +6,13 @@ import (
 	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/tunnel"
+	"unsafe"
 )
 
 /*
 #cgo CFLAGS: -Werror
 #include "buffer.h"
 #include "proxies.h"
-
-#include <malloc.h>
-
-static proxy_group_list_t *new_proxy_group_list_t(int size) {
-	proxy_group_list_t *result = (proxy_group_list_t *) malloc(sizeof(proxy_group_list_t) + size * sizeof(proxy_group_t*));
-
-	result->size = size;
-
-	return result;
-}
-
-static proxy_group_t *new_proxy_group_t(int proxies_size) {
-	proxy_group_t *result = (proxy_group_t *) malloc(sizeof(proxy_group_t) + proxies_size * sizeof(proxy_t));
-
-	result->proxies_size = proxies_size;
-
-	return result;
-}
-
-static proxy_t *proxy_group_get_proxy(proxy_group_t *group, int index) {
-	return &group->proxies[index];
-}
-
-static void proxy_group_list_set(proxy_group_list_t *list, int index, proxy_group_t *group) {
-	list->groups[index] = group;
-}
  */
 import "C"
 
@@ -87,6 +62,7 @@ func setSelector(group C.const_string_t, selected C.const_string_t) C.int {
 
 //export queryProxyGroups
 func queryProxyGroups() *C.proxy_group_list_t {
+	stringPool := make([]byte, 0, 4096)
 	proxies := tunnel.Proxies()
 	groups := make([]outboundgroup.ProxyGroup, 0, len(proxies))
 
@@ -104,7 +80,7 @@ func queryProxyGroups() *C.proxy_group_list_t {
 		groups = append(groups, adapter)
 	}
 
-	result := C.new_proxy_group_list_t(C.int(len(groups)))
+	result := allocCProxyGroupList(len(groups))
 	groupIndex := 0
 	for _, group := range groups {
 		ps := make([]constant.Proxy, 0)
@@ -112,19 +88,25 @@ func queryProxyGroups() *C.proxy_group_list_t {
 			ps = append(ps, provider.Proxies()...)
 		}
 
-		g := C.new_proxy_group_t(C.int(len(proxies)))
+		g := allocCProxyGroup(len(proxies))
 
-		g.base.name = C.CString(group.Name())
+		g.base.name_index = C.long(len(stringPool))
 		g.base.proxy_type = typeToProxyTypeC(group.Type())
 		g.base.delay = 0
 
+		stringPool = append(stringPool, group.Name()...)
+		stringPool = append(stringPool, 0)
+
 		proxyIndex := 0
 		for _, proxy := range proxies {
-			p := C.proxy_group_get_proxy(g, C.int(proxyIndex))
+			p := indexCProxyGroupElement(g, proxyIndex)
 
-			p.name = C.CString(proxy.Name())
+			p.name_index = C.long(len(stringPool))
 			p.proxy_type = typeToProxyTypeC(proxy.Type())
 			p.delay = C.long(proxy.LastDelay())
+
+			stringPool = append(stringPool, proxy.Name()...)
+			stringPool = append(stringPool, 0)
 
 			if proxy.Name() == group.Now() {
 				g.now = C.int(proxyIndex)
@@ -133,13 +115,17 @@ func queryProxyGroups() *C.proxy_group_list_t {
 			proxyIndex++
 		}
 
-		C.proxy_group_list_set(result, C.int(groupIndex), g)
+		setCProxyGroupListElement(result, groupIndex, g)
 
 		groupIndex++
 	}
 
+	result.string_pool = (*C.char)(C.CBytes(stringPool))
+
 	return result
 }
+
+
 
 func typeToProxyTypeC(t constant.AdapterType) C.proxy_type_t {
 	switch t {
@@ -175,4 +161,30 @@ func typeToProxyTypeC(t constant.AdapterType) C.proxy_type_t {
 	default:
 		return C.Unknown
 	}
+}
+
+func allocCProxyGroup(proxiesSize int) *C.proxy_group_t {
+	return (*C.proxy_group_t)(C.malloc(C.sizeof_proxy_group_t + C.sizeof_proxy_t * C.size_t(proxiesSize)))
+}
+
+func allocCProxyGroupList(groupSize int) *C.proxy_group_list_t {
+	return (*C.proxy_group_list_t)(C.malloc(C.sizeof_proxy_group_list_t + C.sizeof_long * C.size_t(groupSize)))
+}
+
+//noinspection GoVetUnsafePointer
+func setCProxyGroupListElement(list *C.proxy_group_list_t, index int, element *C.proxy_group_t) {
+	address := uintptr(unsafe.Pointer(list))
+
+	offset := address + uintptr(C.sizeof_proxy_group_list_t) + uintptr(index) * uintptr(C.sizeof_long)
+
+	*(**C.proxy_group_t)(unsafe.Pointer(offset)) = element
+}
+
+//noinspection GoVetUnsafePointer
+func indexCProxyGroupElement(group *C.proxy_group_t, index int) *C.proxy_t {
+	address := uintptr(unsafe.Pointer(group))
+
+	offset := address + uintptr(C.sizeof_proxy_group_list_t) + uintptr(index) * uintptr(C.sizeof_proxy_t)
+
+	return (*C.proxy_t)(unsafe.Pointer(offset))
 }
