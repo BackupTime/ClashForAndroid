@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "libclash.h"
+#include "event_queue.h"
 
 #define UNUSED(v) ((void)v)
 

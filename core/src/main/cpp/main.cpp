@@ -224,6 +224,10 @@ jobject Master::Context::createProxyGroup(char const *name, proxy_type_t type,
     return env->NewObject(master->cProxyGroup, master->cProxyGroupConstructor, env->NewStringUTF(name), ts, env->NewStringUTF(current), proxies);
 }
 
+static void enqueue_event(event_t *e) {
+    EventQueue::getInstance()->enqueueEvent(e);
+}
+
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *unused) {
     UNUSED(unused);
 
@@ -233,6 +237,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *unused) {
         return -1;
 
     new Master(vm, env);
+    new EventQueue();
+
+    set_event_handler(&enqueue_event);
 
     return JNI_VERSION_1_6;
 }

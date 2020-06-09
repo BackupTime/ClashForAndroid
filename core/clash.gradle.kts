@@ -145,7 +145,7 @@ task("compileClashCore") {
                 mkdirs()
             }.resolve("libclash.so")
 
-            "go build --buildmode=c-shared -o \"$out\"".exec(pwd = golangSource, env = env)
+            "go build --buildmode=c-shared -trimpath -o \"$out\"".exec(pwd = golangSource, env = env)
         }
     }
 }

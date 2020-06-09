@@ -8,29 +8,29 @@ import (
 	"github.com/Dreamacro/clash/tunnel"
 	"github.com/kr328/cfa/config"
 	"sync"
-	"unsafe"
 )
 
 //#include "buffer.h"
+//#include "event.h"
 import "C"
 
 //export downloadProfileFromFd
-func downloadProfileFromFd(fd int, base C.const_string_t, output C.const_string_t, onSuccess nativeCcall, onFailure nativeCcall) {
+func downloadProfileFromFd(fd int, base C.const_string_t, output C.const_string_t, callbackId uint64) {
 	b := C.GoString(base)
 	o := C.GoString(output)
 
 	go func() {
 		err := config.DownloadFd(fd, o, b)
 		if err != nil {
-			callCcall(onFailure, unsafe.Pointer(C.CString(err.Error())))
+			sendEvent(C.COMPLETE, callbackId, err.Error())
 		} else {
-			callCcall(onSuccess, nil)
+			sendEvent(C.COMPLETE, callbackId, "")
 		}
 	}()
 }
 
 //export downloadProfileFromUrl
-func downloadProfileFromUrl(url C.const_string_t, base C.const_string_t, output C.const_string_t, onSuccess nativeCcall, onFailure nativeCcall) {
+func downloadProfileFromUrl(url C.const_string_t, base C.const_string_t, output C.const_string_t, callbackId uint64) {
 	u := C.GoString(url)
 	b := C.GoString(base)
 	o := C.GoString(output)
@@ -38,36 +38,36 @@ func downloadProfileFromUrl(url C.const_string_t, base C.const_string_t, output 
 	go func() {
 		err := config.DownloadUrl(u, o, b)
 		if err != nil {
-			callCcall(onFailure, unsafe.Pointer(C.CString(err.Error())))
+			sendEvent(C.COMPLETE, callbackId, err.Error())
 		} else {
-			callCcall(onSuccess, nil)
+			sendEvent(C.COMPLETE, callbackId, "")
 		}
 	}()
 }
 
 //export loadProfile
-func loadProfile(path C.const_string_t, base C.const_string_t, onSuccess nativeCcall, onFailure nativeCcall) {
+func loadProfile(path C.const_string_t, base C.const_string_t, callbackId uint64) {
 	p := C.GoString(path)
 	b := C.GoString(base)
 
 	go func() {
 		err := config.LoadFromFile(p, b)
 		if err != nil {
-			callCcall(onFailure, unsafe.Pointer(C.CString(err.Error())))
+			sendEvent(C.COMPLETE, callbackId, err.Error())
 		} else {
-			callCcall(onSuccess, nil)
+			sendEvent(C.COMPLETE, callbackId, "")
 		}
 	}()
 }
 
 //export performHealthCheck
-func performHealthCheck(group C.const_string_t, onSuccess nativeCcall, onFailure nativeCcall) {
+func performHealthCheck(group C.const_string_t, callbackId uint64) {
 	g := C.GoString(group)
 
 	go func() {
 		p := tunnel.Proxies()[g]
 		if p == nil {
-			callCcall(onFailure, unsafe.Pointer(C.CString("No such proxy group")))
+			sendEvent(C.COMPLETE, callbackId,  "No such proxy group")
 
 			log.Warnln("Perform health check failure: %s not found", g)
 
@@ -76,7 +76,7 @@ func performHealthCheck(group C.const_string_t, onSuccess nativeCcall, onFailure
 
 		pw, ok := p.(*outbound.Proxy)
 		if !ok {
-			callCcall(onFailure, unsafe.Pointer(C.CString("Invalid group")))
+			sendEvent(C.COMPLETE, callbackId, "Invalid group")
 
 			log.Warnln("Perform health check failure: %s not valid group", g)
 
@@ -85,7 +85,7 @@ func performHealthCheck(group C.const_string_t, onSuccess nativeCcall, onFailure
 
 		adapter, ok := pw.ProxyAdapter.(outboundgroup.ProxyGroup)
 		if !ok {
-			callCcall(onFailure, unsafe.Pointer(C.CString("Invalid group")))
+			sendEvent(C.COMPLETE, callbackId, "Invalid group")
 
 			log.Warnln("Perform health check failure: %s not valid group", g)
 
@@ -107,6 +107,6 @@ func performHealthCheck(group C.const_string_t, onSuccess nativeCcall, onFailure
 
 		wg.Wait()
 
-		callCcall(onSuccess, nil)
+		sendEvent(C.COMPLETE, callbackId, "")
 	}()
 }

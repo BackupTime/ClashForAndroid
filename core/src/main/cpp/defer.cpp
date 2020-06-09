@@ -56,25 +56,34 @@ Java_com_github_kr328_clash_core_bridge_Bridge_downloadProfile__ILjava_lang_Stri
         const char *b = context->getString(base);
         const char *o = context->getString(output);
 
-        auto *ctx = new deferContext();
+        jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
 
-        ctx->completableFuture = context->newGlobalReference(context->newCompletableFuture());
+        uint64_t token = EventQueue::getInstance()->obtainToken();
 
-        ccall_t onSuccess = {
-                .context = ctx,
-                .function = &downloadContextSuccess
-        };
-        ccall_t onFailure = {
-                .context = ctx,
-                .function = &downloadContextFailure
-        };
+        EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](event_type_t, uint64_t token, std::string const &payload) {
+            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
+                Master::runWithContext<void>(env, [&](Master::Context *context) {
+                    if ( payload.empty() ) {
+                        context->completeCompletableFuture(completableFuture, nullptr);
+                    } else {
+                        context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(payload));
+                    }
 
-        downloadProfileFromFd(fd, b, o, onSuccess, onFailure);
+                    context->removeGlobalReference(completableFuture);
+                });
+
+                return 0;
+            });
+
+            EventQueue::getInstance()->unregisterHandler(COMPLETE, token);
+        });
+
+        downloadProfileFromFd(fd, b, o, token);
 
         context->releaseString(base, b);
         context->releaseString(output, o);
 
-        return ctx->completableFuture;
+        return completableFuture;
     });
 }
 
@@ -89,26 +98,35 @@ Java_com_github_kr328_clash_core_bridge_Bridge_downloadProfile__Ljava_lang_Strin
         const char *b = context->getString(base);
         const char *o = context->getString(output);
 
-        auto *ctx = new deferContext();
+        jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
 
-        ctx->completableFuture = context->newGlobalReference(context->newCompletableFuture());
+        uint64_t token = EventQueue::getInstance()->obtainToken();
 
-        ccall_t onSuccess = {
-                .context = ctx,
-                .function = &downloadContextSuccess
-        };
-        ccall_t onFailure = {
-                .context = ctx,
-                .function = &downloadContextFailure
-        };
+        EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](event_type_t, uint64_t token, std::string const &payload) {
+            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
+                Master::runWithContext<void>(env, [&](Master::Context *context) {
+                    if ( payload.empty() ) {
+                        context->completeCompletableFuture(completableFuture, nullptr);
+                    } else {
+                        context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(payload));
+                    }
 
-        downloadProfileFromUrl(u, b, o, onSuccess, onFailure);
+                    context->removeGlobalReference(completableFuture);
+                });
+
+                return 0;
+            });
+
+            EventQueue::getInstance()->unregisterHandler(COMPLETE, token);
+        });
+
+        downloadProfileFromUrl(u, b, o, token);
 
         context->releaseString(url, u);
         context->releaseString(base, b);
         context->releaseString(output, o);
 
-        return ctx->completableFuture;
+        return completableFuture;
     });
 }
 
@@ -122,25 +140,34 @@ Java_com_github_kr328_clash_core_bridge_Bridge_loadProfile(JNIEnv *env, jclass c
         const char *p = context->getString(path);
         const char *b = context->getString(base);
 
-        auto *ctx = new deferContext();
+        jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
 
-        ctx->completableFuture = context->newGlobalReference(context->newCompletableFuture());
+        uint64_t token = EventQueue::getInstance()->obtainToken();
 
-        ccall_t onSuccess = {
-                .context = ctx,
-                .function = &downloadContextSuccess
-        };
-        ccall_t onFailure = {
-                .context = ctx,
-                .function = &downloadContextFailure
-        };
+        EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](event_type_t, uint64_t token, std::string const &payload) {
+            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
+                Master::runWithContext<void>(env, [&](Master::Context *context) {
+                    if ( payload.empty() ) {
+                        context->completeCompletableFuture(completableFuture, nullptr);
+                    } else {
+                        context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(payload));
+                    }
 
-        loadProfile(p, b, onSuccess, onFailure);
+                    context->removeGlobalReference(completableFuture);
+                });
+
+                return 0;
+            });
+
+            EventQueue::getInstance()->unregisterHandler(COMPLETE, token);
+        });
+
+        loadProfile(p, b, token);
 
         context->releaseString(path, p);
         context->releaseString(base, b);
 
-        return ctx->completableFuture;
+        return completableFuture;
     });
 }
 
@@ -153,23 +180,32 @@ Java_com_github_kr328_clash_core_bridge_Bridge_performHealthCheck(JNIEnv *env, j
     return Master::runWithContext<jobject>(env, [&](Master::Context *context) -> jobject {
         const char *g = context->getString(group);
 
-        auto *ctx = new deferContext();
+        jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
 
-        ctx->completableFuture = context->newGlobalReference(context->newCompletableFuture());
+        uint64_t token = EventQueue::getInstance()->obtainToken();
 
-        ccall_t onSuccess = {
-                .context = ctx,
-                .function = &downloadContextSuccess
-        };
-        ccall_t onFailure = {
-                .context = ctx,
-                .function = &downloadContextFailure
-        };
+        EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](event_type_t, uint64_t token, std::string const &payload) {
+            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
+                Master::runWithContext<void>(env, [&](Master::Context *context) {
+                    if ( payload.empty() ) {
+                        context->completeCompletableFuture(completableFuture, nullptr);
+                    } else {
+                        context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(payload));
+                    }
 
-        performHealthCheck(g, onSuccess, onFailure);
+                    context->removeGlobalReference(completableFuture);
+                });
+
+                return 0;
+            });
+
+            EventQueue::getInstance()->unregisterHandler(COMPLETE, token);
+        });
+
+        performHealthCheck(g, token);
 
         context->releaseString(group, g);
 
-        return ctx->completableFuture;
+        return completableFuture;
     });
 }

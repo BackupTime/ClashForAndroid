@@ -1,38 +1,6 @@
 #include "main.h"
 
-struct tunContext {
-    jobject callback;
-};
-
-static void tunContextOnNewSocket(void *context, void *argument) {
-    auto *ctx = reinterpret_cast<tunContext*>(context);
-    auto fd = reinterpret_cast<long>(argument);
-
-    Master::runWithAttached<int>([&](JNIEnv *env) -> int {
-        Master::runWithContext<void>(env, [&](Master::Context *context) {
-            context->tunCallbackNewSocket(ctx->callback, fd);
-        });
-
-        return 0;
-    });
-}
-
-static void tunContextOnStop(void *context, void *argument) {
-    UNUSED(argument);
-
-    auto *ctx = reinterpret_cast<tunContext*>(context);
-
-    Master::runWithAttached<int>([&](JNIEnv *env) -> int {
-        Master::runWithContext<void>(env, [&](Master::Context *context) {
-            context->tunCallbackStop(ctx->callback);
-            context->removeGlobalReference(ctx->callback);
-        });
-
-        return 0;
-    });
-
-    delete ctx;
-}
+#include "event_queue.h"
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -48,20 +16,34 @@ Java_com_github_kr328_clash_core_bridge_Bridge_startTunDevice(JNIEnv *env, jclas
         const char *dnsString = context->getString(dns);
 
         jobject callbackGlobal = context->newGlobalReference(callback);
-        auto *callbackContext = new tunContext();
 
-        callbackContext->callback = callbackGlobal;
+        EventQueue::getInstance()->registerHandler(NEW_SOCKET, 0, [callbackGlobal](event_type_t, u_int64_t, const std::string& payload) {
+            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
+                Master::runWithContext<void>(env, [&](Master::Context *context) {
+                    context->tunCallbackNewSocket(callbackGlobal, std::stoi(payload));
+                });
 
-        ccall_t onNewSocket = {
-                .function = &tunContextOnNewSocket,
-                .context = callbackContext
-        };
-        ccall_t onStop = {
-                .function = &tunContextOnStop,
-                .context = callbackContext
-        };
+                return 0;
+            });
+        });
 
-        char *exception = startTunDevice(fd, mtu, gatewayString, mirrorString, dnsString, onNewSocket, onStop);
+        EventQueue::getInstance()->registerHandler(TUN_STOP, 0, [callbackGlobal](event_type_t, u_int64_t, const std::string&) {
+            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
+                Master::runWithContext<void>(env, [&](Master::Context *context) {
+                    context->tunCallbackStop(callbackGlobal);
+                    context->removeGlobalReference(callbackGlobal);
+                });
+
+                return 0;
+            });
+
+            auto queue = EventQueue::getInstance();
+
+            queue->unregisterHandler(NEW_SOCKET, 0);
+            queue->unregisterHandler(TUN_STOP, 0);
+        });
+
+        char *exception = startTunDevice(fd, mtu, gatewayString, mirrorString, dnsString);
 
         context->releaseString(gateway, gatewayString);
         context->releaseString(mirror, mirrorString);
@@ -69,9 +51,8 @@ Java_com_github_kr328_clash_core_bridge_Bridge_startTunDevice(JNIEnv *env, jclas
 
         if ( exception != nullptr ) {
             context->throwThrowable(context->newClashException(exception));
-            context->removeGlobalReference(callbackContext->callback);
+            context->removeGlobalReference(callbackGlobal);
             free(exception);
-            delete callbackContext;
         }
     });
 }
