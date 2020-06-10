@@ -69,7 +69,7 @@ public:
     Context(JNIEnv *env);
 
 public:
-    jthrowable newClashException(std::string const &message);
+    jthrowable newClashException(const char *message);
     jobject newTraffic(long upload, long download);
     jobject newGeneral(char const *mode, int http, int socks, int redirect, int mixed);
     jobject newCompletableFuture();

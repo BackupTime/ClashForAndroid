@@ -2,48 +2,29 @@
 
 #include <android/log.h>
 
-struct deferContext {
-    jobject completableFuture;
-};
+static std::pair<jobject, uint64_t> completableFutureWithToken(Master::Context *context) {
+    uint64_t token = EventQueue::getInstance()->obtainToken();
+    jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
 
-static void downloadContextSuccess(void *context, void *argument) {
-    UNUSED(argument);
+    EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](const event_t *event) {
+        Master::runWithAttached<int>([&](JNIEnv *env) -> int {
+            Master::runWithContext<void>(env, [&](Master::Context *context) {
+                if ( strlen(event->payload) == 0 ) {
+                    context->completeCompletableFuture(completableFuture, nullptr);
+                } else {
+                    context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(event->payload));
+                }
 
-    auto *ctx = reinterpret_cast<deferContext*>(context);
+                context->removeGlobalReference(completableFuture);
+            });
 
-    Master::runWithAttached<int>([&](JNIEnv *env) -> int {
-        Master::runWithContext<void>(env, [&](Master::Context *context) {
-            context->completeCompletableFuture(ctx->completableFuture, nullptr);
-
-            context->removeGlobalReference(ctx->completableFuture);
+            return 0;
         });
 
-        return 0;
+        EventQueue::getInstance()->unregisterHandler(COMPLETE, event->token);
     });
 
-    delete ctx;
-}
-
-static void downloadContextFailure(void *context, void *argument) {
-    auto *ctx = reinterpret_cast<deferContext*>(context);
-    auto *err = reinterpret_cast<char *>(argument);
-
-    Master::runWithAttached<int>([&](JNIEnv *env) -> int {
-        Master::runWithContext<void>(env, [&](Master::Context *context) {
-            if (err != nullptr) {
-                context->completeExceptionallyCompletableFuture(ctx->completableFuture, context->newClashException(err));
-            } else {
-                context->completeExceptionallyCompletableFuture(ctx->completableFuture, context->newClashException("Unknown"));
-            }
-
-            context->removeGlobalReference(ctx->completableFuture);
-        });
-
-        return 0;
-    });
-
-    free(err);
-    delete ctx;
+    return {completableFuture, token};
 }
 
 extern "C"
@@ -56,34 +37,14 @@ Java_com_github_kr328_clash_core_bridge_Bridge_downloadProfile__ILjava_lang_Stri
         const char *b = context->getString(base);
         const char *o = context->getString(output);
 
-        jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
+        auto completableFuture = completableFutureWithToken(context);
 
-        uint64_t token = EventQueue::getInstance()->obtainToken();
-
-        EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](event_type_t, uint64_t token, std::string const &payload) {
-            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
-                Master::runWithContext<void>(env, [&](Master::Context *context) {
-                    if ( payload.empty() ) {
-                        context->completeCompletableFuture(completableFuture, nullptr);
-                    } else {
-                        context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(payload));
-                    }
-
-                    context->removeGlobalReference(completableFuture);
-                });
-
-                return 0;
-            });
-
-            EventQueue::getInstance()->unregisterHandler(COMPLETE, token);
-        });
-
-        downloadProfileFromFd(fd, b, o, token);
+        downloadProfileFromFd(fd, b, o, completableFuture.second);
 
         context->releaseString(base, b);
         context->releaseString(output, o);
 
-        return completableFuture;
+        return completableFuture.first;
     });
 }
 
@@ -98,35 +59,15 @@ Java_com_github_kr328_clash_core_bridge_Bridge_downloadProfile__Ljava_lang_Strin
         const char *b = context->getString(base);
         const char *o = context->getString(output);
 
-        jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
+        auto completableFuture = completableFutureWithToken(context);
 
-        uint64_t token = EventQueue::getInstance()->obtainToken();
-
-        EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](event_type_t, uint64_t token, std::string const &payload) {
-            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
-                Master::runWithContext<void>(env, [&](Master::Context *context) {
-                    if ( payload.empty() ) {
-                        context->completeCompletableFuture(completableFuture, nullptr);
-                    } else {
-                        context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(payload));
-                    }
-
-                    context->removeGlobalReference(completableFuture);
-                });
-
-                return 0;
-            });
-
-            EventQueue::getInstance()->unregisterHandler(COMPLETE, token);
-        });
-
-        downloadProfileFromUrl(u, b, o, token);
+        downloadProfileFromUrl(u, b, o, completableFuture.second);
 
         context->releaseString(url, u);
         context->releaseString(base, b);
         context->releaseString(output, o);
 
-        return completableFuture;
+        return completableFuture.first;
     });
 }
 
@@ -140,34 +81,14 @@ Java_com_github_kr328_clash_core_bridge_Bridge_loadProfile(JNIEnv *env, jclass c
         const char *p = context->getString(path);
         const char *b = context->getString(base);
 
-        jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
+        auto completableFuture = completableFutureWithToken(context);
 
-        uint64_t token = EventQueue::getInstance()->obtainToken();
-
-        EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](event_type_t, uint64_t token, std::string const &payload) {
-            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
-                Master::runWithContext<void>(env, [&](Master::Context *context) {
-                    if ( payload.empty() ) {
-                        context->completeCompletableFuture(completableFuture, nullptr);
-                    } else {
-                        context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(payload));
-                    }
-
-                    context->removeGlobalReference(completableFuture);
-                });
-
-                return 0;
-            });
-
-            EventQueue::getInstance()->unregisterHandler(COMPLETE, token);
-        });
-
-        loadProfile(p, b, token);
+        loadProfile(p, b, completableFuture.second);
 
         context->releaseString(path, p);
         context->releaseString(base, b);
 
-        return completableFuture;
+        return completableFuture.first;
     });
 }
 
@@ -180,32 +101,12 @@ Java_com_github_kr328_clash_core_bridge_Bridge_performHealthCheck(JNIEnv *env, j
     return Master::runWithContext<jobject>(env, [&](Master::Context *context) -> jobject {
         const char *g = context->getString(group);
 
-        jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
+        auto completableFuture = completableFutureWithToken(context);
 
-        uint64_t token = EventQueue::getInstance()->obtainToken();
-
-        EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](event_type_t, uint64_t token, std::string const &payload) {
-            Master::runWithAttached<int>([&](JNIEnv *env) -> int {
-                Master::runWithContext<void>(env, [&](Master::Context *context) {
-                    if ( payload.empty() ) {
-                        context->completeCompletableFuture(completableFuture, nullptr);
-                    } else {
-                        context->completeExceptionallyCompletableFuture(completableFuture, context->newClashException(payload));
-                    }
-
-                    context->removeGlobalReference(completableFuture);
-                });
-
-                return 0;
-            });
-
-            EventQueue::getInstance()->unregisterHandler(COMPLETE, token);
-        });
-
-        performHealthCheck(g, token);
+        performHealthCheck(g, completableFuture.second);
 
         context->releaseString(group, g);
 
-        return completableFuture;
+        return completableFuture.first;
     });
 }

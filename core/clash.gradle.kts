@@ -127,7 +127,12 @@ fun String.exec(pwd: File = buildDir, env: Map<String, String> = System.getenv()
 task("compileClashCore") {
     onlyIf {
         val sourceModified = golangSource.walk()
-            .filter { it.extension == "go" || it.extension == "c" || it.extension == "h" || it.name == "go.mod" }
+            .filter {
+                when ( it.extension ) {
+                    "c", "cpp", "h", "go", "mod" -> true
+                    else -> false
+                }
+            }
             .map { it.lastModified() }
             .max() ?: Long.MAX_VALUE
         val targetModified = golangOutput.walk()

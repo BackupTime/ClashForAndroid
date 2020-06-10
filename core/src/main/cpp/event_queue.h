@@ -13,14 +13,14 @@
 
 class EventQueue {
 public:
-    typedef std::function<void (event_type_t type, uint64_t token, std::string payload)> Handler;
+    typedef std::function<void (const event_t *event)> Handler;
 
 public:
     EventQueue();
 
 public:
-    void enqueueEvent(event_t *event);
-    event_t *dequeueEvent();
+    void enqueueEvent(const event_t *event);
+    const event_t *dequeueEvent();
 
 public:
     void registerHandler(event_type_t type, uint64_t token, const Handler& handler);
@@ -40,7 +40,7 @@ public:
 
 private:
     bool closed;
-    std::vector<event_t*> queue;
+    std::vector<const event_t*> queue;
     std::map<event_type_t, std::map<uint64_t, Handler>> handlers;
     pthread_mutex_t lock;
     pthread_cond_t condition;

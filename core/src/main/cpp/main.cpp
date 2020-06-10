@@ -52,10 +52,10 @@ Master::Context::Context(JNIEnv *env) {
     this->env = env;
 }
 
-jthrowable Master::Context::newClashException(std::string const &reason) {
+jthrowable Master::Context::newClashException(const char *reason) {
     return reinterpret_cast<jthrowable>(env->NewObject(master->cClashException,
                                                        master->cClashExceptionConstructor,
-                                                       env->NewStringUTF(reason.c_str())));
+                                                       env->NewStringUTF(reason)));
 }
 
 void Master::Context::throwThrowable(jthrowable throwable) {
@@ -224,7 +224,7 @@ jobject Master::Context::createProxyGroup(char const *name, proxy_type_t type,
     return env->NewObject(master->cProxyGroup, master->cProxyGroupConstructor, env->NewStringUTF(name), ts, env->NewStringUTF(current), proxies);
 }
 
-static void enqueue_event(event_t *e) {
+static void enqueue_event(const event_t *e) {
     EventQueue::getInstance()->enqueueEvent(e);
 }
 

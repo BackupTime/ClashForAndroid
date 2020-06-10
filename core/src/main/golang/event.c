@@ -18,11 +18,12 @@ void send_event(event_t *event, const void *payload, size_t payload_length) {
         h(event);
     }
     else {
-        answer_event(event->id);
-        free(event);
+        answer_event(event);
     }
 }
 
-void answer_event(uint64_t id) {
-    answerEvent(id);
+void answer_event(const event_t *event) {
+    answerEvent(event->id);
+
+    free((void*)event);
 }

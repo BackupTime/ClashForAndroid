@@ -33,7 +33,7 @@ func init() {
 }
 
 //export startTunDevice
-func startTunDevice(fd, mtu int, gateway, mirror, dns C.const_string_t) *C.char {
+func startTunDevice(fd, mtu int, gateway, mirror, dns C.const_string_t, callbackId uint64) *C.char {
 	stopTunDevice()
 
 	tunLock.Lock()
@@ -44,7 +44,7 @@ func startTunDevice(fd, mtu int, gateway, mirror, dns C.const_string_t) *C.char 
 	d := C.GoString(dns)
 
 	err := tun.StartTunDevice(fd, mtu, g, m, d, func() {
-		sendEvent(C.TUN_STOP, 0, "")
+		sendEvent(C.TUN_STOP, callbackId, "")
 	})
 	if err != nil {
 		return C.CString(err.Error())

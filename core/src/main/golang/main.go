@@ -23,7 +23,9 @@ extern void log_verbose(const char *msg);
  */
 import "C"
 
-func main() {}
+func main() {
+	panic("Only for linking")
+}
 
 func init() {
 	r := make(chan struct{})

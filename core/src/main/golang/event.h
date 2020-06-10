@@ -18,11 +18,11 @@ typedef struct event_t {
     char payload[];
 } event_t;
 
-typedef void (*event_handler_t)(event_t *event);
+typedef void (*event_handler_t)(const event_t *event);
 
 void set_event_handler(event_handler_t handler);
 void send_event(event_t *event, const void *payload, size_t payload_length);
-void answer_event(uint64_t id);
+void answer_event(const event_t *event);
 
 #if __cplusplus
 };

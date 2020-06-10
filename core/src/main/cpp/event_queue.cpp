@@ -4,15 +4,13 @@ static void *handleEventQueue(void *context) {
     auto *queue = reinterpret_cast<EventQueue*>(context);
 
     while ( !queue->isClosed() ) {
-        event_t *e = queue->dequeueEvent();
+        const event_t *e = queue->dequeueEvent();
 
         EventQueue::Handler h = queue->findHandler(e->type, e->token);
 
-        h(e->type, e->token, e->payload);
+        h(e);
 
-        answer_event(e->id);
-
-        free(e);
+        answer_event(e);
     }
 
     return nullptr;
@@ -32,7 +30,7 @@ EventQueue::EventQueue(): lock(), condition(), closed(false), currentToken(0) {
     }
 }
 
-void EventQueue::enqueueEvent(event_t *event) {
+void EventQueue::enqueueEvent(const event_t *event) {
     pthread_mutex_lock(&lock);
 
     queue.push_back(event);
@@ -42,7 +40,7 @@ void EventQueue::enqueueEvent(event_t *event) {
     pthread_mutex_unlock(&lock);
 }
 
-event_t *EventQueue::dequeueEvent() {
+const event_t *EventQueue::dequeueEvent() {
     pthread_mutex_lock(&lock);
 
     while ( queue.empty() )
@@ -81,7 +79,7 @@ EventQueue::Handler EventQueue::findHandler(event_type_t type, uint64_t token) {
     pthread_mutex_unlock(&lock);
 
     if (result == nullptr)
-        return [](event_type_t type, uint64_t token, const std::string& payload){};
+        return [](const event_t*){};
 
     return result;
 }

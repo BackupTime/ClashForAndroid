@@ -16,18 +16,19 @@ Java_com_github_kr328_clash_core_bridge_Bridge_startTunDevice(JNIEnv *env, jclas
         const char *dnsString = context->getString(dns);
 
         jobject callbackGlobal = context->newGlobalReference(callback);
+        uint64_t token = EventQueue::getInstance()->obtainToken();
 
-        EventQueue::getInstance()->registerHandler(NEW_SOCKET, 0, [callbackGlobal](event_type_t, u_int64_t, const std::string& payload) {
+        EventQueue::getInstance()->registerHandler(NEW_SOCKET, token, [callbackGlobal](const event_t *e) {
             Master::runWithAttached<int>([&](JNIEnv *env) -> int {
                 Master::runWithContext<void>(env, [&](Master::Context *context) {
-                    context->tunCallbackNewSocket(callbackGlobal, std::stoi(payload));
+                    context->tunCallbackNewSocket(callbackGlobal, strtol(e->payload, nullptr, 10));
                 });
 
                 return 0;
             });
         });
 
-        EventQueue::getInstance()->registerHandler(TUN_STOP, 0, [callbackGlobal](event_type_t, u_int64_t, const std::string&) {
+        EventQueue::getInstance()->registerHandler(TUN_STOP, token, [callbackGlobal](const event_t *e) {
             Master::runWithAttached<int>([&](JNIEnv *env) -> int {
                 Master::runWithContext<void>(env, [&](Master::Context *context) {
                     context->tunCallbackStop(callbackGlobal);
@@ -39,11 +40,11 @@ Java_com_github_kr328_clash_core_bridge_Bridge_startTunDevice(JNIEnv *env, jclas
 
             auto queue = EventQueue::getInstance();
 
-            queue->unregisterHandler(NEW_SOCKET, 0);
-            queue->unregisterHandler(TUN_STOP, 0);
+            queue->unregisterHandler(NEW_SOCKET, e->token);
+            queue->unregisterHandler(TUN_STOP, e->token);
         });
 
-        char *exception = startTunDevice(fd, mtu, gatewayString, mirrorString, dnsString);
+        char *exception = startTunDevice(fd, mtu, gatewayString, mirrorString, dnsString, token);
 
         context->releaseString(gateway, gatewayString);
         context->releaseString(mirror, mirrorString);
