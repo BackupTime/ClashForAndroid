@@ -53,3 +53,4 @@ func sendEvent(t C.event_type_t, token uint64, payload string) *EventWaiter {
 func allocCEvent(payloadLength int) *C.event_t {
 	return (*C.event_t)(C.malloc(C.sizeof_event_t + C.size_t(payloadLength)))
 }
+

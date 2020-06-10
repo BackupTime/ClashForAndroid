@@ -18,7 +18,7 @@ static void *handleEventQueue(void *context) {
     return nullptr;
 }
 
-EventQueue::EventQueue(): lock(), condition(), closed(false), token(0) {
+EventQueue::EventQueue(): lock(), condition(), closed(false), currentToken(0) {
     instance = this;
 
     pthread_mutex_init(&lock, nullptr);
@@ -93,7 +93,7 @@ EventQueue *EventQueue::getInstance() {
 uint64_t EventQueue::obtainToken() {
     pthread_mutex_lock(&lock);
 
-    uint64_t r = token++;
+    uint64_t r = currentToken++;
 
     pthread_mutex_unlock(&lock);
 

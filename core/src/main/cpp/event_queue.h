@@ -44,7 +44,7 @@ private:
     std::map<event_type_t, std::map<uint64_t, Handler>> handlers;
     pthread_mutex_t lock;
     pthread_cond_t condition;
-    uint64_t token;
+    uint64_t currentToken;
 
 public:
     static EventQueue *instance;
