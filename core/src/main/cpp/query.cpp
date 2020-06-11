@@ -1,5 +1,7 @@
 #include "main.h"
 
+#include <android/log.h>
+
 extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_github_kr328_clash_core_bridge_Bridge_queryGeneral(JNIEnv *env, jclass clazz) {
@@ -90,7 +92,7 @@ Java_com_github_kr328_clash_core_bridge_Bridge_queryProxyGroups(JNIEnv *env, jcl
                     group_name,
                     group->base.proxy_type,
                     now,
-                    context->createProxyArray(group->proxies_size, jproxies));
+                    context->createProxyArray(group->proxies_size, jproxies);
 
             delete[] jproxies;
 

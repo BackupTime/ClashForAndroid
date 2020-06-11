@@ -6,6 +6,7 @@ import (
 	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/tunnel"
+	"strings"
 	"unsafe"
 )
 
@@ -88,7 +89,7 @@ func queryProxyGroups() *C.proxy_group_list_t {
 			ps = append(ps, provider.Proxies()...)
 		}
 
-		g := allocCProxyGroup(len(proxies))
+		g := allocCProxyGroup(len(ps))
 
 		g.base.name_index = C.long(len(stringPool))
 		g.base.proxy_type = typeToProxyTypeC(group.Type())
@@ -98,7 +99,7 @@ func queryProxyGroups() *C.proxy_group_list_t {
 		stringPool = append(stringPool, 0)
 
 		proxyIndex := 0
-		for _, proxy := range proxies {
+		for _, proxy := range ps {
 			p := indexCProxyGroupElement(g, proxyIndex)
 
 			p.name_index = C.long(len(stringPool))
@@ -119,6 +120,8 @@ func queryProxyGroups() *C.proxy_group_list_t {
 
 		groupIndex++
 	}
+
+	log.Infoln("string_pool = %s", strings.Replace(string(stringPool), "\000", "|", -1))
 
 	result.string_pool = (*C.char)(C.CBytes(stringPool))
 
@@ -164,11 +167,19 @@ func typeToProxyTypeC(t constant.AdapterType) C.proxy_type_t {
 }
 
 func allocCProxyGroup(proxiesSize int) *C.proxy_group_t {
-	return (*C.proxy_group_t)(C.malloc(C.sizeof_proxy_group_t + C.sizeof_proxy_t * C.size_t(proxiesSize)))
+	result := (*C.proxy_group_t)(C.malloc(C.sizeof_proxy_group_t + C.sizeof_proxy_t * C.size_t(proxiesSize)))
+
+	result.proxies_size = C.int(proxiesSize)
+
+	return result
 }
 
 func allocCProxyGroupList(groupSize int) *C.proxy_group_list_t {
-	return (*C.proxy_group_list_t)(C.malloc(C.sizeof_proxy_group_list_t + C.sizeof_long * C.size_t(groupSize)))
+	result := (*C.proxy_group_list_t)(C.malloc(C.sizeof_proxy_group_list_t + C.sizeof_long * C.size_t(groupSize)))
+
+	result.size = C.int(groupSize)
+
+	return result
 }
 
 //noinspection GoVetUnsafePointer
@@ -184,7 +195,7 @@ func setCProxyGroupListElement(list *C.proxy_group_list_t, index int, element *C
 func indexCProxyGroupElement(group *C.proxy_group_t, index int) *C.proxy_t {
 	address := uintptr(unsafe.Pointer(group))
 
-	offset := address + uintptr(C.sizeof_proxy_group_list_t) + uintptr(index) * uintptr(C.sizeof_proxy_t)
+	offset := address + uintptr(C.sizeof_proxy_group_t) + uintptr(index) * uintptr(C.sizeof_proxy_t)
 
 	return (*C.proxy_t)(unsafe.Pointer(offset))
 }
