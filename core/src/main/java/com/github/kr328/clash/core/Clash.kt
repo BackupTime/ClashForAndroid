@@ -14,6 +14,8 @@ import java.io.InputStream
 import java.util.concurrent.CompletableFuture
 
 object Clash {
+    private val logReceivers = mutableMapOf<String, (LogEvent) -> Unit>()
+
     init {
         val context = Global.application
 
@@ -22,6 +24,12 @@ object Clash {
 
         Bridge.initialize(bytes, context.cacheDir.absolutePath, BuildConfig.VERSION_NAME)
         Bridge.reset()
+
+        Bridge.setLogCallback {
+            synchronized(logReceivers) {
+                logReceivers.forEach { (_, e) -> e(it) }
+            }
+        }
 
         Log.i("Clash core initialized")
     }
@@ -102,10 +110,18 @@ object Clash {
     }
 
     fun registerLogReceiver(key: String, receiver: (LogEvent) -> Unit) {
-
+        synchronized(logReceivers) {
+            if ( logReceivers.isEmpty() )
+                Bridge.enableLogReport()
+            logReceivers[key] = receiver
+        }
     }
 
     fun unregisterLogReceiver(key: String) {
-
+        synchronized(logReceivers) {
+            logReceivers.remove(key)
+            if ( logReceivers.isEmpty() )
+                Bridge.disableLogReport();
+        }
     }
 }

@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 typedef enum {
-    NEW_SOCKET, TUN_STOP, COMPLETE
+    NEW_SOCKET, TUN_STOP, COMPLETE, LOG_RECEIVED
 } event_type_t;
 
 typedef struct event_t {

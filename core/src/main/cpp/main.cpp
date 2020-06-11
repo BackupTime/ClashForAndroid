@@ -16,7 +16,9 @@ Master::Master(JavaVM *vm, JNIEnv *env): vm(vm) {
     cCompletableFuture = g<jclass>(env, env->FindClass("java/util/concurrent/CompletableFuture"));
     cProxyGroup = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/model/ProxyGroup"));
     cProxy = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/model/Proxy"));
+    cLogEvent = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/event/LogEvent"));
     iTunCallback = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/bridge/TunCallback"));
+    iLogCallback = g<jclass>(env, env->FindClass("com/github/kr328/clash/core/bridge/LogCallback"));
     cClashExceptionConstructor = env->GetMethodID(cClashException, "<init>",
                                                   "(Ljava/lang/String;)V");
     cTrafficConstructor = env->GetMethodID(cTraffic, "<init>", "(JJ)V");
@@ -24,6 +26,7 @@ Master::Master(JavaVM *vm, JNIEnv *env): vm(vm) {
     cCompletableFutureConstructor = env->GetMethodID(cCompletableFuture, "<init>", "()V");
     cProxyGroupConstructor = env->GetMethodID(cProxyGroup, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Lcom/github/kr328/clash/core/model/Proxy;)V");
     cProxyConstructor = env->GetMethodID(cProxy, "<init>", "(Ljava/lang/String;Ljava/lang/String;J)V");
+    cLogEventConstructor = env->GetMethodID(cLogEvent, "<init>", "(Ljava/lang/String;)V");
     mCompletableFutureComplete = env->GetMethodID(cCompletableFuture, "complete",
                                                   "(Ljava/lang/Object;)Z");
     mCompletableFutureCompleteExceptionally = env->GetMethodID(cCompletableFuture,
@@ -31,6 +34,7 @@ Master::Master(JavaVM *vm, JNIEnv *env): vm(vm) {
                                                                "(Ljava/lang/Throwable;)Z");
     mTunCallbackOnNewSocket = env->GetMethodID(iTunCallback, "onNewSocket", "(I)V");
     mTunCallbackOnStop = env->GetMethodID(iTunCallback, "onStop", "()V");
+    mLogCallbackOnMessage = env->GetMethodID(iLogCallback, "onMessage", "(Lcom/github/kr328/clash/core/event/LogEvent;)V");
 
     sDirect = g<jstring>(env, env->NewStringUTF("Direct"));
     sReject = g<jstring>(env, env->NewStringUTF("Reject"));
@@ -222,6 +226,12 @@ jobject Master::Context::createProxyGroup(char const *name, proxy_type_t type,
     }
 
     return env->NewObject(master->cProxyGroup, master->cProxyGroupConstructor, env->NewStringUTF(name), ts, env->NewStringUTF(current), proxies);
+}
+
+void Master::Context::logCallbackMessage(jobject callback, const char *data) {
+    jobject event = env->NewObject(master->cLogEvent, master->cLogEventConstructor, env->NewStringUTF(data));
+
+    env->CallVoidMethod(callback, master->mLogCallbackOnMessage, event);
 }
 
 static void enqueue_event(const event_t *e) {

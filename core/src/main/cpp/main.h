@@ -25,17 +25,21 @@ private:
     jclass cCompletableFuture;
     jclass cProxyGroup;
     jclass cProxy;
+    jclass cLogEvent;
     jclass iTunCallback;
+    jclass iLogCallback;
     jmethodID cClashExceptionConstructor;
     jmethodID cTrafficConstructor;
     jmethodID cGeneralConstructor;
     jmethodID cCompletableFutureConstructor;
     jmethodID cProxyGroupConstructor;
     jmethodID cProxyConstructor;
+    jmethodID cLogEventConstructor;
     jmethodID mCompletableFutureComplete;
     jmethodID mCompletableFutureCompleteExceptionally;
     jmethodID mTunCallbackOnNewSocket;
     jmethodID mTunCallbackOnStop;
+    jmethodID mLogCallbackOnMessage;
 
 private:
     jstring sDirect;
@@ -86,6 +90,7 @@ public:
     bool completeExceptionallyCompletableFuture(jobject completable, jthrowable throwable);
     void tunCallbackNewSocket(jobject callback, int fd);
     void tunCallbackStop(jobject callback);
+    void logCallbackMessage(jobject callback, const char *data);
 
 public:
     jobject createProxy(char const *name, proxy_type_t type, long delay);

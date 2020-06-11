@@ -13,8 +13,9 @@ data class LogEvent(
     val message: String,
     val time: Long = System.currentTimeMillis()
 ) : Parcelable {
+    private constructor(data: List<String>): this(Level.fromString(data[0]), data[1])
     @Keep
-    constructor(level: String, message: String): this(Level.fromString(level), message)
+    constructor(data: String) : this(data.split(":", limit = 2))
 
     companion object {
         const val DEBUG_VALUE = "debug"

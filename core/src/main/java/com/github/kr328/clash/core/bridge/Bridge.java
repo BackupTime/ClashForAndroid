@@ -38,4 +38,8 @@ public final class Bridge {
 
     public static native CompletableFuture<Object> loadProfile(String path, String base);
     public static native CompletableFuture<Object> performHealthCheck(String group);
+
+    public static native void setLogCallback(LogCallback callback);
+    public static native void enableLogReport();
+    public static native void disableLogReport();
 }
