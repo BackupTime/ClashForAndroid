@@ -11,7 +11,7 @@ buildscript {
         this["gTargetSdkVersion"] = 29
 
         this["gVersionCode"] = 10215
-        this["gVersionName"] = "1.2.15"
+        this["gVersionName"] = "1.3.1"
 
         this["gKotlinVersion"] = kotlinVersion
         this["gKotlinCoroutineVersion"] = "1.3.7"
