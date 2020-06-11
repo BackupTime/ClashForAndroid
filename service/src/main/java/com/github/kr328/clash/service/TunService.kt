@@ -19,7 +19,6 @@ class TunService : VpnService(), CoroutineScope by MainScope() {
         private const val PRIVATE_VLAN4_CLIENT = "172.31.255.253"
         private const val PRIVATE_VLAN4_MIRROR = "172.31.255.254"
         private const val PRIVATE_VLAN_DNS = "198.18.0.1"
-        private const val VLAN_ANY = "0.0.0.0/0"
     }
 
     private val service = this
