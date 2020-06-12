@@ -12,11 +12,11 @@ type EventWaiter struct {
 }
 
 var idLock = sync.Mutex{}
-var currentId = uint64(0)
-var ids = map[uint64]*EventWaiter{}
+var currentId = int64(0)
+var ids = map[int64]*EventWaiter{}
 
 //export answerEvent
-func answerEvent(id uint64) {
+func answerEvent(id int64) {
 	idLock.Lock()
 	defer idLock.Unlock()
 
@@ -41,9 +41,9 @@ func sendEvent(t C.event_type_t, token uint64, payload string) *EventWaiter {
 	p := append([]byte(payload), 0)
 	e := allocCEvent(len(p))
 
-	e.id = C.uint64_t(id)
+	e.id = C.int64_t(id)
 	e._type = t
-	e.token = C.uint64_t(token)
+	e.token = C.int64_t(token)
 
 	C.send_event(e, unsafe.Pointer(&p[0]), C.size_t(len(p)))
 

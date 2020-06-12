@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include <functional>
+#include <cstdint>
 
 #include "libclash.h"
 #include "event_queue.h"
@@ -74,8 +75,8 @@ public:
 
 public:
     jthrowable newClashException(const char *message);
-    jobject newTraffic(long upload, long download);
-    jobject newGeneral(char const *mode, int http, int socks, int redirect, int mixed);
+    jobject newTraffic(jlong upload, jlong download);
+    jobject newGeneral(char const *mode, jint http, jint socks, jint redirect, jint mixed);
     jobject newCompletableFuture();
 
 public:
@@ -88,12 +89,12 @@ public:
 public:
     bool completeCompletableFuture(jobject completable, jobject object);
     bool completeExceptionallyCompletableFuture(jobject completable, jthrowable throwable);
-    void tunCallbackNewSocket(jobject callback, int fd);
+    void tunCallbackNewSocket(jobject callback, jint fd);
     void tunCallbackStop(jobject callback);
     void logCallbackMessage(jobject callback, const char *data);
 
 public:
-    jobject createProxy(char const *name, proxy_type_t type, long delay);
+    jobject createProxy(char const *name, proxy_type_t type, jlong delay);
     jobject createProxyGroup(char const *name, proxy_type_t type, char const *current, jobjectArray proxies);
     jobjectArray createProxyArray(int size, jobject elements[]);
     jobjectArray createProxyGroupArray(int size, jobject elements[]);

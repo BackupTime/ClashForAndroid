@@ -12,8 +12,8 @@ typedef enum {
 } event_type_t;
 
 typedef struct event_t {
-    uint64_t id;
-    uint64_t token;
+    int64_t id;
+    int64_t token;
     event_type_t type;
     char payload[];
 } event_t;

@@ -1,5 +1,7 @@
 #include "main.h"
 
+#include <android/log.h>
+
 Master *Master::master = nullptr;
 
 template <class T>
@@ -66,12 +68,12 @@ void Master::Context::throwThrowable(jthrowable throwable) {
     env->Throw(throwable);
 }
 
-jobject Master::Context::newTraffic(long upload, long download) {
+jobject Master::Context::newTraffic(jlong upload, jlong download) {
     return env->NewObject(master->cTraffic, master->cTrafficConstructor, upload, download);
 }
 
-jobject Master::Context::newGeneral(char const *mode, int http, int socks, int redirect,
-                                    int mixed) {
+jobject Master::Context::newGeneral(char const *mode, jint http, jint socks, jint redirect,
+                                    jint mixed) {
     return env->NewObject(master->cGeneral, master->cGeneralConstructor,
                           env->NewStringUTF(mode), http, socks, redirect, mixed);
 }
@@ -119,7 +121,7 @@ void Master::Context::releaseString(jstring str, const char *c) {
     env->ReleaseStringUTFChars(str, c);
 }
 
-void Master::Context::tunCallbackNewSocket(jobject callback, int fd) {
+void Master::Context::tunCallbackNewSocket(jobject callback, jint fd) {
     env->CallVoidMethod(callback, master->mTunCallbackOnNewSocket, fd);
 }
 
@@ -145,7 +147,7 @@ jobjectArray Master::Context::createProxyArray(int size, jobject elements[]) {
     return result;
 }
 
-jobject Master::Context::createProxy(char const *name, proxy_type_t type, long delay) {
+jobject Master::Context::createProxy(char const *name, proxy_type_t type, jlong delay) {
     jstring ts = nullptr;
 
     switch (type) {

@@ -10,8 +10,8 @@ import "github.com/Dreamacro/clash/tunnel"
 func querySpeed(r *C.traffic_t) {
 	u, d := tunnel.DefaultManager.Now()
 
-	r.upload = C.uint64_t(u)
-	r.download = C.uint64_t(d)
+	r.upload = C.int64_t(u)
+	r.download = C.int64_t(d)
 }
 
 //export queryBandwidth
@@ -19,6 +19,6 @@ func queryBandwidth(r *C.traffic_t) {
 	u := tunnel.DefaultManager.UploadTotal()
 	d := tunnel.DefaultManager.DownloadTotal()
 
-	r.upload = C.uint64_t(u)
-	r.download = C.uint64_t(d)
+	r.upload = C.int64_t(u)
+	r.download = C.int64_t(d)
 }

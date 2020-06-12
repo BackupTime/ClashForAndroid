@@ -21,7 +21,7 @@ Java_com_github_kr328_clash_core_bridge_Bridge_startTunDevice(JNIEnv *env, jclas
         EventQueue::getInstance()->registerHandler(NEW_SOCKET, token, [callbackGlobal](const event_t *e) {
             Master::runWithAttached<int>([&](JNIEnv *env) -> int {
                 Master::runWithContext<void>(env, [&](Master::Context *context) {
-                    context->tunCallbackNewSocket(callbackGlobal, strtol(e->payload, nullptr, 10));
+                    context->tunCallbackNewSocket(callbackGlobal, static_cast<int>(strtol(e->payload, nullptr, 10)));
                 });
 
                 return 0;

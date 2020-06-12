@@ -3,7 +3,7 @@
 #include <malloc.h>
 #include <string.h>
 
-extern void answerEvent(uint64_t id);
+extern void answerEvent(int64_t id);
 
 static event_handler_t event_handler;
 
