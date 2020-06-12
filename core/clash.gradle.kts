@@ -13,6 +13,14 @@ val golangSource = file("src/main/golang")
 val golangOutput = buildDir.resolve("outputs/golang")
 val nativeAbis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 
+val String.exe: String
+    get() {
+        return if ( Os.isFamily(Os.FAMILY_WINDOWS) )
+            "$this.exe"
+        else
+            this
+    }
+
 fun generateGolangBuildEnvironment(abi: String): Map<String, String> {
     val properties = Properties().apply {
         load(FileInputStream(rootProject.file("local.properties")))
@@ -88,9 +96,9 @@ fun generateGolangBuildEnvironment(abi: String): Map<String, String> {
     }
 
     return mapOf(
-        "CC" to compilerBase.resolve(cCompiler).absolutePath,
-        "CXX" to compilerBase.resolve(cppCompiler).absolutePath,
-        "LD" to compilerBase.resolve(linker).absolutePath,
+        "CC" to compilerBase.resolve(cCompiler.exe).absolutePath,
+        "CXX" to compilerBase.resolve(cppCompiler.exe).absolutePath,
+        "LD" to compilerBase.resolve(linker.exe).absolutePath,
         "GOOS" to "android",
         "GOARCH" to golangArch,
         "CGO_ENABLED" to "1",
