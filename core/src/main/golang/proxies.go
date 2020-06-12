@@ -6,7 +6,6 @@ import (
 	"github.com/Dreamacro/clash/constant"
 	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/tunnel"
-	"strings"
 	"unsafe"
 )
 
@@ -120,8 +119,6 @@ func queryProxyGroups() *C.proxy_group_list_t {
 
 		groupIndex++
 	}
-
-	log.Infoln("string_pool = %s", strings.Replace(string(stringPool), "\000", "|", -1))
 
 	result.string_pool = (*C.char)(C.CBytes(stringPool))
 
