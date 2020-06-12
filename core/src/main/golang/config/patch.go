@@ -32,10 +32,14 @@ func init() {
 			GeoIP:  false,
 			IPCIDR: []string{},
 		},
-		Listen:            ":0",
-		EnhancedMode:      dns.FAKEIP,
-		FakeIPRange:       "198.18.0.0/16",
-		FakeIPFilter:      []string{},
+		Listen:       ":0",
+		EnhancedMode: dns.FAKEIP,
+		FakeIPRange:  "198.18.0.0/16",
+		FakeIPFilter: []string{ // default fake-ip filters for stun services
+			".stun.*.*",
+			".stun.*.*.*",
+			".stun.*.*.*.*",
+		},
 		DefaultNameserver: defaultNameServers,
 	}
 }
