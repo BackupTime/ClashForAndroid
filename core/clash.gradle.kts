@@ -4,7 +4,7 @@ import java.util.*
 import java.net.*
 import java.time.*
 
-val gMinSdkVersion: Int by rootProject.extra
+val gMinSdkVersion: String by project
 
 val geoipDatabaseUrl = "https://github.com/Dreamacro/maxmind-geoip/releases/latest/download/Country.mmdb"
 val geoipInvalidate = Duration.ofDays(7)
@@ -41,30 +41,32 @@ fun generateGolangBuildEnvironment(abi: String): Map<String, String> {
             throw GradleScriptException("Unsupported host", FileNotFoundException("Unsupported host"))
     }
 
+    val minSdkVersion = gMinSdkVersion.removePrefix("android-")
+
     val compilerBase = rootProject.file(ndk).resolve("toolchains/llvm/prebuilt/$host-x86_64/bin")
 
     val cCompiler = when(abi) {
         "armeabi-v7a" ->
-            "armv7a-linux-androideabi$gMinSdkVersion-clang"
+            "armv7a-linux-androideabi$minSdkVersion-clang"
         "arm64-v8a" ->
-            "aarch64-linux-android$gMinSdkVersion-clang"
+            "aarch64-linux-android$minSdkVersion-clang"
         "x86" ->
-            "i686-linux-android$gMinSdkVersion-clang"
+            "i686-linux-android$minSdkVersion-clang"
         "x86_64" ->
-            "x86_64-linux-android$gMinSdkVersion-clang"
+            "x86_64-linux-android$minSdkVersion-clang"
         else ->
             throw GradleScriptException("Unsupported abi $abi", FileNotFoundException("Unsupported abi $abi"))
     }
 
     val cppCompiler = when(abi) {
         "armeabi-v7a" ->
-            "armv7a-linux-androideabi$gMinSdkVersion-clang++"
+            "armv7a-linux-androideabi$minSdkVersion-clang++"
         "arm64-v8a" ->
-            "aarch64-linux-android$gMinSdkVersion-clang++"
+            "aarch64-linux-android$minSdkVersion-clang++"
         "x86" ->
-            "i686-linux-android$gMinSdkVersion-clang++"
+            "i686-linux-android$minSdkVersion-clang++"
         "x86_64" ->
-            "x86_64-linux-android$gMinSdkVersion-clang++"
+            "x86_64-linux-android$minSdkVersion-clang++"
         else ->
             throw GradleScriptException("Unsupported abi $abi", FileNotFoundException("Unsupported abi $abi"))
     }
