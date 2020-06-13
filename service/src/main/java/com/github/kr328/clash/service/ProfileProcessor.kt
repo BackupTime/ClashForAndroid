@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.URLUtil
-import com.github.kr328.clash.common.utils.Log
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.service.data.ProfileDao
 import com.github.kr328.clash.service.model.Profile
@@ -17,8 +16,6 @@ import kotlinx.coroutines.future.await
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
-import java.lang.Exception
-import java.lang.NullPointerException
 import java.util.*
 
 object ProfileProcessor {

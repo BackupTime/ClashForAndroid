@@ -8,12 +8,9 @@ import com.github.kr328.clash.service.data.SelectedProxyDao
 import com.github.kr328.clash.service.data.SelectedProxyEntity
 import com.github.kr328.clash.service.transact.IStreamCallback
 import com.github.kr328.clash.service.transact.ParcelableContainer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class ClashManager(parent: CoroutineScope) :
-    IClashManager.Stub(), CoroutineScope by parent {
-
+class ClashManager: IClashManager.Stub() {
     override fun setProxyMode(mode: String?) {
         Clash.setProxyMode(requireNotNull(mode))
     }
@@ -29,8 +26,8 @@ class ClashManager(parent: CoroutineScope) :
     override fun setSelector(proxy: String?, selected: String?) {
         require(proxy != null && selected != null)
 
-        launch {
-            val current = ProfileDao.queryActive() ?: return@launch
+        runBlocking {
+            val current = ProfileDao.queryActive() ?: return@runBlocking
 
             SelectedProxyDao.setSelectedForProfile(SelectedProxyEntity(current.id, proxy, selected))
         }

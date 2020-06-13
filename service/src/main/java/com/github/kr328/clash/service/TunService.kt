@@ -7,11 +7,11 @@ import com.github.kr328.clash.service.clash.module.*
 import com.github.kr328.clash.service.settings.ServiceSettings
 import com.github.kr328.clash.service.util.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-class TunService : VpnService(), CoroutineScope by MainScope() {
+class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.Default) {
     companion object {
         // from https://github.com/shadowsocks/shadowsocks-android/blob/master/core/src/main/java/com/github/shadowsocks/bg/VpnService.kt
         private const val VPN_MTU = 9000
