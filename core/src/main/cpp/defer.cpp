@@ -7,6 +7,8 @@ static std::pair<jobject, uint64_t> completableFutureWithToken(Master::Context *
     jobject completableFuture = context->newGlobalReference(context->newCompletableFuture());
 
     EventQueue::getInstance()->registerHandler(COMPLETE, token, [completableFuture](const event_t *event) {
+        EventQueue::getInstance()->unregisterHandler(COMPLETE, event->token);
+
         Master::runWithAttached<int>([&](JNIEnv *env) -> int {
             Master::runWithContext<void>(env, [&](Master::Context *context) {
                 if ( strlen(event->payload) == 0 ) {
@@ -20,8 +22,6 @@ static std::pair<jobject, uint64_t> completableFutureWithToken(Master::Context *
 
             return 0;
         });
-
-        EventQueue::getInstance()->unregisterHandler(COMPLETE, event->token);
     });
 
     return {completableFuture, token};

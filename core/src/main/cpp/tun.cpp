@@ -29,6 +29,11 @@ Java_com_github_kr328_clash_core_bridge_Bridge_startTunDevice(JNIEnv *env, jclas
         });
 
         EventQueue::getInstance()->registerHandler(TUN_STOP, token, [callbackGlobal](const event_t *e) {
+            auto queue = EventQueue::getInstance();
+
+            queue->unregisterHandler(NEW_SOCKET, e->token);
+            queue->unregisterHandler(TUN_STOP, e->token);
+
             Master::runWithAttached<int>([&](JNIEnv *env) -> int {
                 Master::runWithContext<void>(env, [&](Master::Context *context) {
                     context->tunCallbackStop(callbackGlobal);
@@ -37,11 +42,6 @@ Java_com_github_kr328_clash_core_bridge_Bridge_startTunDevice(JNIEnv *env, jclas
 
                 return 0;
             });
-
-            auto queue = EventQueue::getInstance();
-
-            queue->unregisterHandler(NEW_SOCKET, e->token);
-            queue->unregisterHandler(TUN_STOP, e->token);
         });
 
         char *exception = startTunDevice(fd, mtu, gatewayString, mirrorString, dnsString, token);
