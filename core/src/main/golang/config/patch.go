@@ -36,9 +36,9 @@ func init() {
 		EnhancedMode: dns.FAKEIP,
 		FakeIPRange:  "198.18.0.0/16",
 		FakeIPFilter: []string{ // default fake-ip filters for stun services
-			".stun.*.*",
-			".stun.*.*.*",
-			".stun.*.*.*.*",
+			"+.stun.*.*",
+			"+.stun.*.*.*",
+			"+.stun.*.*.*.*",
 		},
 		DefaultNameserver: defaultNameServers,
 	}

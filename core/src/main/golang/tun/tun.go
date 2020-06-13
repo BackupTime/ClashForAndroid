@@ -55,8 +55,6 @@ func StartTunDevice(fd, mtu int, gateway, mirror, dnsAddress string, onStop func
 	file := os.NewFile(uintptr(fd), "/dev/tun")
 	_ = syscall.SetNonblock(fd, true)
 
-	increaseMaxConnection()
-
 	adapter = tun2socket.NewTun2Socket(file, mtu, gatewayIP, mirrorIP.To4())
 
 	adapter.SetLogger(&ClashLogger{})
@@ -134,24 +132,4 @@ func StopTunDevice() {
 
 		log.Infoln("Android tun stopped")
 	}
-}
-
-func increaseMaxConnection() {
-	var limit syscall.Rlimit
-
-	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &limit); err != nil {
-		return
-	}
-
-	if limit.Max == limit.Cur {
-		return
-	}
-
-	limit.Cur = limit.Max
-
-	if err := syscall.Setrlimit(syscall.RLIMIT_NOFILE, &limit); err != nil {
-		return
-	}
-
-	log.Infoln("Increase max connection to %d", limit.Cur)
 }
