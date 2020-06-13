@@ -11,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
 @Keep
 public final class Bridge {
     static {
-        System.loadLibrary("clash");
         System.loadLibrary("bridge");
     }
 
