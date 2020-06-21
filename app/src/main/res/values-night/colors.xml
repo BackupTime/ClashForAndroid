@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="colorPrimaryClashBlue">#FFFFFF</color>
-    <color name="primaryCardColorStopped">#121212</color>
-    <color name="statusBarColor">#000000</color>
-    <color name="backgroundColor">#000000</color>
-    <color name="toolbarColor">#121212</color>
-    <color name="chipBackgroundColor">#242424</color>
-</resources>

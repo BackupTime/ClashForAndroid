@@ -6,8 +6,7 @@ A Graphical user interface of [clash](https://github.com/Dreamacro/clash) for An
 
 ### Feature
 
-Fully feature of [clash](https://github.com/Dreamacro/clash) ~~(Exclude `external-controller`~~
-
+Fully feature of [Clash Premium](https://github.com/Dreamacro/clash/releases)
 
 
 ### Requirement
@@ -15,9 +14,10 @@ Fully feature of [clash](https://github.com/Dreamacro/clash) ~~(Exclude `externa
 * Android 7.0+
 * `armeabi-v7a` , `arm64-v8a`, `x86` or `x86_64` Architecture
 
-### License
 
-See also [LICENSE](./LICENSE) and [NOTICE](./NOTICE)
+### 3rd Part License
+
+See also [NOTICE](./NOTICE)
 
 
 
@@ -27,37 +27,7 @@ See also [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)
 
 
 
-### Build
+### NOTICE
 
-1. Update submodules
+**Clash for Android** now uses **closed-source** upstream branches. According to the upstream license agreement, Clash for Android also needs to **close source**.
 
-   ```bash
-   git submodule update --init --recursive
-   ```
-
-2. Install `JDK 1.8`, `Android SDK` ,`Android NDK` and `Golang`
-
-3. Create `local.properties` in project root with 
-
-   ```properties
-   sdk.dir=/path/to/android-sdk
-   ndk.dir=/path/to/android-ndk
-   appcenter.key=<AppCenter Key>    # Optional, from "appcenter.ms"
-   ```
-
-4. Create `keystore.properties` in project root with
-
-   ```properties
-   storeFile=/path/to/keystore/file
-   storePassword=<key store password>
-   keyAlias=<key alias>
-   keyPassword=<key password>
-   ``` 
-
-5. Build
-
-   ```bash
-   ./gradlew app:assembleRelease
-   ```
-
-6. Pick `app-release-<arch>.apk` in `app/build/outputs/apks`
